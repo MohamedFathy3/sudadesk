@@ -103,7 +103,7 @@ export default function Sidebar({
           {/* Header */}
           <div className="flex items-center justify-between h-16 px-4 border-b border-gray-200 dark:border-gray-700">
             {!collapsed ? (
-              <h2 className="text-xl font-bold text-gray-800 dark:text-white">ERP System</h2>
+              <h2 className="text-xl font-bold text-gray-800 dark:text-white">System</h2>
             ) : (
               <div className="w-8 h-8 rounded-full bg-green-600 flex items-center justify-center text-white font-bold">
                 E

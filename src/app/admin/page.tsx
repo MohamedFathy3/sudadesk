@@ -6,6 +6,7 @@ import { TrendingUp, School, Calendar, RefreshCw, Users, Building2, ArrowUp, Act
 import { CartesianGrid, Line, LineChart, XAxis, BarChart, Bar, ResponsiveContainer, Dot, Tooltip } from 'recharts';
 import MainLayout from '@/components/MainLayout';
 import { useAuth } from '@/contexts/AuthContext';
+import { useLanguage } from '@/contexts/LanguageContext';
 import { apiFetch } from '@/lib/api';
 
 import {
@@ -45,13 +46,13 @@ const lineChartConfig = {
 
 // Custom Tooltip component
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-const CustomTooltip = ({ active, payload, label }: any) => {
+const CustomTooltip = ({ active, payload, label, language }: any) => {
   if (active && payload && payload.length) {
     return (
-      <div className="bg-white p-3 border border-green-200 rounded-lg shadow-sm">
+      <div className="bg-white p-3 border border-green-200 rounded-lg shadow-sm" dir={language === 'ar' ? 'rtl' : 'ltr'}>
         <p className="text-green-900 font-medium">{label}</p>
         <p className="text-green-600">
-          Schools: <span className="font-semibold">{payload[0].value}</span>
+          {language === 'ar' ? 'المدارس:' : 'Schools:'} <span className="font-semibold">{payload[0].value}</span>
         </p>
       </div>
     );
@@ -61,12 +62,60 @@ const CustomTooltip = ({ active, payload, label }: any) => {
 
 export default function SchoolsMonthlyReport() {
   const { user, loading: authLoading } = useAuth();
+  const { language } = useLanguage();
   const router = useRouter();
   
   const [reportData, setReportData] = useState<ReportData | null>(null);
   const [dataLoading, setDataLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
+
+  // الترجمات
+  const t = {
+    // العناوين الرئيسية
+    pageTitle: language === 'ar' ? 'التقرير الشهري للمدارس' : 'Schools Monthly Report',
+    welcome: language === 'ar' ? 'مرحباً بعودتك' : 'Welcome back',
+    educationalOverview: language === 'ar' ? 'هنا نظرة عامة على التعليم' : "Here's your educational overview",
+    
+    // الأزرار والإجراءات
+    refreshData: language === 'ar' ? 'تحديث البيانات' : 'Refresh Data',
+    tryAgain: language === 'ar' ? 'حاول مرة أخرى' : 'Try Again',
+    updated: language === 'ar' ? 'تم التحديث:' : 'Updated:',
+    
+    // البطاقات الإحصائية
+    totalSchools: language === 'ar' ? 'إجمالي المدارس' : 'Total Schools',
+    growth: language === 'ar' ? 'نمو' : 'growth',
+    allTime: language === 'ar' ? 'كل الوقت' : 'All time',
+    activeMonths: language === 'ar' ? 'الأشهر النشطة' : 'Active Months',
+    activeRate: language === 'ar' ? 'معدل النشاط' : 'active rate',
+    totalMonths: language === 'ar' ? 'إجمالي الأشهر' : 'total months',
+    performance: language === 'ar' ? 'الأداء' : 'Performance',
+    excellent: language === 'ar' ? 'ممتاز' : 'Excellent',
+    stableGrowth: language === 'ar' ? 'نمو مستقر' : 'Stable growth',
+    monitoring: language === 'ar' ? 'مراقبة' : 'Monitoring',
+    
+    // الرسوم البيانية
+    monthlyGrowthTrend: language === 'ar' ? 'اتجاه النمو الشهري' : 'Monthly Growth Trend',
+    visualizingRegistrations: language === 'ar' ? 'تصور تسجيلات المدارس عبر الوقت' : 'Visualizing school registrations over time',
+    distributionOverview: language === 'ar' ? 'نظرة عامة على التوزيع' : 'Distribution Overview',
+    schoolCountComparison: language === 'ar' ? 'مقارنة عدد المدارس عبر الأشهر' : 'School count comparison across months',
+    eachDotRepresents: language === 'ar' ? 'كل نقطة تمثل شهراً بنشاط مدرسي' : 'Each dot represents a month with school activity',
+    barHeightShows: language === 'ar' ? 'ارتفاع العمود يظهر عدد المدارس المسجلة' : 'Bar height shows number of schools registered',
+    
+    // التقارير الشهرية
+    monthlyBreakdown: language === 'ar' ? 'تفصيل شهري - عرض مفصل' : 'Monthly Breakdown - Detailed View',
+    completeTimeline: language === 'ar' ? 'الجدول الزمني الكامل لتسجيلات المدارس' : 'Complete school registration timeline',
+    schoolRegistration: language === 'ar' ? 'تسجيل المدارس' : 'School Registration',
+    monthlyReport: language === 'ar' ? 'تقرير شهري' : 'Monthly report',
+    schools: language === 'ar' ? 'مدارس' : 'schools',
+    school: language === 'ar' ? 'مدرسة' : 'school',
+    
+    // حالات التحميل والخطأ
+    checkingLogin: language === 'ar' ? 'جاري التحقق من حالة الدخول...' : 'Checking your login status...',
+    loadingReport: language === 'ar' ? 'جاري تحميل تقرير المدارس...' : 'Loading Schools Report...',
+    fetchingData: language === 'ar' ? 'جاري جلب أحدث البيانات' : 'Fetching the latest data',
+    errorLoadingData: language === 'ar' ? 'خطأ في تحميل البيانات' : 'Error loading data',
+  };
 
   // Redirect if not authenticated
   useEffect(() => {
@@ -142,9 +191,9 @@ export default function SchoolsMonthlyReport() {
   // Show loading while checking auth or loading data
   if (authLoading || (!user && !authLoading)) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-green-50 to-green-100">
+      <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-green-50 to-green-100" dir={language === 'ar' ? 'rtl' : 'ltr'}>
         <div className="w-16 h-16 border-4 border-green-500 border-t-transparent rounded-full animate-spin mb-4"></div>
-        <p className="text-lg text-green-700 font-medium">Checking your login status...</p>
+        <p className="text-lg text-green-700 font-medium">{t.checkingLogin}</p>
       </div>
     );
   }
@@ -152,13 +201,13 @@ export default function SchoolsMonthlyReport() {
   if (dataLoading) {
     return (
       <MainLayout>
-        <div className="container mx-auto p-6">
+        <div className="container mx-auto p-6" dir={language === 'ar' ? 'rtl' : 'ltr'}>
           <Card className="bg-gradient-to-r from-green-50 to-emerald-50 border-green-200">
             <CardContent className="flex items-center justify-center p-12">
               <div className="text-center">
                 <RefreshCw className="h-12 w-12 animate-spin text-green-500 mx-auto mb-4" />
-                <p className="text-green-700 font-medium text-lg">Loading Schools Report...</p>
-                <p className="text-green-600 text-sm mt-2">Fetching the latest data</p>
+                <p className="text-green-700 font-medium text-lg">{t.loadingReport}</p>
+                <p className="text-green-600 text-sm mt-2">{t.fetchingData}</p>
               </div>
             </CardContent>
           </Card>
@@ -170,20 +219,20 @@ export default function SchoolsMonthlyReport() {
   if (error) {
     return (
       <MainLayout>
-        <div className="container mx-auto p-6">
+        <div className="container mx-auto p-6" dir={language === 'ar' ? 'rtl' : 'ltr'}>
           <Card className="border-red-200 bg-red-50">
             <CardContent className="p-8 text-center">
               <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
                 <Activity className="h-6 w-6 text-red-500" />
               </div>
-              <p className="text-red-700 font-medium text-lg mb-2">Error loading data</p>
+              <p className="text-red-700 font-medium text-lg mb-2">{t.errorLoadingData}</p>
               <p className="text-red-600 mb-4">{error}</p>
               <Button 
                 onClick={() => fetchReportData(true)} 
                 className="bg-green-600 hover:bg-green-700 text-white"
               >
-                <RefreshCw className="h-4 w-4 mr-2" />
-                Try Again
+                <RefreshCw className={`h-4 w-4 ${language === 'ar' ? 'ml-2' : 'mr-2'}`} />
+                {t.tryAgain}
               </Button>
             </CardContent>
           </Card>
@@ -194,39 +243,45 @@ export default function SchoolsMonthlyReport() {
 
   return (
     <MainLayout>
-      <div className="min-h-screen bg-gradient-to-br from-green-50 via-white to-emerald-50">
+      <div className="min-h-screen bg-gradient-to-br from-green-50 via-white to-emerald-50" dir={language === 'ar' ? 'rtl' : 'ltr'}>
         <div className="container mx-auto p-6 space-y-8">
           {/* Page Header */}
           <div className="text-center space-y-4">
-            <div className="inline-flex items-center gap-3 bg-white/80 backdrop-blur-sm rounded-2xl px-6 py-4 border border-green-200 shadow-sm">
+            <div className={`inline-flex items-center gap-3 bg-white/80 backdrop-blur-sm rounded-2xl px-6 py-4 border border-green-200 shadow-sm ${
+              language === 'ar' ? 'flex-row-reverse' : ''
+            }`}>
               <div className="w-12 h-12 bg-gradient-to-r from-green-500 to-emerald-600 rounded-xl flex items-center justify-center">
                 <Building2 className="h-6 w-6 text-white" />
               </div>
-              <div className="text-left">
+              <div className={language === 'ar' ? 'text-right' : 'text-left'}>
                 <h1 className="text-3xl font-bold bg-gradient-to-r from-green-600 to-emerald-700 bg-clip-text text-transparent">
-                  Schools Monthly Report
+                  {t.pageTitle}
                 </h1>
                 <p className="text-green-600 font-medium">
-                  Welcome back, {user?.name}! Heres your educational overview.
+                  {t.welcome}، {user?.name}! {t.educationalOverview}
                 </p>
               </div>
             </div>
             
-            <div className="flex justify-center gap-4">
+            <div className={`flex justify-center gap-4 ${language === 'ar' ? 'flex-row-reverse' : ''}`}>
               <Button 
                 onClick={() => fetchReportData(true)}
                 variant="outline"
-                className="flex items-center gap-2 border-green-200 text-green-700 hover:bg-green-50"
+                className={`flex items-center gap-2 border-green-200 text-green-700 hover:bg-green-50 ${
+                  language === 'ar' ? 'flex-row-reverse' : ''
+                }`}
                 disabled={dataLoading}
               >
                 <RefreshCw className={`h-4 w-4 ${dataLoading ? 'animate-spin' : ''}`} />
-                Refresh Data
+                {t.refreshData}
               </Button>
               
               {lastUpdated && (
-                <div className="flex items-center gap-2 text-sm text-green-600 bg-green-50 px-3 py-2 rounded-lg">
+                <div className={`flex items-center gap-2 text-sm text-green-600 bg-green-50 px-3 py-2 rounded-lg ${
+                  language === 'ar' ? 'flex-row-reverse' : ''
+                }`}>
                   <Calendar className="h-4 w-4" />
-                  Updated: {lastUpdated.toLocaleTimeString()}
+                  {t.updated} {lastUpdated.toLocaleTimeString()}
                 </div>
               )}
             </div>
@@ -235,7 +290,7 @@ export default function SchoolsMonthlyReport() {
           {/* Success Message */}
           {reportData?.message && (
             <div className="bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-2xl p-6 text-center shadow-lg">
-              <div className="flex items-center justify-center gap-3">
+              <div className={`flex items-center justify-center gap-3 ${language === 'ar' ? 'flex-row-reverse' : ''}`}>
                 <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center">
                   <TrendingUp className="h-4 w-4" />
                 </div>
@@ -250,57 +305,63 @@ export default function SchoolsMonthlyReport() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {/* Total Schools Card */}
             <Card className="bg-gradient-to-br from-white to-green-50 border-green-200 shadow-sm hover:shadow-md transition-shadow duration-300">
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
-                <CardTitle className="text-sm font-semibold text-green-700">Total Schools</CardTitle>
+              <CardHeader className={`flex flex-row items-center justify-between space-y-0 pb-4 ${
+                language === 'ar' ? 'flex-row-reverse' : ''
+              }`}>
+                <CardTitle className="text-sm font-semibold text-green-700">{t.totalSchools}</CardTitle>
                 <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
                   <School className="h-5 w-5 text-green-600" />
                 </div>
               </CardHeader>
               <CardContent>
                 <div className="text-3xl font-bold text-green-900 mb-2">{totalSchools}</div>
-                <div className="flex items-center gap-2 text-sm">
-                  <div className="flex items-center gap-1 text-green-600">
+                <div className={`flex items-center gap-2 text-sm ${language === 'ar' ? 'flex-row-reverse' : ''}`}>
+                  <div className={`flex items-center gap-1 text-green-600 ${language === 'ar' ? 'flex-row-reverse' : ''}`}>
                     <ArrowUp className="h-3 w-3" />
-                    <span>0% growth</span>
+                    <span>0% {t.growth}</span>
                   </div>
                   <span className="text-green-400">•</span>
-                  <span className="text-green-500">All time</span>
+                  <span className="text-green-500">{t.allTime}</span>
                 </div>
               </CardContent>
             </Card>
 
             {/* Active Months Card */}
             <Card className="bg-gradient-to-br from-white to-emerald-50 border-emerald-200 shadow-sm hover:shadow-md transition-shadow duration-300">
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
-                <CardTitle className="text-sm font-semibold text-emerald-700">Active Months</CardTitle>
+              <CardHeader className={`flex flex-row items-center justify-between space-y-0 pb-4 ${
+                language === 'ar' ? 'flex-row-reverse' : ''
+              }`}>
+                <CardTitle className="text-sm font-semibold text-emerald-700">{t.activeMonths}</CardTitle>
                 <div className="w-10 h-10 bg-emerald-100 rounded-lg flex items-center justify-center">
                   <Activity className="h-5 w-5 text-emerald-600" />
                 </div>
               </CardHeader>
               <CardContent>
                 <div className="text-3xl font-bold text-emerald-900 mb-2">{activeMonths}</div>
-                <div className="flex items-center gap-2 text-sm">
-                  <span className="text-emerald-600">{Math.round((activeMonths / totalMonths) * 100)}% active rate</span>
+                <div className={`flex items-center gap-2 text-sm ${language === 'ar' ? 'flex-row-reverse' : ''}`}>
+                  <span className="text-emerald-600">{Math.round((activeMonths / totalMonths) * 100)}% {t.activeRate}</span>
                   <span className="text-emerald-400">•</span>
-                  <span className="text-emerald-500">{totalMonths} total months</span>
+                  <span className="text-emerald-500">{totalMonths} {t.totalMonths}</span>
                 </div>
               </CardContent>
             </Card>
 
             {/* Performance Card */}
             <Card className="bg-gradient-to-br from-white to-teal-50 border-teal-200 shadow-sm hover:shadow-md transition-shadow duration-300">
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
-                <CardTitle className="text-sm font-semibold text-teal-700">Performance</CardTitle>
+              <CardHeader className={`flex flex-row items-center justify-between space-y-0 pb-4 ${
+                language === 'ar' ? 'flex-row-reverse' : ''
+              }`}>
+                <CardTitle className="text-sm font-semibold text-teal-700">{t.performance}</CardTitle>
                 <div className="w-10 h-10 bg-teal-100 rounded-lg flex items-center justify-center">
                   <TrendingUp className="h-5 w-5 text-teal-600" />
                 </div>
               </CardHeader>
               <CardContent>
-                <div className="text-3xl font-bold text-teal-900 mb-2">Excellent</div>
-                <div className="flex items-center gap-2 text-sm">
-                  <span className="text-teal-600">Stable growth</span>
+                <div className="text-3xl font-bold text-teal-900 mb-2">{t.excellent}</div>
+                <div className={`flex items-center gap-2 text-sm ${language === 'ar' ? 'flex-row-reverse' : ''}`}>
+                  <span className="text-teal-600">{t.stableGrowth}</span>
                   <span className="text-teal-400">•</span>
-                  <span className="text-teal-500">Monitoring</span>
+                  <span className="text-teal-500">{t.monitoring}</span>
                 </div>
               </CardContent>
             </Card>
@@ -311,12 +372,12 @@ export default function SchoolsMonthlyReport() {
             {/* Line Chart with Dots */}
             <Card className="border-green-200 shadow-sm">
               <CardHeader className="bg-gradient-to-r from-green-50 to-emerald-50 border-b border-green-200">
-                <CardTitle className="text-green-800 flex items-center gap-2">
+                <CardTitle className={`text-green-800 flex items-center gap-2 ${language === 'ar' ? 'flex-row-reverse' : ''}`}>
                   <TrendingUp className="h-5 w-5" />
-                  Monthly Growth Trend
+                  {t.monthlyGrowthTrend}
                 </CardTitle>
                 <CardDescription className="text-green-600">
-                  Visualizing school registrations over time
+                  {t.visualizingRegistrations}
                 </CardDescription>
               </CardHeader>
               <CardContent className="p-6">
@@ -337,7 +398,7 @@ export default function SchoolsMonthlyReport() {
                         tickFormatter={(value: string) => value.split(' ')[0]}
                         stroke="#6b7280"
                       />
-                      <Tooltip content={<CustomTooltip />} />
+                      <Tooltip content={<CustomTooltip language={language} />} />
                       <Line
                         dataKey="schools_count"
                         type="monotone"
@@ -363,9 +424,9 @@ export default function SchoolsMonthlyReport() {
                 </ChartContainer>
               </CardContent>
               <CardFooter className="bg-green-50 border-t border-green-200">
-                <div className="flex items-center gap-3 text-sm text-green-700">
+                <div className={`flex items-center gap-3 text-sm text-green-700 ${language === 'ar' ? 'flex-row-reverse' : ''}`}>
                   <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                  <span>Each dot represents a month with school activity</span>
+                  <span>{t.eachDotRepresents}</span>
                 </div>
               </CardFooter>
             </Card>
@@ -373,12 +434,12 @@ export default function SchoolsMonthlyReport() {
             {/* Bar Chart */}
             <Card className="border-emerald-200 shadow-sm">
               <CardHeader className="bg-gradient-to-r from-emerald-50 to-teal-50 border-b border-emerald-200">
-                <CardTitle className="text-emerald-800 flex items-center gap-2">
+                <CardTitle className={`text-emerald-800 flex items-center gap-2 ${language === 'ar' ? 'flex-row-reverse' : ''}`}>
                   <Building2 className="h-5 w-5" />
-                  Distribution Overview
+                  {t.distributionOverview}
                 </CardTitle>
                 <CardDescription className="text-emerald-600">
-                  School count comparison across months
+                  {t.schoolCountComparison}
                 </CardDescription>
               </CardHeader>
               <CardContent className="p-6">
@@ -390,7 +451,7 @@ export default function SchoolsMonthlyReport() {
                       tickFormatter={(value: string) => value.split(' ')[0]}
                       stroke="#6b7280"
                     />
-                    <Tooltip content={<CustomTooltip />} />
+                    <Tooltip content={<CustomTooltip language={language} />} />
                     <Bar 
                       dataKey="schools_count" 
                       fill="hsl(142, 76%, 36%)" 
@@ -400,15 +461,15 @@ export default function SchoolsMonthlyReport() {
                 </ResponsiveContainer>
               </CardContent>
               <CardFooter className="bg-emerald-50 border-t border-emerald-200">
-                <div className="flex items-center gap-3 text-sm text-emerald-700">
+                <div className={`flex items-center gap-3 text-sm text-emerald-700 ${language === 'ar' ? 'flex-row-reverse' : ''}`}>
                   <div className="w-2 h-2 bg-emerald-500 rounded-full"></div>
-                  <span>Bar height shows number of schools registered</span>
+                  <span>{t.barHeightShows}</span>
                 </div>
               </CardFooter>
             </Card>
           </div>
 
-          {/* Monthly Report Cards Grid - جنب بعض */}
+          {/* Monthly Report Cards Grid */}
           <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
             {reportData?.report?.map((item: ReportItem, index: number) => (
               <Card 
@@ -416,19 +477,19 @@ export default function SchoolsMonthlyReport() {
                 className="border-green-200 shadow-sm hover:shadow-md transition-all duration-300 hover:border-green-300"
               >
                 <CardHeader className="pb-3">
-                  <div className="flex items-center justify-between">
+                  <div className={`flex items-center justify-between ${language === 'ar' ? 'flex-row-reverse' : ''}`}>
                     <CardTitle className="text-lg font-semibold text-green-900">
                       {item.month}
                     </CardTitle>
                     <div className={`w-3 h-3 rounded-full ${item.schools_count > 0 ? 'bg-green-500 animate-pulse' : 'bg-green-200'}`}></div>
                   </div>
                   <CardDescription className="text-green-600">
-                    School Registration
+                    {t.schoolRegistration}
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="pb-3">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
+                  <div className={`flex items-center justify-between ${language === 'ar' ? 'flex-row-reverse' : ''}`}>
+                    <div className={`flex items-center gap-2 ${language === 'ar' ? 'flex-row-reverse' : ''}`}>
                       <School className="h-5 w-5 text-green-500" />
                       <span className="text-2xl font-bold text-green-700">
                         {item.schools_count}
@@ -441,29 +502,29 @@ export default function SchoolsMonthlyReport() {
                         : "bg-green-50 text-green-500 border-green-100"
                       }
                     >
-                      {item.schools_count === 1 ? 'school' : 'schools'}
+                      {item.schools_count} {item.schools_count === 1 ? t.school : t.schools}
                     </Badge>
                   </div>
                 </CardContent>
                 <CardFooter className="pt-3 border-t border-green-100">
-                  <div className="flex items-center gap-2 text-sm text-green-600">
+                  <div className={`flex items-center gap-2 text-sm text-green-600 ${language === 'ar' ? 'flex-row-reverse' : ''}`}>
                     <Calendar className="h-3 w-3" />
-                    <span>Monthly report</span>
+                    <span>{t.monthlyReport}</span>
                   </div>
                 </CardFooter>
               </Card>
             ))}
           </div>
 
-          {/* Alternative Detailed View - إذا كنت تفضل العرض التقليدي */}
+          {/* Alternative Detailed View */}
           <Card className="border-green-200 shadow-sm">
             <CardHeader className="bg-gradient-to-r from-green-50 to-emerald-50 border-b border-green-200">
-              <CardTitle className="text-green-800 flex items-center gap-2">
+              <CardTitle className={`text-green-800 flex items-center gap-2 ${language === 'ar' ? 'flex-row-reverse' : ''}`}>
                 <Calendar className="h-5 w-5" />
-                Monthly Breakdown - Detailed View
+                {t.monthlyBreakdown}
               </CardTitle>
               <CardDescription className="text-green-600">
-                Complete school registration timeline
+                {t.completeTimeline}
               </CardDescription>
             </CardHeader>
             <CardContent className="p-6">
@@ -471,11 +532,13 @@ export default function SchoolsMonthlyReport() {
                 {reportData?.report?.map((item: ReportItem, index: number) => (
                   <div 
                     key={index} 
-                    className="flex items-center justify-between p-4 bg-white rounded-xl border border-green-100 hover:border-green-300 transition-colors duration-200"
+                    className={`flex items-center justify-between p-4 bg-white rounded-xl border border-green-100 hover:border-green-300 transition-colors duration-200 ${
+                      language === 'ar' ? 'flex-row-reverse' : ''
+                    }`}
                   >
-                    <div className="flex items-center gap-4">
+                    <div className={`flex items-center gap-4 ${language === 'ar' ? 'flex-row-reverse' : ''}`}>
                       <div className={`w-3 h-3 rounded-full ${item.schools_count > 0 ? 'bg-green-500' : 'bg-green-200'}`}></div>
-                      <div className="flex items-center gap-3">
+                      <div className={`flex items-center gap-3 ${language === 'ar' ? 'flex-row-reverse' : ''}`}>
                         <Calendar className="h-4 w-4 text-green-500" />
                         <span className="font-semibold text-green-900">{item.month}</span>
                       </div>
@@ -487,7 +550,7 @@ export default function SchoolsMonthlyReport() {
                         : "bg-green-50 text-green-500 border-green-100"
                       }
                     >
-                      {item.schools_count} {item.schools_count === 1 ? 'school' : 'schools'}
+                      {item.schools_count} {item.schools_count === 1 ? t.school : t.schools}
                     </Badge>
                   </div>
                 ))}

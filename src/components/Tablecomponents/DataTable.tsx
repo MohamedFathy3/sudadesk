@@ -23,6 +23,7 @@ export interface BaseEntity {
   [key: string]: any;
 }
 
+// تعريف ColumnDefinition قبل استخدامه
 export interface ColumnDefinition<T = BaseEntity> {
   key: string;
   label: string;
@@ -178,7 +179,7 @@ export function DataTable<T extends BaseEntity>({
   language = 'en'
 }: ExtendedDataTableProps<T>) {
   
-  // الترجمات الافتراضية - تم التصحيح هنا
+  // الترجمات الافتراضية
   const t = translations || {
     actions: language === 'ar' ? 'الإجراءات' : 'Actions',
     status: language === 'ar' ? 'الحالة' : 'Status',
@@ -208,7 +209,7 @@ export function DataTable<T extends BaseEntity>({
 
   // تحديد إذا كان هناك أي عمود صورة
   const imageFieldKeys = ['image', 'avatar', 'photo', 'picture', 'profile_image', 'logo'];
-  const hasImageColumn = columns.some((col: ColumnDefinition<T>) => imageFieldKeys.includes(col.key));
+  const hasImageColumn = columns.some((col) => imageFieldKeys.includes(col.key));
   
   // الحقول التي تظهر في العرض المدمج (فقط هذه)
   const compactDisplayFields = ['name', 'company', 'email', 'phone'];
@@ -299,7 +300,7 @@ export function DataTable<T extends BaseEntity>({
   const getTableColumns = () => {
     if (!compactView) return columns;
     
-    return columns.filter((col: ColumnDefinition<T>) => 
+    return columns.filter((col) => 
       ![...imageFieldKeys, ...compactDisplayFields].includes(col.key)
     );
   };
@@ -332,6 +333,32 @@ export function DataTable<T extends BaseEntity>({
     return colSpan;
   };
 
+  // دالة لترجمة اتجاه الترتيب
+  const getOrderDirectionText = (direction: 'asc' | 'desc') => {
+    if (language === 'ar') {
+      return direction === 'asc' ? 'تصاعدي' : 'تنازلي';
+    }
+    return direction;
+  };
+
+  // دالة لعكس ترتيب الأعمدة في العربية
+  const getDisplayColumns = () => {
+    if (language === 'ar') {
+      // عكس ترتيب الأعمدة في العربية
+      return [...columns].reverse();
+    }
+    return columns;
+  };
+
+  // دالة لعكس ترتيب الأعمدة في العرض المدمج
+  const getDisplayTableColumns = () => {
+    const tableColumns = getTableColumns();
+    if (language === 'ar') {
+      return [...tableColumns].reverse();
+    }
+    return tableColumns;
+  };
+
   return (
     <div className="w-full" dir={language === 'ar' ? 'rtl' : 'ltr'}>
       {/* Container للجدول بدون ارتفاع ثابت */}
@@ -342,31 +369,35 @@ export function DataTable<T extends BaseEntity>({
           showingDeleted
           ? "bg-red-100 dark:bg-red-800 text-red-400 dark:text-red-100 border-b border-red-200 dark:border-red-700"
           : "bg-gradient-to-r from-green-200 to-green-300 dark:from-green-900/30 dark:to-green-800/30 text-black dark:text-green-200 border-b border-green-100 dark:border-green-900/50"
-        } font-semibold text-lg px-6 py-4`}>
+        } font-semibold text-lg px-6 py-4 text-center`}>
           {t.management} {title} {showingDeleted && t.deletedItems}
         </div>
 
         {/* Table Info Bar */}
         <div className={`p-4 flex items-center justify-between ${
           showingDeleted ? "bg-red-50 dark:bg-red-900/20" : "bg-white dark:bg-gray-800"
-        }`}>
-          <div className="flex items-center gap-4">
+        } ${language === 'ar' ? 'flex-row-reverse' : ''}`}>
+          <div className={`flex items-center gap-4 ${language === 'ar' ? 'flex-row-reverse' : ''}`}>
             <span className={`text-sm ${
               showingDeleted ? "text-red-600 dark:text-red-300" : "text-gray-600 dark:text-gray-400"
             }`}>
               {t.showing} {data.length} {t.of} {pagination.total} {t.items}
               {showingDeleted && (
-                <span className="text-red-500 ml-1">({language === 'ar' ? 'محذوف' : 'Deleted'})</span>
+                <span className={language === 'ar' ? "mr-1 text-red-500" : "ml-1 text-red-500"}>
+                  ({language === 'ar' ? 'محذوف' : 'Deleted'})
+                </span>
               )}
             </span>
             
             {/* Dropdown لتحديد عدد العناصر المعروضة */}
-            <div className="flex items-center gap-2">
+            <div className={`flex items-center gap-2 ${language === 'ar' ? 'flex-row-reverse' : ''}`}>
               <span className="text-sm text-gray-600 dark:text-gray-400">{t.show}:</span>
               <select 
                 value={perPage}
                 onChange={(e) => onPerPageChange?.(Number(e.target.value))}
-                className="text-sm border border-gray-300 dark:border-gray-600 rounded-lg px-2 py-1 bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                className={`text-sm border border-gray-300 dark:border-gray-600 rounded-lg px-2 py-1 bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 ${
+                  language === 'ar' ? 'text-right' : 'text-left'
+                }`}
               >
                 <option value="10">10</option>
                 <option value="20">20</option>
@@ -378,7 +409,7 @@ export function DataTable<T extends BaseEntity>({
             </div>
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className={`flex items-center gap-2 ${language === 'ar' ? 'flex-row-reverse' : ''}`}>
             <span className={`text-sm ${
               showingDeleted ? "text-red-600 dark:text-red-300" : "text-gray-600 dark:text-gray-400"
             }`}>
@@ -387,7 +418,7 @@ export function DataTable<T extends BaseEntity>({
             <span className={`text-sm font-medium ${
               showingDeleted ? "text-red-700 dark:text-red-400" : "text-indigo-600 dark:text-indigo-400"
             }`}>
-              {orderBy} ({orderByDirection})
+              {orderBy} ({getOrderDirectionText(orderByDirection)})
             </span>
           </div>
         </div>
@@ -399,58 +430,121 @@ export function DataTable<T extends BaseEntity>({
             ? "divide-red-300 dark:divide-red-700"
             : "divide-gray-200 dark:divide-gray-700"
           }`}>
-            <thead className="bg-gray-50 text-center dark:bg-gray-700">
+            <thead className="bg-gray-50 dark:bg-gray-700">
               <tr>
-                <th className="px-4 py-3 text-center w-12">
-                  <Checkbox
-                    checked={allSelected}
-                    indeterminate={someSelected && !allSelected}
-                    onChange={onToggleSelectAll}
-                    className="h-4 w-4"
-                  />
-                </th>
-                {compactView && hasImageColumn ? (
+                {/* في العربية: نعكس ترتيب الأعمدة - الإجراءات أولاً ثم البيانات */}
+                {language === 'ar' ? (
                   <>
-                    {/* Compact Data Column */}
-                    <th className="px-4 py-3 text-center text-gray-700 dark:text-gray-300 font-medium uppercase tracking-wider min-w-[300px]">
-                      {t.basicInfo}
-                    </th>
-                    {/* Regular Columns */}
-                    {getTableColumns().map((column: ColumnDefinition<T>) => (
-                      <th key={column.key} className="px-4 py-3 text-center text-gray-700 dark:text-gray-300 font-medium uppercase tracking-wider min-w-[120px]">
-                        <div 
-                          className="flex items-center justify-center gap-1 cursor-pointer hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors duration-200"
-                          onClick={() => onSort(column)}
-                        >
-                          {column.label}
-                          {column.sortable !== false && <ArrowUpDown className="w-4 h-4" />}
-                        </div>
+                    {/* عمود الإجراءات أولاً في العربية */}
+                    {(showEditButton || showDeleteButton || showActiveToggle) && (
+                      <th className="px-4 py-3 text-gray-700 dark:text-gray-300 font-medium uppercase tracking-wider min-w-[180px] text-center">
+                        {t.actions}
                       </th>
-                    ))}
+                    )}
+
+                    {/* ثم باقي الأعمدة */}
+                    {compactView && hasImageColumn ? (
+                      <>
+                        {/* الأعمدة العادية */}
+                        {getDisplayTableColumns().map((column) => (
+                          <th key={column.key} className="px-4 py-3 text-gray-700 dark:text-gray-300 font-medium uppercase tracking-wider min-w-[120px] text-center">
+                            <div 
+                              className="flex items-center justify-center gap-1 cursor-pointer hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors duration-200"
+                              onClick={() => onSort(column)}
+                            >
+                              {column.label}
+                              {column.sortable !== false && <ArrowUpDown className="w-4 h-4" />}
+                            </div>
+                          </th>
+                        ))}
+                        {/* عمود البيانات المدمجة */}
+                        <th className="px-4 py-3 text-gray-700 dark:text-gray-300 font-medium uppercase tracking-wider min-w-[300px] text-center">
+                          {t.basicInfo}
+                        </th>
+                      </>
+                    ) : (
+                      // Normal View - عكس الأعمدة
+                      getDisplayColumns().map((column) => (
+                        <th key={column.key} className="px-4 py-3 text-gray-700 dark:text-gray-300 font-medium uppercase tracking-wider min-w-[120px] text-center">
+                          <div 
+                            className="flex items-center justify-center gap-1 cursor-pointer hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors duration-200"
+                            onClick={() => onSort(column)}
+                          >
+                            {column.label}
+                            {column.sortable !== false && <ArrowUpDown className="w-4 h-4" />}
+                          </div>
+                        </th>
+                      ))
+                    )}
+
+                    {/* عمود التحديد - يبقى في النهاية في العربية */}
+                    <th className="px-4 py-3 text-center w-12">
+                      <Checkbox
+                        checked={allSelected}
+                        indeterminate={someSelected && !allSelected}
+                        onChange={onToggleSelectAll}
+                        className="h-4 w-4"
+                      />
+                    </th>
                   </>
                 ) : (
-                  // Normal View
-                  columns.map((column: ColumnDefinition<T>) => (
-                    <th key={column.key} className="px-4 py-3 text-center text-gray-700 dark:text-gray-300 font-medium uppercase tracking-wider min-w-[120px]">
-                      <div 
-                        className="flex items-center justify-center gap-1 cursor-pointer hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors duration-200"
-                        onClick={() => onSort(column)}
-                      >
-                        {column.label}
-                        {column.sortable !== false && <ArrowUpDown className="w-4 h-4" />}
-                      </div>
+                  // الإنجليزية: الترتيب الطبيعي
+                  <>
+                    {/* عمود التحديد أولاً في الإنجليزية */}
+                    <th className="px-4 py-3 text-center w-12">
+                      <Checkbox
+                        checked={allSelected}
+                        indeterminate={someSelected && !allSelected}
+                        onChange={onToggleSelectAll}
+                        className="h-4 w-4"
+                      />
                     </th>
-                  ))
-                )}
-                {/* إخفاء عمود الإجراءات إذا لم يكن هناك أي أزرار مسموح بها */}
-                {(showEditButton || showDeleteButton || showActiveToggle) && (
-                  <th className="px-4 py-3 text-center text-gray-700 dark:text-gray-300 font-medium uppercase tracking-wider min-w-[180px]">
-                    {t.actions}
-                  </th>
+
+                    {compactView && hasImageColumn ? (
+                      <>
+                        {/* Compact Data Column */}
+                        <th className="px-4 py-3 text-center text-gray-700 dark:text-gray-300 font-medium uppercase tracking-wider min-w-[300px]">
+                          {t.basicInfo}
+                        </th>
+                        {/* Regular Columns */}
+                        {getTableColumns().map((column) => (
+                          <th key={column.key} className="px-4 py-3 text-center text-gray-700 dark:text-gray-300 font-medium uppercase tracking-wider min-w-[120px]">
+                            <div 
+                              className="flex items-center justify-center gap-1 cursor-pointer hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors duration-200"
+                              onClick={() => onSort(column)}
+                            >
+                              {column.label}
+                              {column.sortable !== false && <ArrowUpDown className="w-4 h-4" />}
+                            </div>
+                          </th>
+                        ))}
+                      </>
+                    ) : (
+                      // Normal View
+                      columns.map((column) => (
+                        <th key={column.key} className="px-4 py-3 text-center text-gray-700 dark:text-gray-300 font-medium uppercase tracking-wider min-w-[120px]">
+                          <div 
+                            className="flex items-center justify-center gap-1 cursor-pointer hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors duration-200"
+                            onClick={() => onSort(column)}
+                          >
+                            {column.label}
+                            {column.sortable !== false && <ArrowUpDown className="w-4 h-4" />}
+                          </div>
+                        </th>
+                      ))
+                    )}
+
+                    {/* عمود الإجراءات في النهاية في الإنجليزية */}
+                    {(showEditButton || showDeleteButton || showActiveToggle) && (
+                      <th className="px-4 py-3 text-center text-gray-700 dark:text-gray-300 font-medium uppercase tracking-wider min-w-[180px]">
+                        {t.actions}
+                      </th>
+                    )}
+                  </>
                 )}
               </tr>
             </thead>
-            <tbody className="bg-white text-center dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+            <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
               {data.length ? (
                 data.map((item: T) => {
                   const itemImage = getItemImage(item);
@@ -464,160 +558,326 @@ export function DataTable<T extends BaseEntity>({
                       className="hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-200 cursor-pointer"
                       onDoubleClick={() => showEditButton && handleDoubleClick(item)}
                     >
-                      <td className="px-4 py-3">
-                        <Checkbox
-                          checked={selectedItems.has(item.id)}
-                          onChange={() => onToggleSelectItem(item.id)}
-                          className="h-4 w-4"
-                        />
-                      </td>
-                      
-                      {shouldUseCompactView ? (
+                      {/* في العربية: نعكس ترتيب الخلايا */}
+                      {language === 'ar' ? (
                         <>
-                          {/* Compact Cell */}
-                          <td className="px-4 py-3">
-                            <div className="flex items-start gap-3">
-                              {/* Image */}
-                              <div className="flex-shrink-0">
-                                {itemImage ? (
-                                  <img 
-                                    src={itemImage}
-                                    alt={itemName}
-                                    className="w-12 h-12 rounded-lg object-cover border border-gray-200 dark:border-gray-600 shadow-sm"
-                                  />
+                          {/* خلية الإجراءات أولاً في العربية */}
+                          {(showEditButton || showDeleteButton || showActiveToggle) && (
+                            <td className="px-4 py-3">
+                              <div className="flex justify-center items-center gap-2">
+                                {showingDeleted ? (
+                                  <div className="flex gap-2 flex-row-reverse">
+                                    <Button
+                                      variant="outline"
+                                      size="sm"
+                                      onClick={() => onRestore?.(item.id, itemName)}
+                                      className="bg-green-50 hover:bg-green-100 text-green-700 border-green-200 text-xs flex-row-reverse"
+                                    >
+                                      <i className="fas fa-rotate-left mr-1"></i>
+                                      {t.restore}
+                                    </Button>
+                                    {showDeleteButton && (
+                                      <Button
+                                        variant="destructive"
+                                        size="sm"
+                                        onClick={() => onForceDelete?.(item.id, itemName)}
+                                        className="bg-red-50 hover:bg-red-100 text-red-700 border-red-200 text-xs flex-row-reverse"
+                                      >
+                                        <i className="fas fa-trash mr-1"></i>
+                                        {t.forceDelete}
+                                      </Button>
+                                    )}
+                                  </div>
                                 ) : (
-                                  <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center border border-gray-200 dark:border-gray-600 shadow-sm">
-                                    <span className="text-white font-bold text-lg">
-                                      {getInitial(item)}
-                                    </span>
+                                  <div className="flex items-center gap-2 flex-row-reverse">
+                                    {item.hasOwnProperty('active') && showActiveToggle && (
+                                      <div className="flex items-center gap-1 flex-row-reverse">
+                                        <Switch
+                                          checked={!!item.active}
+                                          onChange={() => onToggleActive?.(item.id, itemName, !!item.active)}
+                                        />
+                                        <span className={`text-xs font-medium ${item.active ? 'text-green-600' : 'text-red-600'}`}>
+                                          {item.active ? t.active : t.inactive}
+                                        </span>
+                                      </div>
+                                    )}
+                                    
+                                    {showEditButton && (
+                                      <Button
+                                        variant="outline"
+                                        size="sm"
+                                        onClick={() => onEdit(item)}
+                                        className="bg-blue-50 hover:bg-blue-100 text-blue-700 border-blue-200 text-xs flex-row-reverse"
+                                      >
+                                        <i className="fas fa-edit mr-1"></i>
+                                        {t.edit}
+                                      </Button>
+                                    )}
+                                    
+                                    {showDeleteButton && (
+                                      <Button
+                                        variant="destructive"
+                                        size="sm"
+                                        onClick={() => onDelete(item.id, itemName)}
+                                        disabled={deleteLoading}
+                                        className="bg-red-50 hover:bg-red-100 text-red-700 border-red-200 text-xs flex-row-reverse"
+                                      >
+                                        {deleteLoading ? (
+                                          <>
+                                            <i className="fas fa-spinner fa-spin mr-1"></i>
+                                            {t.loading}
+                                          </>
+                                        ) : (
+                                          <>
+                                            <i className="fas fa-trash mr-1"></i>
+                                            {t.delete}
+                                          </>
+                                        )}
+                                      </Button>
+                                    )}
                                   </div>
                                 )}
                               </div>
-                              
-                              {/* Basic Data */}
-                              <div className="flex-1 text-left min-w-0">
-                                <div className="space-y-1">
-                                  {compactData.map((data, index) => (
-                                    <div key={index}>
-                                      {data.isTitle ? (
-                                        <div className="font-bold text-gray-900 dark:text-gray-100 text-base">
-                                          {data.value}
-                                        </div>
-                                      ) : (
-                                        <div className="flex items-center gap-2 text-xs text-gray-600 dark:text-gray-400">
-                                          <IconComponent icon={data.icon || 'default-icon'} />
-                                          <span className="truncate">{data.value}</span>
-                                        </div>
-                                      )}
-                                    </div>
-                                  ))}
-                                </div>
-                              </div>
-                            </div>
-                          </td>
-                          
-                          {/* Other Columns */}
-                          {getTableColumns().map((column: ColumnDefinition<T>) => (
-                            <td 
-                              key={column.key} 
-                              className="px-4 py-3 text-gray-700 dark:text-gray-300 text-sm"
-                              onDoubleClick={() => showEditButton && handleDoubleClick(item)}
-                            >
-                              {column.render ? column.render(item) : getNestedValue(item, column.key)}
                             </td>
-                          ))}
+                          )}
+
+                          {/* باقي الخلايا */}
+                          {shouldUseCompactView ? (
+                            <>
+                              {/* Other Columns */}
+                              {getDisplayTableColumns().map((column) => (
+                                <td 
+                                  key={column.key} 
+                                  className="px-4 py-3 text-gray-700 dark:text-gray-300 text-sm text-center"
+                                  onDoubleClick={() => showEditButton && handleDoubleClick(item)}
+                                >
+                                  {column.render ? column.render(item) : getNestedValue(item, column.key)}
+                                </td>
+                              ))}
+                              
+                              {/* Compact Cell */}
+                              <td className="px-4 py-3">
+                                <div className="flex items-start gap-3 flex-row-reverse">
+                                  {/* Basic Data */}
+                                  <div className="flex-1 min-w-0 text-right">
+                                    <div className="space-y-1">
+                                      {compactData.map((data, index) => (
+                                        <div key={index}>
+                                          {data.isTitle ? (
+                                            <div className="font-bold text-gray-900 dark:text-gray-100 text-base">
+                                              {data.value}
+                                            </div>
+                                          ) : (
+                                            <div className="flex items-center gap-2 text-xs text-gray-600 dark:text-gray-400 flex-row-reverse">
+                                              <IconComponent icon={data.icon || 'default-icon'} />
+                                              <span className="truncate">{data.value}</span>
+                                            </div>
+                                          )}
+                                        </div>
+                                      ))}
+                                    </div>
+                                  </div>
+                                  
+                                  {/* Image */}
+                                  <div className="flex-shrink-0">
+                                    {itemImage ? (
+                                      <img 
+                                        src={itemImage}
+                                        alt={itemName}
+                                        className="w-12 h-12 rounded-lg object-cover border border-gray-200 dark:border-gray-600 shadow-sm"
+                                      />
+                                    ) : (
+                                      <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center border border-gray-200 dark:border-gray-600 shadow-sm">
+                                        <span className="text-white font-bold text-lg">
+                                          {getInitial(item)}
+                                        </span>
+                                      </div>
+                                    )}
+                                  </div>
+                                </div>
+                              </td>
+                            </>
+                          ) : (
+                            // Normal View - عكس الخلايا
+                            getDisplayColumns().map((column) => (
+                              <td 
+                                key={column.key} 
+                                className="px-4 py-3 text-gray-700 dark:text-gray-300 text-sm text-center"
+                                onDoubleClick={() => showEditButton && handleDoubleClick(item)}
+                              >
+                                {column.render ? column.render(item) : getNestedValue(item, column.key)}
+                              </td>
+                            ))
+                          )}
+
+                          {/* خلية التحديد في النهاية في العربية */}
+                          <td className="px-4 py-3">
+                            <Checkbox
+                              checked={selectedItems.has(item.id)}
+                              onChange={() => onToggleSelectItem(item.id)}
+                              className="h-4 w-4"
+                            />
+                          </td>
                         </>
                       ) : (
-                        // Normal View
-                        columns.map((column: ColumnDefinition<T>) => (
-                          <td 
-                            key={column.key} 
-                            className="px-4 py-3 text-gray-700 dark:text-gray-300 text-sm"
-                            onDoubleClick={() => showEditButton && handleDoubleClick(item)}
-                          >
-                            {column.render ? column.render(item) : getNestedValue(item, column.key)}
+                        // الإنجليزية: الترتيب الطبيعي
+                        <>
+                          <td className="px-4 py-3">
+                            <Checkbox
+                              checked={selectedItems.has(item.id)}
+                              onChange={() => onToggleSelectItem(item.id)}
+                              className="h-4 w-4"
+                            />
                           </td>
-                        ))
-                      )}
-                      
-                      {/* Actions Cell */}
-                      {(showEditButton || showDeleteButton || showActiveToggle) && (
-                        <td className="px-4 py-3">
-                          <div className="flex justify-center items-center gap-2">
-                            {showingDeleted ? (
-                              <div className="flex gap-2">
-                                <Button
-                                  variant="outline"
-                                  size="sm"
-                                  onClick={() => onRestore?.(item.id, itemName)}
-                                  className="bg-green-50 hover:bg-green-100 text-green-700 border-green-200 text-xs"
+                          
+                          {shouldUseCompactView ? (
+                            <>
+                              {/* Compact Cell */}
+                              <td className="px-4 py-3">
+                                <div className="flex items-start gap-3">
+                                  {/* Image */}
+                                  <div className="flex-shrink-0">
+                                    {itemImage ? (
+                                      <img 
+                                        src={itemImage}
+                                        alt={itemName}
+                                        className="w-12 h-12 rounded-lg object-cover border border-gray-200 dark:border-gray-600 shadow-sm"
+                                      />
+                                    ) : (
+                                      <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center border border-gray-200 dark:border-gray-600 shadow-sm">
+                                        <span className="text-white font-bold text-lg">
+                                          {getInitial(item)}
+                                        </span>
+                                      </div>
+                                    )}
+                                  </div>
+                                  
+                                  {/* Basic Data */}
+                                  <div className="flex-1 min-w-0 text-left">
+                                    <div className="space-y-1">
+                                      {compactData.map((data, index) => (
+                                        <div key={index}>
+                                          {data.isTitle ? (
+                                            <div className="font-bold text-gray-900 dark:text-gray-100 text-base">
+                                              {data.value}
+                                            </div>
+                                          ) : (
+                                            <div className="flex items-center gap-2 text-xs text-gray-600 dark:text-gray-400">
+                                              <IconComponent icon={data.icon || 'default-icon'} />
+                                              <span className="truncate">{data.value}</span>
+                                            </div>
+                                          )}
+                                        </div>
+                                      ))}
+                                    </div>
+                                  </div>
+                                </div>
+                              </td>
+                              
+                              {/* Other Columns */}
+                              {getTableColumns().map((column) => (
+                                <td 
+                                  key={column.key} 
+                                  className="px-4 py-3 text-gray-700 dark:text-gray-300 text-sm text-center"
+                                  onDoubleClick={() => showEditButton && handleDoubleClick(item)}
                                 >
-                                  <i className="fas fa-rotate-left mr-1"></i>
-                                  {t.restore}
-                                </Button>
-                                {showDeleteButton && (
-                                  <Button
-                                    variant="destructive"
-                                    size="sm"
-                                    onClick={() => onForceDelete?.(item.id, itemName)}
-                                    className="bg-red-50 hover:bg-red-100 text-red-700 border-red-200 text-xs"
-                                  >
-                                    <i className="fas fa-trash mr-1"></i>
-                                    {t.forceDelete}
-                                  </Button>
-                                )}
-                              </div>
-                            ) : (
-                              <div className="flex items-center gap-2">
-                                {item.hasOwnProperty('active') && showActiveToggle && (
-                                  <div className="flex items-center gap-1">
-                                    <Switch
-                                      checked={!!item.active}
-                                      onChange={() => onToggleActive?.(item.id, itemName, !!item.active)}
-                                    />
-                                    <span className={`text-xs font-medium ${item.active ? 'text-green-600' : 'text-red-600'}`}>
-                                      {item.active ? t.active : t.inactive}
-                                    </span>
+                                  {column.render ? column.render(item) : getNestedValue(item, column.key)}
+                                </td>
+                              ))}
+                            </>
+                          ) : (
+                            // Normal View
+                            columns.map((column) => (
+                              <td 
+                                key={column.key} 
+                                className="px-4 py-3 text-gray-700 dark:text-gray-300 text-sm text-center"
+                                onDoubleClick={() => showEditButton && handleDoubleClick(item)}
+                              >
+                                {column.render ? column.render(item) : getNestedValue(item, column.key)}
+                              </td>
+                            ))
+                          )}
+                          
+                          {/* Actions Cell */}
+                          {(showEditButton || showDeleteButton || showActiveToggle) && (
+                            <td className="px-4 py-3">
+                              <div className="flex justify-center items-center gap-2">
+                                {showingDeleted ? (
+                                  <div className="flex gap-2">
+                                    <Button
+                                      variant="outline"
+                                      size="sm"
+                                      onClick={() => onRestore?.(item.id, itemName)}
+                                      className="bg-green-50 hover:bg-green-100 text-green-700 border-green-200 text-xs"
+                                    >
+                                      <i className="fas fa-rotate-left mr-1"></i>
+                                      {t.restore}
+                                    </Button>
+                                    {showDeleteButton && (
+                                      <Button
+                                        variant="destructive"
+                                        size="sm"
+                                        onClick={() => onForceDelete?.(item.id, itemName)}
+                                        className="bg-red-50 hover:bg-red-100 text-red-700 border-red-200 text-xs"
+                                      >
+                                        <i className="fas fa-trash mr-1"></i>
+                                        {t.forceDelete}
+                                      </Button>
+                                    )}
+                                  </div>
+                                ) : (
+                                  <div className="flex items-center gap-2">
+                                    {item.hasOwnProperty('active') && showActiveToggle && (
+                                      <div className="flex items-center gap-1">
+                                        <Switch
+                                          checked={!!item.active}
+                                          onChange={() => onToggleActive?.(item.id, itemName, !!item.active)}
+                                        />
+                                        <span className={`text-xs font-medium ${item.active ? 'text-green-600' : 'text-red-600'}`}>
+                                          {item.active ? t.active : t.inactive}
+                                        </span>
+                                      </div>
+                                    )}
+                                    
+                                    {showEditButton && (
+                                      <Button
+                                        variant="outline"
+                                        size="sm"
+                                        onClick={() => onEdit(item)}
+                                        className="bg-blue-50 hover:bg-blue-100 text-blue-700 border-blue-200 text-xs"
+                                      >
+                                        <i className="fas fa-edit mr-1"></i>
+                                        {t.edit}
+                                      </Button>
+                                    )}
+                                    
+                                    {showDeleteButton && (
+                                      <Button
+                                        variant="destructive"
+                                        size="sm"
+                                        onClick={() => onDelete(item.id, itemName)}
+                                        disabled={deleteLoading}
+                                        className="bg-red-50 hover:bg-red-100 text-red-700 border-red-200 text-xs"
+                                      >
+                                        {deleteLoading ? (
+                                          <>
+                                            <i className="fas fa-spinner fa-spin mr-1"></i>
+                                            {t.loading}
+                                          </>
+                                        ) : (
+                                          <>
+                                            <i className="fas fa-trash mr-1"></i>
+                                            {t.delete}
+                                          </>
+                                        )}
+                                      </Button>
+                                    )}
                                   </div>
                                 )}
-                                
-                                {showEditButton && (
-                                  <Button
-                                    variant="outline"
-                                    size="sm"
-                                    onClick={() => onEdit(item)}
-                                    className="bg-blue-50 hover:bg-blue-100 text-blue-700 border-blue-200 text-xs"
-                                  >
-                                    <i className="fas fa-edit mr-1"></i>
-                                    {t.edit}
-                                  </Button>
-                                )}
-                                
-                                {showDeleteButton && (
-                                  <Button
-                                    variant="destructive"
-                                    size="sm"
-                                    onClick={() => onDelete(item.id, itemName)}
-                                    disabled={deleteLoading}
-                                    className="bg-red-50 hover:bg-red-100 text-red-700 border-red-200 text-xs"
-                                  >
-                                    {deleteLoading ? (
-                                      <>
-                                        <i className="fas fa-spinner fa-spin mr-1"></i>
-                                        {t.loading}
-                                      </>
-                                    ) : (
-                                      <>
-                                        <i className="fas fa-trash mr-1"></i>
-                                        {t.delete}
-                                      </>
-                                    )}
-                                  </Button>
-                                )}
                               </div>
-                            )}
-                          </div>
-                        </td>
+                            </td>
+                          )}
+                        </>
                       )}
                     </tr>
                   );

@@ -45,18 +45,17 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             }}
           />
         )} 
-        <QueryClientProvider client={queryClient}>
+        <LanguageProvider>  <QueryClientProvider client={queryClient}>
           <AuthProvider>
             <ThemeProvider attribute="class" defaultTheme="light" enableSystem>
               <ErrorBoundary>
-                  <LanguageProvider>{children}</LanguageProvider>
-                
+                {children}
               </ErrorBoundary>
               <Toaster position="top-right" reverseOrder={false} />
             </ThemeProvider>
           </AuthProvider>
           <ReactQueryDevtools initialIsOpen={false} />
-        </QueryClientProvider>
+        </QueryClientProvider></LanguageProvider>
       
         
       

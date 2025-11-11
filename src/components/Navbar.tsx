@@ -71,7 +71,7 @@ export default function Navbar({
           </div>
 
           {/* الجزء الأيمن */}
-          <div className="flex items-center space-x-3">
+          <div className={`flex items-center ${language === 'ar' ? 'space-x-reverse space-x-3' : 'space-x-3'}`}>
             {/* اختيار اللغة */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
@@ -79,7 +79,7 @@ export default function Navbar({
                   <Globe className="h-5 w-5 text-blue-500" />
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-32">
+              <DropdownMenuContent align={language === 'ar' ? 'start' : 'end'} className="w-32">
                 <DropdownMenuItem onClick={() => setLanguage('en')}>
                   🇺🇸 English
                 </DropdownMenuItem>
@@ -100,54 +100,12 @@ export default function Navbar({
               <FileText className="h-5 w-5" />
             </Button>
 
-            {/* المفضلة */}
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button 
-                  variant="ghost" 
-                  size="icon"
-                  className="text-green-600 hover:text-green-600 dark:hover:text-green-400"
-                  title={t.favorites}
-                >
-                  <Bookmark className="h-5 w-5" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent className="w-56" align="end">
-                <div className="px-2 py-1.5 text-sm font-semibold">{t.favorites}</div>
-                <DropdownMenuSeparator />
-                {favorites.map((fav, index) => (
-                  <DropdownMenuItem 
-                    key={index}
-                    onClick={() => window.location.href = fav.url}
-                    className="cursor-pointer"
-                  >
-                    {fav.name}
-                  </DropdownMenuItem>
-                ))}
-              </DropdownMenuContent>
-            </DropdownMenu>
-
-            {/* الإشعارات */}
-            <div className="relative">
-              <Button
-                variant="ghost"
-                size="icon"
-                className="text-yellow-600 hover:text-yellow-600 dark:hover:text-yellow-200"
-                title={t.notifications}
-              >
-                <Bell className="h-5 w-5" />
-                <span className="absolute top-0.5 right-0.5 h-4 min-w-[16px] px-1 bg-red-500 text-white text-xs font-medium rounded-full flex items-center justify-center">
-                  3
-                </span>
-              </Button>
-            </div>
-
             <ThemeToggle />
 
             {/* قائمة المستخدم */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <div className="flex items-center space-x-2 cursor-pointer">
+                <div className={`flex items-center ${language === 'ar' ? 'space-x-reverse space-x-2' : 'space-x-2'} cursor-pointer`}>
                   <div className="h-8 w-8 rounded-full bg-gray-300 dark:bg-gray-600 flex items-center justify-center overflow-hidden">
                     {user?.logo ? (
                       <img src={user.logo} alt="User" className="h-full w-full object-cover" />
@@ -160,7 +118,10 @@ export default function Navbar({
                   </span>
                 </div>
               </DropdownMenuTrigger>
-              <DropdownMenuContent className="w-56" align="end">
+              <DropdownMenuContent 
+                className={`w-56 ${language === 'ar' ? 'text-right' : 'text-left'}`}
+                align={language === 'ar' ? 'start' : 'end'}
+              >
                 <div className="px-2 py-1.5">
                   <p className="text-sm font-semibold">{user?.name ?? (language === 'ar' ? 'زائر' : 'Guest')}</p>
                   <p className="text-xs text-gray-600 dark:text-gray-400 truncate">{user?.email ?? ''}</p>
@@ -168,15 +129,33 @@ export default function Navbar({
                 <DropdownMenuSeparator />
                 
                 <DropdownMenuItem onClick={() => window.location.href = '/Profile'}>
-                  <User className="mr-2 h-4 w-4" />
-                  <span>{t.profile}</span>
+                  {language === 'ar' ? (
+                    <>
+                      <span>{t.profile}</span>
+                      <User className="ml-2 h-4 w-4" />
+                    </>
+                  ) : (
+                    <>
+                      <User className="mr-2 h-4 w-4" />
+                      <span>{t.profile}</span>
+                    </>
+                  )}
                 </DropdownMenuItem>
 
                 <DropdownMenuSeparator />
 
                 <DropdownMenuItem onClick={logout}>
-                  <LogOut className="mr-2 h-4 w-4" />
-                  <span>{t.logout}</span>
+                  {language === 'ar' ? (
+                    <>
+                      <span>{t.logout}</span>
+                      <LogOut className="ml-2 h-4 w-4" />
+                    </>
+                  ) : (
+                    <>
+                      <LogOut className="mr-2 h-4 w-4" />
+                      <span>{t.logout}</span>
+                    </>
+                  )}
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>

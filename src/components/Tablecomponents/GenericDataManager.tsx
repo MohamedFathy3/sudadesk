@@ -456,7 +456,7 @@ export default function GenericDataManager(props: GenericDataManagerProps): Reac
 
   return (
     <MainLayout>
-      <div className="space-y-6 p-6 pb-16 border-black rounded-lg min-h-screen">
+      <div className="space-y-6 p-6 pb-16 border-black rounded-lg min-h-screen" dir={language === 'ar' ? 'rtl' : 'ltr'}>
         {/* Main Section - كل المكونات في سكشن واحد */}
      
           
@@ -484,6 +484,7 @@ export default function GenericDataManager(props: GenericDataManagerProps): Reac
             showBulkActions={showBulkActions}
             showDeletedToggle={showDeletedToggle}
             translations={translations}
+            language={language}
           />
 
           {/* Search & Filter داخل السكشن */}
@@ -539,6 +540,7 @@ export default function GenericDataManager(props: GenericDataManagerProps): Reac
               perPage={perPage}  
               onPerPageChange={setPerPage}
               translations={translations}
+              language={language}
             />
           </div>
 
@@ -592,6 +594,7 @@ interface ExtendedHeaderProps extends HeaderProps {
     forceDeleteSelected: string;
     selected: string;
   };
+  language: 'en' | 'ar';
 }
 
 // Sub-components
@@ -606,7 +609,8 @@ const Header = ({
   showBulkActions = true,
   showDeletedToggle = true,
   onForceDeleteSelected,
-  translations
+  translations,
+  language
 
 }:ExtendedHeaderProps & { 
   onDeleteAll?: () => void; 
@@ -617,7 +621,9 @@ const Header = ({
   const totalItems = pagination.total;
 
   return (
-    <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+    <div className={`flex flex-col md:flex-row justify-between items-start md:items-center gap-4 ${
+      language === 'ar' ? 'text-right' : 'text-left'
+    }`}>
       
       <div>
         <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">{title}</h1>
@@ -631,7 +637,7 @@ const Header = ({
         </p>
       </div>
      
-      <div className="flex gap-3 flex-wrap">
+      <div className={`flex gap-3 flex-wrap ${language === 'ar' ? 'flex-row-reverse' : ''}`}>
         {/* Bulk Action Button - يظهر فقط لما يتم تحديد عناصر */}
         {selectedItems.size > 0 && showDeleteButton && showBulkActions && (
           <Button
@@ -672,7 +678,7 @@ const Header = ({
             `}
             disabled={bulkLoading}
           >
-            <span className="relative z-10 flex items-center gap-3">
+            <span className={`relative z-10 flex items-center gap-3 ${language === 'ar' ? 'flex-row-reverse' : ''}`}>
               {bulkLoading ? (
                 <i className="fas fa-spinner fa-spin text-sm"></i>
               ) : showingDeleted ? (
@@ -701,7 +707,7 @@ const Header = ({
               bg-gradient-to-r from-red-50 to-red-100 dark:bg-red-900/30 p-2 rounded-lg group-hover:scale-110 transition-transform duration-200
             `}
           >
-            <span className="relative z-10 flex items-center gap-3">
+            <span className={`relative z-10 flex items-center gap-3 ${language === 'ar' ? 'flex-row-reverse' : ''}`}>
               <i className="fas fa-fire text-red-600 group-hover:scale-110 transition-transform duration-200"></i>
               {translations.forceDeleteSelected} ({selectedItems.size})
             </span>
@@ -747,7 +753,7 @@ const Header = ({
               group
             `}
           >
-            <span className="flex items-center gap-3">
+            <span className={`flex items-center gap-3 ${language === 'ar' ? 'flex-row-reverse' : ''}`}>
               {showingDeleted ? (
                 <>
                   <div className="bg-red-100 dark:bg-red-900/30 p-2 rounded-lg group-hover:scale-110 transition-transform duration-200">
@@ -779,7 +785,7 @@ const Header = ({
             `}
             onClick={onAddItem}
           >
-            <span className="flex items-center gap-3">
+            <span className={`flex items-center gap-3 ${language === 'ar' ? 'flex-row-reverse' : ''}`}>
               <div className="bg-green-100 dark:bg-green-900/30 p-2 rounded-lg group-hover:scale-110 transition-transform duration-200">
                 <i className="fas fa-plus text-green-600 dark:text-green-400 text-sm"></i>
               </div>

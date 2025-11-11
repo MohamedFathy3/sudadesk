@@ -15,8 +15,8 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
 
   // بيانات الشركة - يمكن جلبها من environment variables أو config
   const companyInfo = {
-    name: process.env.NEXT_PUBLIC_COMPANY_NAME || "Pyramids Freight Services",
-    website: process.env.NEXT_PUBLIC_COMPANY_WEBSITE || "wsa-elite.com/",
+    name: process.env.NEXT_PUBLIC_COMPANY_NAME || "starplus  ",
+    website: process.env.NEXT_PUBLIC_COMPANY_WEBSITE || "starplus.agency/en",
     year: new Date().getFullYear()
   };
 
