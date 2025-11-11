@@ -16,8 +16,10 @@ export interface BaseEntity {
   title?: string;
   email?: string;
   phone?: string;
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
   company?: any;
   active?: boolean;
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
   [key: string]: any;
 }
 
@@ -33,6 +35,7 @@ export interface PaginationMeta {
   last_page: number;
   per_page: number;
   total: number;
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
   links: any[];
 }
 
@@ -319,6 +322,7 @@ export function DataTable<T extends BaseEntity>({
   };
 
   // دالة للحصول على القيمة من الحقول المتداخلة
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const getNestedValue = (obj: any, path: string) => {
     return path.split('.').reduce((current, key) => {
       return current && current[key] !== undefined ? current[key] : null;
