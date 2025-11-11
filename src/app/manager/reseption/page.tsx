@@ -8,7 +8,7 @@ export default function ReceptionsPage() {
   const { language } = useLanguage();
 
   const t = {
-    title: language === 'ar' ? 'إدارة الاستقبال' : 'Receptions Management',
+    title: language === 'ar' ? ' شئون الطلاب' : 'Receptions Management',
     id: language === 'ar' ? 'الرقم' : 'ID',
     name: language === 'ar' ? 'الاسم' : 'Name',
     email: language === 'ar' ? 'البريد الإلكتروني' : 'Email',

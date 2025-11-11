@@ -456,123 +456,123 @@ export default function GenericDataManager(props: GenericDataManagerProps): Reac
 
   return (
     <MainLayout>
-      <div className="space-y-6 p-6 pb-16 border-black rounded-lg min-h-screen" dir={language === 'ar' ? 'rtl' : 'ltr'}>
-        {/* Main Section - كل المكونات في سكشن واحد */}
-     
-          
-          {/* Header داخل السكشن */}
-          <Header 
+      <div 
+        className="space-y-6 p-6 pb-16 border-black rounded-lg min-h-screen" 
+        dir={language === 'ar' ? 'rtl' : 'ltr'}
+      >
+        {/* Header */}
+        <Header 
+          title={title}
+          dataLength={data.length} 
+          onDeleteAll={handleDeleteAll} 
+          currentPage={currentPage}
+          pagination={safePagination}
+          selectedItems={selectedItems}
+          showingDeleted={showingDeleted}
+          showFilter={showFilter}
+          onForceDeleteSelected={handleForceDeleteSelected}
+          searchTerm={filters.search}
+          onBulkAction={showingDeleted ? handleBulkRestore : handleBulkDelete}
+          onToggleFilter={handleToggleFilter}
+          onToggleDeleted={handleToggleDeleted}
+          onAddItem={handleAddItem}
+          bulkLoading={bulkDeleteMutation.isPending || bulkRestoreMutation.isPending}
+          showEditButton={showEditButton}
+          showDeleteButton={showDeleteButton}
+          showActiveToggle={showActiveToggle}
+          showAddButton={showAddButton}
+          showBulkActions={showBulkActions}
+          showDeletedToggle={showDeletedToggle}
+          translations={translations}
+          language={language}
+        />
+
+        {/* Search & Filter */}
+        {(showSearch || showFilter) && (
+          <div className="mt-6">
+            <FilterSearch
+              search={search}
+              onSearchChange={setSearch}
+              onSearch={handleSearch}
+              filters={filters}
+              onFiltersChange={handleFiltersChange}
+              orderBy={orderBy}
+              onOrderByChange={handleOrderByChange}
+              orderByDirection={orderByDirection}
+              onOrderByDirectionChange={handleOrderByDirectionChange}
+              onApplyFilter={handleFilter}
+              onResetFilters={handleResetFilters}
+              showFilter={showFilter}
+              onToggleFilter={handleToggleFilter}
+              availableFilters={finalAvailableFilters}
+              language={language}
+            />
+          </div>
+        )}
+
+        {/* Table */}
+        <div className="mt-6">
+          <DataTable
             title={title}
-            dataLength={data.length} 
-            onDeleteAll={handleDeleteAll} 
-            currentPage={currentPage}
-            pagination={safePagination}
+            data={data}
+            columns={columns}
             selectedItems={selectedItems}
+            allSelected={allSelected}
+            someSelected={someSelected}
+            orderBy={orderBy}
+            orderByDirection={orderByDirection}
+            pagination={safePagination}
+            onToggleSelectAll={toggleSelectAll}
+            onToggleSelectItem={toggleSelectItem}
+            onSort={handleSort}
+            onEdit={handleEditItem}
+            onDelete={handleDelete}
+            onToggleActive={handleItemToggleActive}
+            deleteLoading={deleteItemMutation.isPending}
+            Checkbox={Checkbox}
             showingDeleted={showingDeleted}
-            showFilter={showFilter}
-            onForceDeleteSelected={handleForceDeleteSelected}
-            searchTerm={filters.search}
-            onBulkAction={showingDeleted ? handleBulkRestore : handleBulkDelete}
-            onToggleFilter={handleToggleFilter}
-            onToggleDeleted={handleToggleDeleted}
-            onAddItem={handleAddItem}
-            bulkLoading={bulkDeleteMutation.isPending || bulkRestoreMutation.isPending}
+            onRestore={handleRestore} 
+            onForceDelete={handleForceDelete}
+            compactView={shouldUseCompactView}
             showEditButton={showEditButton}
             showDeleteButton={showDeleteButton}
             showActiveToggle={showActiveToggle}
-            showAddButton={showAddButton}
-            showBulkActions={showBulkActions}
-            showDeletedToggle={showDeletedToggle}
+            perPage={perPage}  
+            onPerPageChange={setPerPage}
             translations={translations}
             language={language}
           />
-
-          {/* Search & Filter داخل السكشن */}
-          {(showSearch || showFilter) && (
-            <div className="mt-6">
-              <FilterSearch
-                search={search}
-                onSearchChange={setSearch}
-                onSearch={handleSearch}
-                filters={filters}
-                onFiltersChange={handleFiltersChange}
-                orderBy={orderBy}
-                onOrderByChange={handleOrderByChange}
-                orderByDirection={orderByDirection}
-                onOrderByDirectionChange={handleOrderByDirectionChange}
-                onApplyFilter={handleFilter}
-                onResetFilters={handleResetFilters}
-                showFilter={showFilter}
-                onToggleFilter={handleToggleFilter}
-                availableFilters={finalAvailableFilters}
-                language={language}
-              />
-            </div>
-          )}
-
-          {/* Table داخل السكشن */}
-          <div className="mt-6">
-            <DataTable
-              title={title}
-              data={data}
-              columns={columns}
-              selectedItems={selectedItems}
-              allSelected={allSelected}
-              someSelected={someSelected}
-              orderBy={orderBy}
-              orderByDirection={orderByDirection}
-              pagination={safePagination}
-              onToggleSelectAll={toggleSelectAll}
-              onToggleSelectItem={toggleSelectItem}
-              onSort={handleSort}
-              onEdit={handleEditItem}
-              onDelete={handleDelete}
-              onToggleActive={handleItemToggleActive}
-              deleteLoading={deleteItemMutation.isPending}
-              Checkbox={Checkbox}
-              showingDeleted={showingDeleted}
-              onRestore={handleRestore} 
-              onForceDelete={handleForceDelete}
-              compactView={shouldUseCompactView}
-              showEditButton={showEditButton}
-              showDeleteButton={showDeleteButton}
-              showActiveToggle={showActiveToggle}
-              perPage={perPage}  
-              onPerPageChange={setPerPage}
-              translations={translations}
-              language={language}
-            />
-          </div>
-
-          {/* Pagination داخل السكشن */}
-          <div className="mt-6">
-            <Pagination
-              currentPage={safePagination.current_page}
-              lastPage={safePagination.last_page}
-              total={safePagination.total}
-              perPage={perPage}
-              onPageChange={setCurrentPage}
-              language={language}
-            />
-          </div>
         </div>
 
-        {/* Modal خارج السكشن الرئيسي */}
-        {(showAddButton || showEditButton) && open && (
-         <FormModal
-  title={title}
-  editingItem={editingItem}
-  formFields={formFields || []}
-  formData={formData}
-  additionalQueries={additionalQueries}
-  onFormDataChange={handleFormDataChange}
-  onSave={handleSave}
-  onClose={handleCloseModal}
-  saveLoading={saveItemMutation.isPending}
-  compactLayout={hasManyFields}
-  language={language}
-/>
-        )}
+        {/* Pagination */}
+        <div className="mt-6">
+          <Pagination
+            currentPage={safePagination.current_page}
+            lastPage={safePagination.last_page}
+            total={safePagination.total}
+            perPage={perPage}
+            onPageChange={setCurrentPage}
+            language={language}
+          />
+        </div>
+      </div>
+
+      {/* Modal */}
+      {(showAddButton || showEditButton) && open && (
+        <FormModal
+          title={title}
+          editingItem={editingItem}
+          formFields={formFields || []}
+          formData={formData}
+          additionalQueries={additionalQueries}
+          onFormDataChange={handleFormDataChange}
+          onSave={handleSave}
+          onClose={handleCloseModal}
+          saveLoading={saveItemMutation.isPending}
+          compactLayout={hasManyFields}
+          language={language}
+        />
+      )}
     </MainLayout>
   );
 }
@@ -612,7 +612,7 @@ const Header = ({
   translations,
   language
 
-}:ExtendedHeaderProps & { 
+}: ExtendedHeaderProps & { 
   onDeleteAll?: () => void; 
   dataLength: number;
 }) => {
@@ -704,7 +704,35 @@ const Header = ({
             variant="destructive"
             onClick={onForceDeleteSelected}
             className={`
-              bg-gradient-to-r from-red-50 to-red-100 dark:bg-red-900/30 p-2 rounded-lg group-hover:scale-110 transition-transform duration-200
+              relative
+              overflow-hidden
+              bg-gradient-to-r
+              from-red-50
+              to-red-100
+              dark:from-red-900/30
+              dark:to-red-800/30
+              hover:from-red-100
+              hover:to-red-200
+              dark:hover:from-red-800/40
+              dark:hover:to-red-700/40
+              text-red-700
+              dark:text-red-200
+              font-semibold
+              py-3
+              px-6
+              rounded-2xl
+              shadow-md
+              hover:shadow-lg
+              transform
+              hover:-translate-y-0.5
+              active:translate-y-0
+              transition-all
+              duration-250
+              ease-in-out
+              border
+              border-red-100
+              dark:border-red-900/50
+              group
             `}
           >
             <span className={`relative z-10 flex items-center gap-3 ${language === 'ar' ? 'flex-row-reverse' : ''}`}>

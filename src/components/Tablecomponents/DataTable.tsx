@@ -16,14 +16,11 @@ export interface BaseEntity {
   title?: string;
   email?: string;
   phone?: string;
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
   company?: any;
   active?: boolean;
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
   [key: string]: any;
 }
 
-// تعريف ColumnDefinition قبل استخدامه
 export interface ColumnDefinition<T = BaseEntity> {
   key: string;
   label: string;
@@ -36,7 +33,6 @@ export interface PaginationMeta {
   last_page: number;
   per_page: number;
   total: number;
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
   links: any[];
 }
 
@@ -258,7 +254,7 @@ export function DataTable<T extends BaseEntity>({
         icon: 'building',
         type: 'text'
       });
-    } else if (item.company) {
+    } else if (item.company && typeof item.company === 'string') {
       displayData.push({
         field: 'company',
         value: item.company,
@@ -305,8 +301,24 @@ export function DataTable<T extends BaseEntity>({
     );
   };
 
+  // دالة لعكس ترتيب الأعمدة في العربية
+  const getDisplayColumns = () => {
+    if (language === 'ar') {
+      return [...columns].reverse();
+    }
+    return columns;
+  };
+
+  // دالة لعكس ترتيب الأعمدة في العرض المدمج
+  const getDisplayTableColumns = () => {
+    const tableColumns = getTableColumns();
+    if (language === 'ar') {
+      return [...tableColumns].reverse();
+    }
+    return tableColumns;
+  };
+
   // دالة للحصول على القيمة من الحقول المتداخلة
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const getNestedValue = (obj: any, path: string) => {
     return path.split('.').reduce((current, key) => {
       return current && current[key] !== undefined ? current[key] : null;
@@ -339,24 +351,6 @@ export function DataTable<T extends BaseEntity>({
       return direction === 'asc' ? 'تصاعدي' : 'تنازلي';
     }
     return direction;
-  };
-
-  // دالة لعكس ترتيب الأعمدة في العربية
-  const getDisplayColumns = () => {
-    if (language === 'ar') {
-      // عكس ترتيب الأعمدة في العربية
-      return [...columns].reverse();
-    }
-    return columns;
-  };
-
-  // دالة لعكس ترتيب الأعمدة في العرض المدمج
-  const getDisplayTableColumns = () => {
-    const tableColumns = getTableColumns();
-    if (language === 'ar') {
-      return [...tableColumns].reverse();
-    }
-    return tableColumns;
   };
 
   return (
@@ -432,17 +426,17 @@ export function DataTable<T extends BaseEntity>({
           }`}>
             <thead className="bg-gray-50 dark:bg-gray-700">
               <tr>
-                {/* في العربية: نعكس ترتيب الأعمدة - الإجراءات أولاً ثم البيانات */}
+                {/* ترتيب الأعمدة في العربية: من اليمين لليسار */}
                 {language === 'ar' ? (
                   <>
-                    {/* عمود الإجراءات أولاً في العربية */}
+                    {/* الإجراءات أولاً على اليمين */}
                     {(showEditButton || showDeleteButton || showActiveToggle) && (
                       <th className="px-4 py-3 text-gray-700 dark:text-gray-300 font-medium uppercase tracking-wider min-w-[180px] text-center">
                         {t.actions}
                       </th>
                     )}
 
-                    {/* ثم باقي الأعمدة */}
+                    {/* باقي الأعمدة */}
                     {compactView && hasImageColumn ? (
                       <>
                         {/* الأعمدة العادية */}
@@ -457,13 +451,13 @@ export function DataTable<T extends BaseEntity>({
                             </div>
                           </th>
                         ))}
-                        {/* عمود البيانات المدمجة */}
-                        <th className="px-4 py-3 text-gray-700 dark:text-gray-300 font-medium uppercase tracking-wider min-w-[300px] text-center">
+                        {/* المعلومات الأساسية */}
+                        <th className="px-4 py-3 text-gray-700 dark:text-gray-300 font-medium uppercase tracking-wider min-w-[350px] text-center">
                           {t.basicInfo}
                         </th>
                       </>
                     ) : (
-                      // Normal View - عكس الأعمدة
+                      // Normal View
                       getDisplayColumns().map((column) => (
                         <th key={column.key} className="px-4 py-3 text-gray-700 dark:text-gray-300 font-medium uppercase tracking-wider min-w-[120px] text-center">
                           <div 
@@ -477,7 +471,7 @@ export function DataTable<T extends BaseEntity>({
                       ))
                     )}
 
-                    {/* عمود التحديد - يبقى في النهاية في العربية */}
+                    {/* التحديد أخيراً على اليسار */}
                     <th className="px-4 py-3 text-center w-12">
                       <Checkbox
                         checked={allSelected}
@@ -488,9 +482,9 @@ export function DataTable<T extends BaseEntity>({
                     </th>
                   </>
                 ) : (
-                  // الإنجليزية: الترتيب الطبيعي
+                  // الإنجليزية: من اليسار لليمين
                   <>
-                    {/* عمود التحديد أولاً في الإنجليزية */}
+                    {/* التحديد أولاً على اليسار */}
                     <th className="px-4 py-3 text-center w-12">
                       <Checkbox
                         checked={allSelected}
@@ -502,11 +496,11 @@ export function DataTable<T extends BaseEntity>({
 
                     {compactView && hasImageColumn ? (
                       <>
-                        {/* Compact Data Column */}
-                        <th className="px-4 py-3 text-center text-gray-700 dark:text-gray-300 font-medium uppercase tracking-wider min-w-[300px]">
+                        {/* المعلومات الأساسية */}
+                        <th className="px-4 py-3 text-center text-gray-700 dark:text-gray-300 font-medium uppercase tracking-wider min-w-[350px]">
                           {t.basicInfo}
                         </th>
-                        {/* Regular Columns */}
+                        {/* الأعمدة العادية */}
                         {getTableColumns().map((column) => (
                           <th key={column.key} className="px-4 py-3 text-center text-gray-700 dark:text-gray-300 font-medium uppercase tracking-wider min-w-[120px]">
                             <div 
@@ -534,7 +528,7 @@ export function DataTable<T extends BaseEntity>({
                       ))
                     )}
 
-                    {/* عمود الإجراءات في النهاية في الإنجليزية */}
+                    {/* الإجراءات أخيراً على اليمين */}
                     {(showEditButton || showDeleteButton || showActiveToggle) && (
                       <th className="px-4 py-3 text-center text-gray-700 dark:text-gray-300 font-medium uppercase tracking-wider min-w-[180px]">
                         {t.actions}
@@ -558,12 +552,12 @@ export function DataTable<T extends BaseEntity>({
                       className="hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-200 cursor-pointer"
                       onDoubleClick={() => showEditButton && handleDoubleClick(item)}
                     >
-                      {/* في العربية: نعكس ترتيب الخلايا */}
+                      {/* ترتيب الخلايا في العربية: من اليمين لليسار */}
                       {language === 'ar' ? (
                         <>
-                          {/* خلية الإجراءات أولاً في العربية */}
+                          {/* الإجراءات أولاً على اليمين */}
                           {(showEditButton || showDeleteButton || showActiveToggle) && (
-                            <td className="px-4 py-3">
+                            <td className="px-4 py-3 align-middle">
                               <div className="flex justify-center items-center gap-2">
                                 {showingDeleted ? (
                                   <div className="flex gap-2 flex-row-reverse">
@@ -573,7 +567,7 @@ export function DataTable<T extends BaseEntity>({
                                       onClick={() => onRestore?.(item.id, itemName)}
                                       className="bg-green-50 hover:bg-green-100 text-green-700 border-green-200 text-xs flex-row-reverse"
                                     >
-                                      <i className="fas fa-rotate-left mr-1"></i>
+                                      <i className="fas fa-rotate-left ml-2"></i>
                                       {t.restore}
                                     </Button>
                                     {showDeleteButton && (
@@ -583,7 +577,7 @@ export function DataTable<T extends BaseEntity>({
                                         onClick={() => onForceDelete?.(item.id, itemName)}
                                         className="bg-red-50 hover:bg-red-100 text-red-700 border-red-200 text-xs flex-row-reverse"
                                       >
-                                        <i className="fas fa-trash mr-1"></i>
+                                        <i className="fas fa-trash ml-2"></i>
                                         {t.forceDelete}
                                       </Button>
                                     )}
@@ -609,7 +603,7 @@ export function DataTable<T extends BaseEntity>({
                                         onClick={() => onEdit(item)}
                                         className="bg-blue-50 hover:bg-blue-100 text-blue-700 border-blue-200 text-xs flex-row-reverse"
                                       >
-                                        <i className="fas fa-edit mr-1"></i>
+                                        <i className="fas fa-edit ml-2"></i>
                                         {t.edit}
                                       </Button>
                                     )}
@@ -624,12 +618,12 @@ export function DataTable<T extends BaseEntity>({
                                       >
                                         {deleteLoading ? (
                                           <>
-                                            <i className="fas fa-spinner fa-spin mr-1"></i>
+                                            <i className="fas fa-spinner fa-spin ml-2"></i>
                                             {t.loading}
                                           </>
                                         ) : (
                                           <>
-                                            <i className="fas fa-trash mr-1"></i>
+                                            <i className="fas fa-trash ml-2"></i>
                                             {t.delete}
                                           </>
                                         )}
@@ -644,33 +638,33 @@ export function DataTable<T extends BaseEntity>({
                           {/* باقي الخلايا */}
                           {shouldUseCompactView ? (
                             <>
-                              {/* Other Columns */}
+                              {/* الأعمدة العادية */}
                               {getDisplayTableColumns().map((column) => (
                                 <td 
                                   key={column.key} 
-                                  className="px-4 py-3 text-gray-700 dark:text-gray-300 text-sm text-center"
+                                  className="px-4 py-3 text-gray-700 dark:text-gray-300 text-sm text-center align-middle"
                                   onDoubleClick={() => showEditButton && handleDoubleClick(item)}
                                 >
                                   {column.render ? column.render(item) : getNestedValue(item, column.key)}
                                 </td>
                               ))}
                               
-                              {/* Compact Cell */}
-                              <td className="px-4 py-3">
-                                <div className="flex items-start gap-3 flex-row-reverse">
-                                  {/* Basic Data */}
-                                  <div className="flex-1 min-w-0 text-right">
-                                    <div className="space-y-1">
+                              {/* المعلومات الأساسية */}
+                              <td className="px-4 py-3 align-middle">
+                                <div className="flex items-center gap-3 flex-row-reverse">
+                                  {/* البيانات على اليمين */}
+                                  <div className="flex-1 min-w-0">
+                                    <div className="space-y-2">
                                       {compactData.map((data, index) => (
-                                        <div key={index}>
+                                        <div key={index} className="flex items-center gap-2 flex-row-reverse">
                                           {data.isTitle ? (
-                                            <div className="font-bold text-gray-900 dark:text-gray-100 text-base">
+                                            <div className="font-bold text-gray-900 dark:text-gray-100 text-base leading-tight text-right">
                                               {data.value}
                                             </div>
                                           ) : (
                                             <div className="flex items-center gap-2 text-xs text-gray-600 dark:text-gray-400 flex-row-reverse">
-                                              <IconComponent icon={data.icon || 'default-icon'} />
-                                              <span className="truncate">{data.value}</span>
+                                              <IconComponent icon={data.icon || 'default-icon'} className="flex-shrink-0" />
+                                              <span className="truncate text-sm text-right">{data.value}</span>
                                             </div>
                                           )}
                                         </div>
@@ -678,7 +672,7 @@ export function DataTable<T extends BaseEntity>({
                                     </div>
                                   </div>
                                   
-                                  {/* Image */}
+                                  {/* الصورة على اليسار */}
                                   <div className="flex-shrink-0">
                                     {itemImage ? (
                                       <img 
@@ -698,11 +692,11 @@ export function DataTable<T extends BaseEntity>({
                               </td>
                             </>
                           ) : (
-                            // Normal View - عكس الخلايا
+                            // Normal View
                             getDisplayColumns().map((column) => (
                               <td 
                                 key={column.key} 
-                                className="px-4 py-3 text-gray-700 dark:text-gray-300 text-sm text-center"
+                                className="px-4 py-3 text-gray-700 dark:text-gray-300 text-sm text-center align-middle"
                                 onDoubleClick={() => showEditButton && handleDoubleClick(item)}
                               >
                                 {column.render ? column.render(item) : getNestedValue(item, column.key)}
@@ -710,8 +704,8 @@ export function DataTable<T extends BaseEntity>({
                             ))
                           )}
 
-                          {/* خلية التحديد في النهاية في العربية */}
-                          <td className="px-4 py-3">
+                          {/* التحديد أخيراً على اليسار */}
+                          <td className="px-4 py-3 align-middle">
                             <Checkbox
                               checked={selectedItems.has(item.id)}
                               onChange={() => onToggleSelectItem(item.id)}
@@ -720,9 +714,10 @@ export function DataTable<T extends BaseEntity>({
                           </td>
                         </>
                       ) : (
-                        // الإنجليزية: الترتيب الطبيعي
+                        // الإنجليزية: من اليسار لليمين
                         <>
-                          <td className="px-4 py-3">
+                          {/* التحديد أولاً على اليسار */}
+                          <td className="px-4 py-3 align-middle">
                             <Checkbox
                               checked={selectedItems.has(item.id)}
                               onChange={() => onToggleSelectItem(item.id)}
@@ -732,10 +727,10 @@ export function DataTable<T extends BaseEntity>({
                           
                           {shouldUseCompactView ? (
                             <>
-                              {/* Compact Cell */}
-                              <td className="px-4 py-3">
-                                <div className="flex items-start gap-3">
-                                  {/* Image */}
+                              {/* المعلومات الأساسية */}
+                              <td className="px-4 py-3 align-middle">
+                                <div className="flex items-center gap-3">
+                                  {/* الصورة على اليسار */}
                                   <div className="flex-shrink-0">
                                     {itemImage ? (
                                       <img 
@@ -752,19 +747,19 @@ export function DataTable<T extends BaseEntity>({
                                     )}
                                   </div>
                                   
-                                  {/* Basic Data */}
-                                  <div className="flex-1 min-w-0 text-left">
-                                    <div className="space-y-1">
+                                  {/* البيانات على اليمين */}
+                                  <div className="flex-1 min-w-0">
+                                    <div className="space-y-2">
                                       {compactData.map((data, index) => (
-                                        <div key={index}>
+                                        <div key={index} className="flex items-center gap-2">
                                           {data.isTitle ? (
-                                            <div className="font-bold text-gray-900 dark:text-gray-100 text-base">
+                                            <div className="font-bold text-gray-900 dark:text-gray-100 text-base leading-tight text-left">
                                               {data.value}
                                             </div>
                                           ) : (
                                             <div className="flex items-center gap-2 text-xs text-gray-600 dark:text-gray-400">
-                                              <IconComponent icon={data.icon || 'default-icon'} />
-                                              <span className="truncate">{data.value}</span>
+                                              <IconComponent icon={data.icon || 'default-icon'} className="flex-shrink-0" />
+                                              <span className="truncate text-sm text-left">{data.value}</span>
                                             </div>
                                           )}
                                         </div>
@@ -774,11 +769,11 @@ export function DataTable<T extends BaseEntity>({
                                 </div>
                               </td>
                               
-                              {/* Other Columns */}
+                              {/* الأعمدة العادية */}
                               {getTableColumns().map((column) => (
                                 <td 
                                   key={column.key} 
-                                  className="px-4 py-3 text-gray-700 dark:text-gray-300 text-sm text-center"
+                                  className="px-4 py-3 text-gray-700 dark:text-gray-300 text-sm text-center align-middle"
                                   onDoubleClick={() => showEditButton && handleDoubleClick(item)}
                                 >
                                   {column.render ? column.render(item) : getNestedValue(item, column.key)}
@@ -790,7 +785,7 @@ export function DataTable<T extends BaseEntity>({
                             columns.map((column) => (
                               <td 
                                 key={column.key} 
-                                className="px-4 py-3 text-gray-700 dark:text-gray-300 text-sm text-center"
+                                className="px-4 py-3 text-gray-700 dark:text-gray-300 text-sm text-center align-middle"
                                 onDoubleClick={() => showEditButton && handleDoubleClick(item)}
                               >
                                 {column.render ? column.render(item) : getNestedValue(item, column.key)}
@@ -798,9 +793,9 @@ export function DataTable<T extends BaseEntity>({
                             ))
                           )}
                           
-                          {/* Actions Cell */}
+                          {/* الإجراءات أخيراً على اليمين */}
                           {(showEditButton || showDeleteButton || showActiveToggle) && (
-                            <td className="px-4 py-3">
+                            <td className="px-4 py-3 align-middle">
                               <div className="flex justify-center items-center gap-2">
                                 {showingDeleted ? (
                                   <div className="flex gap-2">
@@ -810,7 +805,7 @@ export function DataTable<T extends BaseEntity>({
                                       onClick={() => onRestore?.(item.id, itemName)}
                                       className="bg-green-50 hover:bg-green-100 text-green-700 border-green-200 text-xs"
                                     >
-                                      <i className="fas fa-rotate-left mr-1"></i>
+                                      <i className="fas fa-rotate-left mr-2"></i>
                                       {t.restore}
                                     </Button>
                                     {showDeleteButton && (
@@ -820,7 +815,7 @@ export function DataTable<T extends BaseEntity>({
                                         onClick={() => onForceDelete?.(item.id, itemName)}
                                         className="bg-red-50 hover:bg-red-100 text-red-700 border-red-200 text-xs"
                                       >
-                                        <i className="fas fa-trash mr-1"></i>
+                                        <i className="fas fa-trash mr-2"></i>
                                         {t.forceDelete}
                                       </Button>
                                     )}
@@ -846,7 +841,7 @@ export function DataTable<T extends BaseEntity>({
                                         onClick={() => onEdit(item)}
                                         className="bg-blue-50 hover:bg-blue-100 text-blue-700 border-blue-200 text-xs"
                                       >
-                                        <i className="fas fa-edit mr-1"></i>
+                                        <i className="fas fa-edit mr-2"></i>
                                         {t.edit}
                                       </Button>
                                     )}
@@ -861,12 +856,12 @@ export function DataTable<T extends BaseEntity>({
                                       >
                                         {deleteLoading ? (
                                           <>
-                                            <i className="fas fa-spinner fa-spin mr-1"></i>
+                                            <i className="fas fa-spinner fa-spin mr-2"></i>
                                             {t.loading}
                                           </>
                                         ) : (
                                           <>
-                                            <i className="fas fa-trash mr-1"></i>
+                                            <i className="fas fa-trash mr-2"></i>
                                             {t.delete}
                                           </>
                                         )}
