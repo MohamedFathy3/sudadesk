@@ -30,6 +30,7 @@ interface ExamResult {
   class_name: string;
   teacher_name: string;
   exam_date: string;
+  course:string;
 }
 
 interface AttendanceMonth {
@@ -95,6 +96,8 @@ interface Filters {
 }
 
 // Student Details Modal Component
+// Student Details Modal Component - Exam Results Section فقط
+// Student Details Modal Component - Exam Results Section فقط
 function StudentDetailsModal({ 
   student, 
   isOpen, 
@@ -118,12 +121,20 @@ function StudentDetailsModal({
       recentAttendance: 'Recent Attendance',
       noAttendance: 'No attendance records available',
       examResults: 'Exam Results',
+      subject: 'Subject',
       score: 'Score',
+      totalMark: 'Total Mark',
+      studentMark: 'Student Mark',
       percentage: 'Percentage',
       teacher: 'Teacher',
+      className: 'Class Name',
+      examDate: 'Exam Date',
+      status: 'Status',
       pass: 'Pass',
       fail: 'Fail',
-      noExams: 'No exam results available'
+      noExams: 'No exam results available',
+      examName: 'Exam Name',
+      grade: 'Grade'
     },
     ar: {
       title: 'تفاصيل الطالب',
@@ -136,12 +147,20 @@ function StudentDetailsModal({
       recentAttendance: 'الحضور الحديث',
       noAttendance: 'لا توجد سجلات حضور متاحة',
       examResults: 'نتائج الامتحانات',
+      subject: 'المادة',
       score: 'الدرجة',
+      totalMark: 'الدرجة الكلية',
+      studentMark: 'درجة الطالب',
       percentage: 'النسبة المئوية',
       teacher: 'المعلم',
+      className: 'اسم الفصل',
+      examDate: 'تاريخ الامتحان',
+      status: 'الحالة',
       pass: 'ناجح',
       fail: 'راسب',
-      noExams: 'لا توجد نتائج امتحانات متاحة'
+      noExams: 'لا توجد نتائج امتحانات متاحة',
+      examName: 'اسم الامتحان',
+      grade: 'التقدير'
     }
   };
 
@@ -154,7 +173,7 @@ function StudentDetailsModal({
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+      <div className="bg-white rounded-2xl max-w-6xl w-full max-h-[90vh] overflow-y-auto">
         {/* Header */}
         <div className="bg-gradient-to-r from-green-500 to-emerald-600 p-6 rounded-t-2xl">
           <div className="flex items-center justify-between">
@@ -177,7 +196,7 @@ function StudentDetailsModal({
         </div>
 
         <div className="p-6">
-          {/* Attendance Section */}
+          {/* Attendance Section (تبقى كما هي) */}
           <div className="mb-8">
             <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
               <ClipboardCheck className="w-5 h-5 text-green-500" />
@@ -233,7 +252,7 @@ function StudentDetailsModal({
             )}
           </div>
 
-          {/* Exam Results Section */}
+          {/* Exam Results Section - الجدول التقليدي بخطوط واضحة */}
           <div>
             <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
               <Award className="w-5 h-5 text-purple-500" />
@@ -241,51 +260,154 @@ function StudentDetailsModal({
             </h3>
             
             {student.exam_results.length > 0 ? (
-              <div className="space-y-4">
-                {student.exam_results.map((exam) => {
-                  const percentage = (exam.student_mark / exam.total_mark) * 100;
-                  const isPassing = percentage >= 50;
-                  
-                  return (
-                    <div key={exam.exam_id} className="bg-white border border-gray-200 rounded-xl p-4 hover:shadow-md transition-shadow">
-                      <div className="flex justify-between items-start mb-3">
-                        <div>
-                          <h4 className="font-semibold text-gray-900">{exam.exam_name}</h4>
-                          <p className="text-sm text-gray-600">{t.teacher}: {exam.teacher_name}</p>
-                        </div>
-                        <span className={`px-3 py-1 rounded-full text-sm font-medium ${
-                          isPassing ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
-                        }`}>
-                          {isPassing ? t.pass : t.fail}
-                        </span>
-                      </div>
+              <div className="bg-white border border-gray-300 rounded-lg overflow-hidden shadow-sm">
+                {/* Table */}
+                <table className="w-full border-collapse">
+                  <thead>
+                    <tr className="bg-purple-50">
+                      <th className="border border-gray-300 px-4 py-3 text-sm font-semibold text-purple-700 bg-purple-100">
+                        {t.examName}
+                      </th>
+                      <th className="border border-gray-300 px-4 py-3 text-sm font-semibold text-purple-700 bg-purple-100">
+                        {t.subject}
+                      </th>
+                      <th className="border border-gray-300 px-4 py-3 text-sm font-semibold text-purple-700 bg-purple-100">
+                        {t.examDate}
+                      </th>
+                      <th className="border border-gray-300 px-4 py-3 text-sm font-semibold text-purple-700 bg-purple-100">
+                        {t.totalMark}
+                      </th>
+                      <th className="border border-gray-300 px-4 py-3 text-sm font-semibold text-purple-700 bg-purple-100">
+                        {t.studentMark}
+                      </th>
+                      <th className="border border-gray-300 px-4 py-3 text-sm font-semibold text-purple-700 bg-purple-100">
+                        {t.percentage}
+                      </th>
+                      <th className="border border-gray-300 px-4 py-3 text-sm font-semibold text-purple-700 bg-purple-100">
+                        {t.grade}
+                      </th>
+                      <th className="border border-gray-300 px-4 py-3 text-sm font-semibold text-purple-700 bg-purple-100">
+                        {t.status}
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {student.exam_results.map((exam, index) => {
+                      const percentage = (exam.student_mark / exam.total_mark) * 100;
+                      const isPassing = percentage >= 50;
                       
-                      <div className="space-y-2">
-                        <div className="flex justify-between text-sm">
-                          <span>{t.score}:</span>
-                          <span className="font-semibold">{exam.student_mark}/{exam.total_mark}</span>
-                        </div>
-                        <div className="w-full bg-gray-200 rounded-full h-2">
-                          <div 
-                            className={`h-2 rounded-full transition-all duration-500 ${
-                              isPassing ? 'bg-green-500' : 'bg-red-500'
-                            }`}
-                            style={{ width: `${Math.min(percentage, 100)}%` }}
-                          ></div>
-                        </div>
-                        <div className="flex justify-between text-sm text-gray-600">
-                          <span>{t.percentage}:</span>
-                          <span>{percentage.toFixed(1)}%</span>
-                        </div>
-                      </div>
-                    </div>
-                  );
-                })}
+                      // حساب التقدير
+                      const getGrade = (percent: number) => {
+                        if (percent >= 90) return language === 'en' ? 'A+' : 'ممتاز';
+                        if (percent >= 80) return language === 'en' ? 'A' : 'جيد جداً';
+                        if (percent >= 70) return language === 'en' ? 'B+' : 'جيد';
+                        if (percent >= 60) return language === 'en' ? 'B' : 'مقبول';
+                        if (percent >= 50) return language === 'en' ? 'C' : 'مقبول';
+                        return language === 'en' ? 'F' : 'راسب';
+                      };
+
+                      const getGradeColor = (percent: number) => {
+                        if (percent >= 90) return 'bg-green-100 text-green-800 border-green-300';
+                        if (percent >= 80) return 'bg-blue-100 text-blue-800 border-blue-300';
+                        if (percent >= 70) return 'bg-yellow-100 text-yellow-800 border-yellow-300';
+                        if (percent >= 60) return 'bg-orange-100 text-orange-800 border-orange-300';
+                        if (percent >= 50) return 'bg-purple-100 text-purple-800 border-purple-300';
+                        return 'bg-red-100 text-red-800 border-red-300';
+                      };
+
+                      return (
+                        <tr 
+                          key={exam.exam_id} 
+                          className={index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}
+                        >
+                          {/* Exam Name */}
+                          <td className="border border-gray-300 px-4 py-3 text-sm text-gray-900">
+                            {exam.exam_name}
+                          </td>
+                          
+                          {/* Subject */}
+                          <td className="border border-gray-300 px-4 py-3 text-sm text-gray-700">
+                            {exam.course || t.subject}
+                          </td>
+                          
+                          {/* Exam Date */}
+                          <td className="border border-gray-300 px-4 py-3 text-sm text-gray-600">
+                            {new Date(exam.exam_date).toLocaleDateString()}
+                          </td>
+                          
+                          {/* Total Mark */}
+                          <td className="border border-gray-300 px-4 py-3 text-sm text-center font-semibold text-gray-700">
+                            {exam.total_mark}
+                          </td>
+                          
+                          {/* Student Mark */}
+                          <td className="border border-gray-300 px-4 py-3 text-sm text-center font-semibold">
+                            <span className={isPassing ? 'text-green-600' : 'text-red-600'}>
+                              {exam.student_mark}
+                            </span>
+                          </td>
+                          
+                          {/* Percentage */}
+                          <td className="border border-gray-300 px-4 py-3 text-sm text-center">
+                            <div className="flex flex-col items-center space-y-1">
+                              <span className="font-semibold text-blue-600">
+                                {percentage.toFixed(1)}%
+                              </span>
+                              <div className="w-20 bg-gray-300 rounded-full h-2">
+                                <div 
+                                  className={`h-2 rounded-full ${
+                                    isPassing ? 'bg-blue-500' : 'bg-red-500'
+                                  }`}
+                                  style={{ width: `${Math.min(percentage, 100)}%` }}
+                                ></div>
+                              </div>
+                            </div>
+                          </td>
+                          
+                          {/* Grade */}
+                          <td className="border border-gray-300 px-4 py-3 text-sm text-center">
+                            <span className={`px-2 py-1 rounded border text-xs font-bold ${getGradeColor(percentage)}`}>
+                              {getGrade(percentage)}
+                            </span>
+                          </td>
+                          
+                          {/* Status */}
+                          <td className="border border-gray-300 px-4 py-3 text-sm text-center">
+                            <span className={`px-3 py-1 rounded-full text-xs font-medium border ${
+                              isPassing 
+                                ? 'bg-green-100 text-green-800 border-green-300' 
+                                : 'bg-red-100 text-red-800 border-red-300'
+                            }`}>
+                              {isPassing ? t.pass : t.fail}
+                            </span>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+
+                {/* Table Summary */}
+                <div className="bg-gray-100 border-t border-gray-300 px-6 py-3">
+                  <div className="flex justify-between items-center text-sm text-gray-700">
+                    <span className="font-medium">
+                      {language === 'en' ? 'Total Results:' : 'إجمالي النتائج:'} {student.exam_results.length}
+                    </span>
+                    <span className="font-semibold text-blue-700">
+                      {language === 'en' ? 'Average:' : 'المتوسط:'} {(student.exam_results.reduce((sum, exam) => sum + (exam.student_mark / exam.total_mark) * 100, 0) / student.exam_results.length).toFixed(1)}%
+                    </span>
+                  </div>
+                </div>
               </div>
             ) : (
-              <div className="bg-blue-50 rounded-xl p-4 border border-blue-200 text-center">
-                <FileText className="w-8 h-8 text-blue-500 mx-auto mb-2" />
-                <p className="text-blue-700">{t.noExams}</p>
+              <div className="bg-blue-50 rounded-xl p-8 border border-blue-300 text-center">
+                <FileText className="w-12 h-12 text-blue-400 mx-auto mb-4" />
+                <p className="text-blue-700 text-lg font-medium">{t.noExams}</p>
+                <p className="text-blue-600 text-sm mt-2">
+                  {language === 'en' 
+                    ? 'No exam results available for this student yet.' 
+                    : 'لا توجد نتائج امتحانات متاحة لهذا الطالب حتى الآن.'}
+                </p>
               </div>
             )}
           </div>

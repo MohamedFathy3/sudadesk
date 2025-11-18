@@ -4,6 +4,7 @@
 import GenericDataManager from "@/components/Tablecomponents/GenericDataManager";
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { Eye } from 'lucide-react';
 
 export default function StudentsPage() {
   const { user } = useAuth();
@@ -19,6 +20,25 @@ export default function StudentsPage() {
     fatherName: language === 'ar' ? 'اسم الأب' : 'Father Name',
     fatherPhone: language === 'ar' ? 'هاتف الأب' : 'Father Phone',
     classroom: language === 'ar' ? 'الفصل' : 'Class',
+    viewProfile: language === 'ar' ? 'عرض الملف' : 'View Profile',
+    actions: language === 'ar' ? 'الإجراءات' : 'Actions',
+  };
+
+  // دالة renderActions علشان تظهر زرار View Profile
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const renderActions = (item: any) => {
+    return (
+      <button
+        onClick={(e) => {
+          e.stopPropagation();
+          window.open(`/manager/students/${item.id}`, '_blank');
+        }}
+        className="flex items-center gap-2 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors text-sm"
+      >
+        <Eye className="w-4 h-4" />
+        {t.viewProfile}
+      </button>
+    );
   };
 
   return (
@@ -68,15 +88,30 @@ export default function StudentsPage() {
           key: 'classroom', 
           label: t.classroom, 
           sortable: true,
+        },
+        { 
+          key: 'actions', 
+          label: t.actions, 
+          sortable: false,
+          render: renderActions
         }
       ]}
       showAddButton={false}
       showEditButton={false}
       showDeleteButton={false}
-      // إضافة user_id تلقائياً في البيانات المرسلة
-      // initialData={{ 
-      //   "X-School-ID": user?.id // إضافة user_id من الـ AuthContext
-      // }}
+      showActiveToggle={false}
+      showSearch={true}
+      showBulkActions={false}
+      showDeletedToggle={false}
+      
+      initialData={{
+        filters: {},
+        orderBy: "id",
+        orderByDirection: "asc",
+        perPage: 10,
+        paginate: true,
+        delete: false
+      }}
     />
   );
 }

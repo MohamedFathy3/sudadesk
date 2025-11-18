@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
 import { apiFetch } from '@/lib/api';
 import { useLanguage } from '@/contexts/LanguageContext';
-
+import MainLayout from '@/components/MainLayout';
 interface AttendanceReport {
   message: string;
   employee: {
@@ -122,7 +122,8 @@ export default function EmployeeAttendanceReport() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-50 to-green-100 p-6">
+
+    <MainLayout>  <div className="min-h-screen bg-gradient-to-br from-green-50 to-green-100 p-6">
       <div className="max-w-6xl mx-auto">
         {/* Header */}
         <div className="bg-white rounded-2xl shadow-lg p-6 mb-6">
@@ -230,6 +231,7 @@ export default function EmployeeAttendanceReport() {
           </div>
         )}
       </div>
-    </div>
+    </div></MainLayout>
+  
   );
 }

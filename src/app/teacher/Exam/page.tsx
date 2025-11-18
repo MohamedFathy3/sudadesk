@@ -18,6 +18,7 @@ export default function TeachersPage() {
     totalMark: language === 'ar' ? 'الدرجة الكلية' : 'Total Mark',
     class: language === 'ar' ? 'الفصل' : 'Class',
     view: language === 'ar' ? 'عرض' : 'View',
+    course: language === 'ar' ? 'الماده' : 'material',
   };
 
   return (
@@ -36,6 +37,12 @@ export default function TeachersPage() {
           label: t.examName, 
           sortable: true 
         },
+         { 
+          key: 'course', 
+          label: t.course, 
+          sortable: true 
+        },
+        
         { 
           key: 'total_mark', 
           label: t.totalMark, 

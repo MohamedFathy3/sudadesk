@@ -9,6 +9,8 @@ import { Toaster } from 'react-hot-toast';
 import ErrorBoundary from './ErrorBoundary';
 import NProgress from 'nprogress';
 import 'nprogress/nprogress.css';
+import { LanguageProvider } from "@/contexts/LanguageContext";
+
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   const [queryClient] = useState(() => new QueryClient());
   const [isLoading, setIsLoading] = useState(true);
@@ -43,7 +45,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             }}
           />
         )} 
-           <QueryClientProvider client={queryClient}>
+        <LanguageProvider>  <QueryClientProvider client={queryClient}>
           <AuthProvider>
             <ThemeProvider attribute="class" defaultTheme="light" enableSystem>
               <ErrorBoundary>
@@ -53,7 +55,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             </ThemeProvider>
           </AuthProvider>
           <ReactQueryDevtools initialIsOpen={false} />
-        </QueryClientProvider>
+        </QueryClientProvider></LanguageProvider>
+      
+        
       
       </body>
     </html>

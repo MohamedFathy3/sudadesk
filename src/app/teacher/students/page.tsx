@@ -9,8 +9,9 @@ import { useState, useEffect } from 'react';
 import { useApiData } from '@/hook/useApiData';
 import { useApiMutation } from '@/hook/useApiMutation';
 import { Entity } from '@/types/generic-data-manager';
+import toast from 'react-hot-toast'; // ✅ إضافة الـ toaster
 
-// Types
+// Types (تبقى كما هي)
 interface Student {
   id: number;
   name: string;
@@ -18,7 +19,6 @@ interface Student {
   exam_results: unknown[];
 }
 
-// ده النوع الأساسي بتاعك
 interface ClassItem extends Entity {
   id: number;
   name: string;
@@ -80,7 +80,6 @@ export default function StudentsPage() {
 
   // تعريف دالة renderActions أولاً
   const renderActions = (item: Entity) => {
-    // نحول item إلى ClassItem
     const classItem = item as ClassItem;
     
     return (
@@ -152,7 +151,7 @@ export default function StudentsPage() {
   // Submit attendance using mutation
   const submitAttendance = async () => {
     if (!selectedClass) {
-      console.error('No class selected');
+      toast.error('No class selected'); // ✅ Toaster بدل alert
       return;
     }
 
@@ -169,7 +168,7 @@ export default function StudentsPage() {
     attendanceMutation.mutate(attendancePayload, {
       onSuccess: (data) => {
         console.log('✅ Attendance submitted successfully:', data);
-        alert('Attendance submitted successfully!');
+        toast.success('Attendance submitted successfully!'); // ✅ Toaster بدل alert
         setIsAttendanceModalOpen(false);
         setSelectedClass(null);
         setAttendanceData({});
@@ -177,7 +176,7 @@ export default function StudentsPage() {
       },
       onError: (error) => {
         console.error('❌ Attendance submission error:', error);
-        alert(`Failed to submit attendance: ${error.message}`);
+        toast.error(`Failed to submit attendance: ${error.message}`); // ✅ Toaster بدل alert
       }
     });
   };
@@ -185,12 +184,12 @@ export default function StudentsPage() {
   // Submit exam results using mutation
   const submitExamResults = async () => {
     if (!selectedClass) {
-      console.error('No class selected');
+      toast.error('No class selected'); // ✅ Toaster بدل alert
       return;
     }
 
     if (selectedExamId === 0) {
-      alert("Please select an exam");
+      toast.error("Please select an exam"); // ✅ Toaster بدل alert
       return;
     }
 
@@ -207,7 +206,7 @@ export default function StudentsPage() {
     examResultsMutation.mutate(examResultsPayload, {
       onSuccess: (data) => {
         console.log('✅ Exam results submitted successfully:', data);
-        alert('Exam results submitted successfully!');
+        toast.success('Exam results submitted successfully!'); // ✅ Toaster بدل alert
         setIsExamModalOpen(false);
         setSelectedClass(null);
         setExamResults({});
@@ -216,7 +215,7 @@ export default function StudentsPage() {
       },
       onError: (error) => {
         console.error('❌ Exam results submission error:', error);
-        alert(`Failed to submit exam results: ${error.message}`);
+        toast.error(`Failed to submit exam results: ${error.message}`); // ✅ Toaster بدل alert
       }
     });
   };
@@ -267,7 +266,7 @@ export default function StudentsPage() {
             key: 'actions', 
             label: 'Actions', 
             sortable: false,
-            render: renderActions // دلوقتي هتشتغل من غير مشاكل
+            render: renderActions
           },
         ]}
         

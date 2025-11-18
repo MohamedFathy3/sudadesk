@@ -2,6 +2,8 @@
 'use client';
 import GenericDataManager from "@/components/Tablecomponents/GenericDataManager";
 import { useLanguage } from '@/contexts/LanguageContext';
+import Link from 'next/link';
+import { Eye, BarChart3,DollarSign } from 'lucide-react';
 
 export default function SchoolsPage() {
   const { language } = useLanguage();
@@ -18,6 +20,10 @@ export default function SchoolsPage() {
     address: language === 'ar' ? 'العنوان' : 'Address',
     notAvailable: language === 'ar' ? 'غير متوفر' : 'N/A',
     noLogo: language === 'ar' ? 'لا يوجد شعار' : 'No Logo',
+    actions: language === 'ar' ? 'الإجراءات' : 'Actions',
+    viewReport: language === 'ar' ? 'عرض التقرير' : 'View Report',
+    expensesReport: language === 'ar' ? 'تقرير المصروفات' : 'Expenses Report',
+    rolesReport: language === 'ar' ? 'تقرير الأدوار' : 'Roles Report',
     
     // Form Labels
     schoolLogo: language === 'ar' ? 'شعار المدرسة' : 'School Logo',
@@ -115,6 +121,35 @@ export default function SchoolsPage() {
           render: (item) => (
             <div className="max-w-[200px] truncate" title={item.address}>
               {item.address || t.notAvailable}
+            </div>
+          )
+        },
+        {
+          key: 'actions',
+          label: t.actions,
+          sortable: false,
+          render: (item) => (
+            <div className="flex justify-center space-x-2">
+              <Link
+                href={`/admin/createSchool/view/${item.id}/`}
+                className="inline-flex items-center px-3 py-1 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm"
+                title={t.expensesReport}
+              >
+                <DollarSign className="w-4 h-4" />
+                <span className={language === 'ar' ? 'mr-2' : 'ml-2'}>
+                  {language === 'ar' ? 'المصروفات' : 'Expenses'}
+                </span>
+              </Link>
+              <Link
+                href={`/admin/createSchool/${item.id}`}
+                className="inline-flex items-center px-3 py-1 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-sm"
+                title={t.rolesReport}
+              >
+                <BarChart3 className="w-4 h-4" />
+                <span className={language === 'ar' ? 'mr-2' : 'ml-2'}>
+                  {language === 'ar' ? 'الأدوار' : 'Roles'}
+                </span>
+              </Link>
             </div>
           )
         }

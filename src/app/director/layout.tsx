@@ -10,7 +10,7 @@ import ErrorBoundary from './ErrorBoundary';
 import NProgress from 'nprogress';
 import 'nprogress/nprogress.css';
 import { LanguageProvider } from "@/contexts/LanguageContext";
-
+import MainLayout from '@/components/MainLayout';
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   const [queryClient] = useState(() => new QueryClient());
   const [isLoading, setIsLoading] = useState(true);
@@ -47,12 +47,14 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         )} 
         <LanguageProvider>  <QueryClientProvider client={queryClient}>
           <AuthProvider>
+            <MainLayout>
             <ThemeProvider attribute="class" defaultTheme="light" enableSystem>
               <ErrorBoundary>
                 {children}
               </ErrorBoundary>
               <Toaster position="top-right" reverseOrder={false} />
             </ThemeProvider>
+            </MainLayout>
           </AuthProvider>
           <ReactQueryDevtools initialIsOpen={false} />
         </QueryClientProvider></LanguageProvider>

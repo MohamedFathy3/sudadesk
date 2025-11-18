@@ -45,6 +45,42 @@ export interface ReceptionInfo {
   email: string;
 }
 
+export interface PaymentTransaction {
+  id: number;
+  amount: number;
+  method: string;
+  bdf_invoice_number: string | null;
+  paid_at: string;
+  notes: string | null;
+  accountant: {
+    id: number;
+    name: string;
+    email: string;
+  };
+}
+
+export interface Payment {
+  id: number;
+  student: {
+    id: number;
+    name: string;
+    education_stage: string;
+    term: string;
+  };
+  total_amount: number;
+  paid_amount: number;
+  remaining_amount: number;
+  type: 'installment' | 'full_payment';
+
+  installmentsCount:string;
+  status: 'paid' | 'pending' | 'overdue';
+  bdf_invoice_number: string | null;
+  created_at: string;
+  transactions: PaymentTransaction[];
+  installments_count:string;
+  
+}
+
 export interface AuthUser {
   id: number;
   name: string;
@@ -59,6 +95,7 @@ export interface AuthUser {
   created_at: string;
   updated_at: string;
   
+  // Student specific fields
   age?: number;
   classroom?: string;
   education_stage?: string;
@@ -71,8 +108,8 @@ export interface AuthUser {
   father?: ParentInfo;
   mother?: ParentInfo;
   reception?: ReceptionInfo;
+  payments?: Payment[];
 }
-
 
 interface LoginResponse {
   result: string;
