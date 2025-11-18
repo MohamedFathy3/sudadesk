@@ -6,8 +6,12 @@ import { useState } from 'react';
 import { apiFetch } from '@/lib/api';
 import { useLanguage } from '@/contexts/LanguageContext';
 import toast from "react-hot-toast";
+import { useAuth } from '@/contexts/AuthContext';
+
 
 export default function TeachersPage() {
+  const { user, role } = useAuth();
+
   const { language } = useLanguage();
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [selectedEmployee, setSelectedEmployee] = useState<any>(null);
@@ -98,16 +102,16 @@ export default function TeachersPage() {
             label: t.name, 
             sortable: true 
           },
-          { 
-            key: 'email', 
-            label: t.email, 
-            sortable: true 
-          },
-          { 
-            key: 'phone', 
-            label: t.phone, 
-            sortable: false 
-          },
+          // { 
+          //   key: 'email', 
+          //   label: t.email, 
+          //   sortable: true 
+          // },
+          // { 
+          //   key: 'phone', 
+          //   label: t.phone, 
+          //   sortable: false 
+          // },
           { 
             key: 'attendance_count', 
             label: t.attendance, 
@@ -156,24 +160,31 @@ export default function TeachersPage() {
                 >
                   {t.viewReport}
                 </button>
-                <button
-                  onClick={() => openAttendanceModal(item)}
-                  className="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 text-sm"
-                >
-                  {t.markAttendance}
-                </button>
-                <button
-                  onClick={() => openSalaryModal(item)}
-                  className="px-3 py-1 bg-purple-500 text-white rounded hover:bg-purple-600 text-sm"
-                >
-                  {t.calculateSalary}
-                </button>
+
+            {user?.role === "hr" && (
+  <div className="flex items-center gap-2">
+    <button
+      onClick={() => openAttendanceModal(item)}
+      className="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 text-sm"
+    >
+      {t.markAttendance}
+    </button>
+
+    <button
+      onClick={() => openSalaryModal(item)}
+      className="px-3 py-1 bg-purple-500 text-white rounded hover:bg-purple-600 text-sm"
+    >
+      {t.calculateSalary}
+    </button>
+  </div>
+)}
+
               </div>
             )
           }
         ]}
         formFields={[]}
-        showActiveToggle={true}
+        showActiveToggle={false}
         showAddButton={false}
         showEditButton={false}
         showDeleteButton={false}

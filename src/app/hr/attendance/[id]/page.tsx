@@ -5,6 +5,7 @@ import { useParams } from 'next/navigation';
 import { apiFetch } from '@/lib/api';
 import { useLanguage } from '@/contexts/LanguageContext';
 import MainLayout from '@/components/MainLayout';
+
 interface AttendanceReport {
   message: string;
   employee: {
@@ -12,7 +13,7 @@ interface AttendanceReport {
     name: string;
     role: string;
   };
-  attendance_report: Array<{
+  report: Array<{
     month: string;
     details: Array<{
       attendance_date: string;
@@ -23,6 +24,12 @@ interface AttendanceReport {
       present_days: number;
       absent_days: number;
       leave_days: number;
+    };
+    salary: {
+      base_salary: string;
+      bonus: string;
+      deduction: string;
+      final_salary: string;
     };
   }>;
 }
@@ -37,13 +44,13 @@ export default function EmployeeAttendanceReport() {
 
   const t = {
     // Loading and Error States
-    loading: language === 'ar' ? 'جاري تحميل تقرير الحضور...' : 'Loading attendance report...',
-    error: language === 'ar' ? 'فشل في تحميل تقرير الحضور' : 'Failed to fetch attendance report',
+    loading: language === 'ar' ? 'جاري تحميل تقرير الحضور والراتب...' : 'Loading attendance and salary report...',
+    error: language === 'ar' ? 'فشل في تحميل التقرير' : 'Failed to fetch report',
     noReport: language === 'ar' ? 'لم يتم العثور على تقرير' : 'No report found',
-    noData: language === 'ar' ? 'لا توجد بيانات حضور' : 'No attendance data',
+    noData: language === 'ar' ? 'لا توجد بيانات' : 'No data available',
     
     // Header
-    attendanceReport: language === 'ar' ? 'تقرير الحضور' : 'Attendance Report',
+    attendanceReport: language === 'ar' ? 'تقرير الحضور والراتب' : 'Attendance & Salary Report',
     employeeId: language === 'ar' ? 'رقم الموظف:' : 'Employee ID:',
     generatedOn: language === 'ar' ? 'تم الإنشاء في:' : 'Generated on:',
     
@@ -53,13 +60,22 @@ export default function EmployeeAttendanceReport() {
     absentDays: language === 'ar' ? 'أيام الغياب' : 'Absent Days',
     leaveDays: language === 'ar' ? 'أيام الإجازة' : 'Leave Days',
     
+    // Salary Section
+    salaryDetails: language === 'ar' ? 'تفاصيل الراتب' : 'Salary Details',
+    baseSalary: language === 'ar' ? 'الراتب الأساسي' : 'Base Salary',
+    bonus: language === 'ar' ? 'المكافأة' : 'Bonus',
+    deduction: language === 'ar' ? 'الخصومات' : 'Deduction',
+    finalSalary: language === 'ar' ? 'صافي الراتب' : 'Final Salary',
+    currency: language === 'ar' ? 'ج.م' : 'EGP',
+    
     // Details Section
     dailyAttendance: language === 'ar' ? 'الحضور اليومي' : 'Daily Attendance',
     present: language === 'ar' ? 'حاضر' : 'PRESENT',
     absent: language === 'ar' ? 'غائب' : 'ABSENT',
     
     // No Data Message
-    noAttendanceData: language === 'ar' ? 'لا توجد سجلات حضور لهذا الموظف' : 'No attendance records found for this employee.'
+    noAttendanceData: language === 'ar' ? 'لا توجد سجلات حضور لهذا الموظف' : 'No attendance records found for this employee.',
+    noSalaryData: language === 'ar' ? 'لا توجد بيانات راتب لهذا الشهر' : 'No salary data for this month.'
   };
 
   useEffect(() => {
@@ -121,117 +137,188 @@ export default function EmployeeAttendanceReport() {
     });
   };
 
+  // Function to format currency
+  const formatCurrency = (amount: string) => {
+    return parseFloat(amount).toLocaleString(language === 'ar' ? 'ar-EG' : 'en-US', {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
+    });
+  };
+
   return (
-
-    <MainLayout>  <div className="min-h-screen bg-gradient-to-br from-green-50 to-green-100 p-6">
-      <div className="max-w-6xl mx-auto">
-        {/* Header */}
-        <div className="bg-white rounded-2xl shadow-lg p-6 mb-6">
-          <div className={`flex justify-between items-center ${language === 'ar' ? 'flex-row-reverse' : ''}`}>
-            <div className={language === 'ar' ? 'text-right' : ''}>
-              <h1 className="text-3xl font-bold text-green-800 mb-2">
-                {t.attendanceReport}
-              </h1>
-              <p className="text-green-600">
-                {report.employee.name} - {report.employee.role}
-              </p>
-            </div>
-            <div className={language === 'ar' ? 'text-left' : 'text-right'}>
-              <p className="text-sm text-green-600">{t.employeeId} EMP{report.employee.id}</p>
-              <p className="text-sm text-green-600">
-                {t.generatedOn} {new Date().toLocaleDateString()}
-              </p>
-            </div>
-          </div>
-        </div>
-
-        {/* Monthly Reports */}
-        <div className="space-y-6">
-          {report.attendance_report.map((monthReport, index) => (
-            <div key={index} className="bg-white rounded-2xl shadow-lg overflow-hidden">
-              {/* Month Header */}
-              <div className="bg-green-500 px-6 py-4">
-                <h2 className="text-xl font-bold text-white">
-                  {formatMonthName(monthReport.month)}
-                </h2>
+    <MainLayout>
+      <div className="min-h-screen bg-gradient-to-br from-green-50 to-green-100 p-6">
+        <div className="max-w-6xl mx-auto">
+          {/* Header */}
+          <div className="bg-white rounded-2xl shadow-lg p-6 mb-6">
+            <div className={`flex justify-between items-center ${language === 'ar' ? 'flex-row-reverse' : ''}`}>
+              <div className={language === 'ar' ? 'text-right' : ''}>
+                <h1 className="text-3xl font-bold text-green-800 mb-2">
+                  {t.attendanceReport}
+                </h1>
+                <p className="text-green-600">
+                  {report.employee.name} - {report.employee.role}
+                </p>
               </div>
-
-              <div className="p-6">
-                {/* Summary Cards */}
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-                  <div className="bg-green-50 rounded-lg p-4 text-center">
-                    <div className="text-2xl font-bold text-green-700">
-                      {monthReport.summary.total_days}
-                    </div>
-                    <div className="text-sm text-green-600">{t.totalDays}</div>
-                  </div>
-                  <div className="bg-green-100 rounded-lg p-4 text-center">
-                    <div className="text-2xl font-bold text-green-800">
-                      {monthReport.summary.present_days}
-                    </div>
-                    <div className="text-sm text-green-700">{t.presentDays}</div>
-                  </div>
-                  <div className="bg-red-50 rounded-lg p-4 text-center">
-                    <div className="text-2xl font-bold text-red-700">
-                      {monthReport.summary.absent_days}
-                    </div>
-                    <div className="text-sm text-red-600">{t.absentDays}</div>
-                  </div>
-                  <div className="bg-blue-50 rounded-lg p-4 text-center">
-                    <div className="text-2xl font-bold text-blue-700">
-                      {monthReport.summary.leave_days}
-                    </div>
-                    <div className="text-sm text-blue-600">{t.leaveDays}</div>
-                  </div>
-                </div>
-
-                {/* Attendance Details */}
-                <h3 className={`text-lg font-semibold text-gray-800 mb-4 ${language === 'ar' ? 'text-right' : ''}`}>
-                  {t.dailyAttendance}
-                </h3>
-                <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3">
-                  {monthReport.details.map((day, dayIndex) => (
-                    <div
-                      key={dayIndex}
-                      className={`p-3 rounded-lg text-center ${
-                        day.status === 'present'
-                          ? 'bg-green-100 border border-green-300'
-                          : 'bg-red-100 border border-red-300'
-                      }`}
-                    >
-                      <div className="text-sm font-medium text-gray-700">
-                        {new Date(day.attendance_date).getDate()}
-                      </div>
-                      <div className="text-xs text-gray-500">
-                        {formatDayName(day.attendance_date)}
-                      </div>
-                      <div className={`text-xs font-bold mt-1 ${
-                        day.status === 'present' ? 'text-green-700' : 'text-red-700'
-                      }`}>
-                        {day.status === 'present' ? t.present : t.absent}
-                      </div>
-                    </div>
-                  ))}
-                </div>
+              <div className={language === 'ar' ? 'text-left' : 'text-right'}>
+                <p className="text-sm text-green-600">{t.employeeId} EMP{report.employee.id}</p>
+                <p className="text-sm text-green-600">
+                  {t.generatedOn} {new Date().toLocaleDateString()}
+                </p>
               </div>
             </div>
-          ))}
-        </div>
-
-        {/* No Data Message */}
-        {report.attendance_report.length === 0 && (
-          <div className="bg-white rounded-2xl shadow-lg p-8 text-center">
-            <div className="text-6xl mb-4">📊</div>
-            <h3 className="text-xl font-semibold text-gray-700 mb-2">
-              {t.noData}
-            </h3>
-            <p className="text-gray-500">
-              {t.noAttendanceData}
-            </p>
           </div>
-        )}
+
+          {/* Monthly Reports */}
+          <div className="space-y-6">
+            {report.report.map((monthReport, index) => (
+              <div key={index} className="bg-white rounded-2xl shadow-lg overflow-hidden">
+                {/* Month Header */}
+                <div className="bg-green-500 px-6 py-4">
+                  <h2 className="text-xl font-bold text-white">
+                    {formatMonthName(monthReport.month)}
+                  </h2>
+                </div>
+
+                <div className="p-6">
+                  {/* Summary Cards */}
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                    <div className="bg-green-50 rounded-lg p-4 text-center">
+                      <div className="text-2xl font-bold text-green-700">
+                        {monthReport.summary.total_days}
+                      </div>
+                      <div className="text-sm text-green-600">{t.totalDays}</div>
+                    </div>
+                    <div className="bg-green-100 rounded-lg p-4 text-center">
+                      <div className="text-2xl font-bold text-green-800">
+                        {monthReport.summary.present_days}
+                      </div>
+                      <div className="text-sm text-green-700">{t.presentDays}</div>
+                    </div>
+                    <div className="bg-red-50 rounded-lg p-4 text-center">
+                      <div className="text-2xl font-bold text-red-700">
+                        {monthReport.summary.absent_days}
+                      </div>
+                      <div className="text-sm text-red-600">{t.absentDays}</div>
+                    </div>
+                    <div className="bg-blue-50 rounded-lg p-4 text-center">
+                      <div className="text-2xl font-bold text-blue-700">
+                        {monthReport.summary.leave_days}
+                      </div>
+                      <div className="text-sm text-blue-600">{t.leaveDays}</div>
+                    </div>
+                  </div>
+
+                  {/* Salary Section */}
+                  <div className="mb-6">
+                    <h3 className={`text-lg font-semibold text-gray-800 mb-4 ${language === 'ar' ? 'text-right' : ''}`}>
+                      {t.salaryDetails}
+                    </h3>
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                      {/* Base Salary */}
+                      <div className="bg-blue-50 rounded-lg p-4 border border-blue-200">
+                        <div className="text-center">
+                          <div className="text-sm text-blue-600 mb-1">{t.baseSalary}</div>
+                          <div className="text-xl font-bold text-blue-800">
+                            {formatCurrency(monthReport.salary.base_salary)} {t.currency}
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Bonus */}
+                      <div className="bg-green-50 rounded-lg p-4 border border-green-200">
+                        <div className="text-center">
+                          <div className="text-sm text-green-600 mb-1">{t.bonus}</div>
+                          <div className="text-xl font-bold text-green-800">
+                            + {formatCurrency(monthReport.salary.bonus)} {t.currency}
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Deduction */}
+                      <div className="bg-red-50 rounded-lg p-4 border border-red-200">
+                        <div className="text-center">
+                          <div className="text-sm text-red-600 mb-1">{t.deduction}</div>
+                          <div className="text-xl font-bold text-red-800">
+                            - {formatCurrency(monthReport.salary.deduction)} {t.currency}
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Final Salary */}
+                      <div className="bg-purple-50 rounded-lg p-4 border border-purple-200">
+                        <div className="text-center">
+                          <div className="text-sm text-purple-600 mb-1">{t.finalSalary}</div>
+                          <div className="text-xl font-bold text-purple-800">
+                            {formatCurrency(monthReport.salary.final_salary)} {t.currency}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Salary Summary */}
+                    <div className="mt-4 bg-gray-50 rounded-lg p-4">
+                      <div className={`flex justify-between items-center ${language === 'ar' ? 'flex-row-reverse' : ''}`}>
+                        <div className={language === 'ar' ? 'text-right' : ''}>
+                          <span className="text-gray-600">{t.baseSalary}: </span>
+                          <span className="font-semibold">{formatCurrency(monthReport.salary.base_salary)} {t.currency}</span>
+                        </div>
+                        <div className={`flex items-center gap-2 ${language === 'ar' ? 'flex-row-reverse' : ''}`}>
+                          <span className="text-green-600">+ {formatCurrency(monthReport.salary.bonus)}</span>
+                          <span className="text-red-600">- {formatCurrency(monthReport.salary.deduction)}</span>
+                          <span className="text-purple-600 font-bold">= {formatCurrency(monthReport.salary.final_salary)}</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Attendance Details */}
+                  <h3 className={`text-lg font-semibold text-gray-800 mb-4 ${language === 'ar' ? 'text-right' : ''}`}>
+                    {t.dailyAttendance}
+                  </h3>
+                  <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3">
+                    {monthReport.details.map((day, dayIndex) => (
+                      <div
+                        key={dayIndex}
+                        className={`p-3 rounded-lg text-center ${
+                          day.status === 'present'
+                            ? 'bg-green-100 border border-green-300'
+                            : 'bg-red-100 border border-red-300'
+                        }`}
+                      >
+                        <div className="text-sm font-medium text-gray-700">
+                          {new Date(day.attendance_date).getDate()}
+                        </div>
+                        <div className="text-xs text-gray-500">
+                          {formatDayName(day.attendance_date)}
+                        </div>
+                        <div className={`text-xs font-bold mt-1 ${
+                          day.status === 'present' ? 'text-green-700' : 'text-red-700'
+                        }`}>
+                          {day.status === 'present' ? t.present : t.absent}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* No Data Message */}
+          {report.report.length === 0 && (
+            <div className="bg-white rounded-2xl shadow-lg p-8 text-center">
+              <div className="text-6xl mb-4">📊</div>
+              <h3 className="text-xl font-semibold text-gray-700 mb-2">
+                {t.noData}
+              </h3>
+              <p className="text-gray-500">
+                {t.noAttendanceData}
+              </p>
+            </div>
+          )}
+        </div>
       </div>
-    </div></MainLayout>
-  
+    </MainLayout>
   );
 }

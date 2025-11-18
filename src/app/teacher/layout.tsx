@@ -29,9 +29,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   }, []);
 
   return (
-    <html lang="en" suppressHydrationWarning>
-      <body suppressHydrationWarning>
-        {isLoading && (
+
+    <>
+     {isLoading && (
           <div
             style={{
               position: 'fixed',
@@ -57,9 +57,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <ReactQueryDevtools initialIsOpen={false} />
         </QueryClientProvider></LanguageProvider>
       
+    </>
+       
         
-      
-      </body>
-    </html>
+     
   );
 }

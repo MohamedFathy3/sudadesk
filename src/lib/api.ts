@@ -122,7 +122,6 @@ export async function apiFetchBlob(endpoint: string, options: RequestInit = {}) 
     }
   }
 
-  // تحضير الـ body - استخدام let
   let body: BodyInit | undefined = undefined;
   
   if (options.body) {

@@ -9,9 +9,8 @@ import { Toaster } from 'react-hot-toast';
 import ErrorBoundary from './ErrorBoundary';
 import NProgress from 'nprogress';
 import 'nprogress/nprogress.css';
-import MainLayout from '@/components/MainLayout';
 import { LanguageProvider } from "@/contexts/LanguageContext";
-
+import MainLayout from '@/components/MainLayout';
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   const [queryClient] = useState(() => new QueryClient());
   const [isLoading, setIsLoading] = useState(true);
@@ -19,23 +18,20 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   useEffect(() => {
     NProgress.start();
 
-    const timer = setTimeout(() => {
+    setTimeout(() => {
       setIsLoading(false);
       NProgress.done(); 
     }, 2000);
 
     return () => {
       NProgress.done();
-    clearTimeout(timer);
-
     };
-    
   }, []);
 
   return (
-    <html lang="en" suppressHydrationWarning>
-      <body suppressHydrationWarning>
-        {isLoading && (
+
+    <>
+     {isLoading && (
           <div
             style={{
               position: 'fixed',
@@ -49,9 +45,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             }}
           />
         )} 
-        <LanguageProvider>    <MainLayout>  <QueryClientProvider client={queryClient}>
+  <MainLayout>     <LanguageProvider>  <QueryClientProvider client={queryClient}>
           <AuthProvider>
-            <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+            <ThemeProvider attribute="class" defaultTheme="light" enableSystem>
               <ErrorBoundary>
                 {children}
               </ErrorBoundary>
@@ -59,10 +55,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             </ThemeProvider>
           </AuthProvider>
           <ReactQueryDevtools initialIsOpen={false} />
-        </QueryClientProvider></MainLayout></LanguageProvider>
-    
+        </QueryClientProvider></LanguageProvider></MainLayout>
+   
       
-      </body>
-    </html>
+    </>
+       
+        
+     
   );
 }

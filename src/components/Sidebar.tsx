@@ -57,9 +57,9 @@ export default function Sidebar({
     financialManagement: language === 'ar' ? 'الإدارة المالية' : 'Financial Management',
     humanResources: language === 'ar' ? 'الموارد البشرية' : 'Human Resources',
     systemSettings: language === 'ar' ? 'إعدادات النظام' : 'System Settings',
+    profile: language === 'ar' ? 'ملف النظام' : 'Profile Settings',
   }
 
-  // تعريف المجموعات الرئيسية
   const menuGroups = [
     {
       id: 'general',
@@ -91,22 +91,26 @@ export default function Sidebar({
         { name: t.directors, icon: Crown, href: '/manager/director', roles: ['manager'] },
       ]
     },
+    
     {
       id: 'financial',
       title: t.financialManagement,
-      roles: ['accountant'],
+      roles: ['accountant','manager'],
       items: [
-        { name: t.expenses, icon: FileText, href: '/Account/expent', roles: ['accountant'] },
-        { name: t.expensesstudents, icon: FileText, href: '/Account/students', roles: ['accountant'] },
+        { name: t.expenses, icon: FileText, href: '/Account/expent', roles: ['accountant','manager'] },
+        { name: t.expensesstudents, icon: FileText, href: '/Account/students', roles: ['accountant','manager'] },
       ]
     },
+
+  
+
     {
       id: 'hr',
-      title: t.humanResources,
+      title: t.humanResources,                                                                                                                                              
       roles: ['hr', 'manager'],
       items: [
         { name: t.hr, icon: Users, href: '/manager/hr', roles: ['manager'] },
-        { name: t.attendance, icon: FileText, href: '/hr/attendance', roles: ['hr'] },
+        { name: t.attendance, icon: FileText, href: '/hr/attendance', roles: ['hr','manager'] },
       ]
     },
     {
@@ -118,14 +122,21 @@ export default function Sidebar({
         { name: t.createExam, icon: FileText, href: '/teacher/AddExam', roles: ['teacher'] },
         { name: t.exam, icon: FileText, href: '/teacher/Exam', roles: ['teacher'] },
       ]
-    }
+    },
+     {
+      id: 'Settings',
+      title: language === 'ar' ? 'الاعدادات' : 'Settings',
+      roles: ['accountant','manager'],
+      items: [
+        { name: t.profile, icon: FileText, href: '/manager/profile', roles: ['manager'] },
+      ]
+    },
   ]
 
   const toggleDropdown = (groupId: string) => {
     setOpenDropdown(openDropdown === groupId ? null : groupId)
   }
 
-  // فلترة المجموعات حسب الصلاحيات
   const filteredGroups = menuGroups.filter(group =>
     group.roles.some(r => hasRole(r)) && 
     group.items.some(item => item.roles.some(role => hasRole(role)))

@@ -18,7 +18,7 @@ import {
   Users
 } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
-
+import MainLayout from '@/components/MainLayout';
 // Types
 interface ExamResult {
   exam_id: number;
@@ -225,20 +225,14 @@ export default function StudentProfilePage() {
   const attendanceData = latestMonth ? student.attendance_report[latestMonth] : null;
 
   return (
-    <div className={`min-h-screen bg-gradient-to-br from-green-50 via-white to-emerald-50 py-8 ${language === 'ar' ? 'rtl' : 'ltr'}`}>
+    <MainLayout><div className={`min-h-screen bg-gradient-to-br from-green-50 via-white to-emerald-50 py-8 ${language === 'ar' ? 'rtl' : 'ltr'}`}>
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* Header */}
         <div className="bg-white rounded-2xl shadow-lg p-6 mb-8 border border-green-200">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
-              <button
-                onClick={() => router.push('/students')}
-                className="flex items-center gap-2 px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors"
-              >
-                <ArrowLeft className="w-5 h-5" />
-                {t.backToClasses}
-              </button>
+            
               <div>
                 <h1 className="text-3xl font-bold text-gray-900">{t.studentProfile}</h1>
                 <p className="text-green-600 font-medium">{student.name}</p>
@@ -527,6 +521,7 @@ export default function StudentProfilePage() {
           </div>
         </div>
       </div>
-    </div>
+    </div></MainLayout>
+    
   );
 }

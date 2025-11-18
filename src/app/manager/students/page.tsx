@@ -64,26 +64,9 @@ export default function StudentsPage() {
           label: t.age, 
           sortable: true,
         },
-        { 
-          key: 'education_stage', 
-          label: t.educationStage, 
-          sortable: true,
-        },
-        { 
-          key: 'term', 
-          label: t.term, 
-          sortable: true,
-        },
-        { 
-          key: 'father.name', 
-          label: t.fatherName, 
-          sortable: true,
-        },
-        { 
-          key: 'father.phone', 
-          label: t.fatherPhone, 
-          sortable: false,
-        },
+ 
+     
+       
         { 
           key: 'classroom', 
           label: t.classroom, 

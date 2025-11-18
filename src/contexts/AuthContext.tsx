@@ -187,7 +187,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       return res;
     },
     onSuccess: async (data: LoginResponse) => {
-      // الكوكيز بتكون محفوظة تلقائياً من الـ proxy
       await queryClient.invalidateQueries({ queryKey: ['user'] });
     },
   });
