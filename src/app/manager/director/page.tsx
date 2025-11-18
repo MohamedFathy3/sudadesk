@@ -8,7 +8,7 @@ export default function TeachersPage() {
   const { language } = useLanguage();
 
   const t = {
-    title: language === 'ar' ? 'إدارة المديرين' : 'Directors Management',
+    title: language === 'ar' ? 'إدارة المشرف' : 'Directors Management',
     id: language === 'ar' ? 'الرقم' : 'ID',
     name: language === 'ar' ? 'اسم المدير' : 'Director Name',
     email: language === 'ar' ? 'البريد الإلكتروني' : 'Email',

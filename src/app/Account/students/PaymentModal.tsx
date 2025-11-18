@@ -171,8 +171,8 @@ export default function PaymentModal({ payment, isOpen, onClose }: PaymentModalP
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
             >
               <option value="cash">Cash</option>
-              <option value="card">Card</option>
-              <option value="transfer">Bank Transfer</option>
+              <option value="installment">Installment</option>
+    
             </select>
           </div>
 
