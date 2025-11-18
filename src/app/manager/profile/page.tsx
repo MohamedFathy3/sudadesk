@@ -520,6 +520,7 @@ export default function EditSchoolPage() {
                         value={formData.address}
                         onChange={handleInputChange}
                         required
+                         disabled
                         className="border-blue-200 focus:border-blue-500"
                       />
                     ) : (
