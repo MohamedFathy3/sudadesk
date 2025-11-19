@@ -197,7 +197,7 @@ const FormModal: React.FC<FormModalProps> = ({
 
   const tabs = getTabsData();
   const currentTab = tabs.find(tab => tab.id === activeTab) || tabs[0] || { id: 'basic', fields: [] };
-  const modalSize = 'w-full max-w-5xl';
+  const modalSize = 'w-full max-w-4xl';
 
   // ✅ دالة محلية لتحديث البيانات
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -247,8 +247,8 @@ const FormModal: React.FC<FormModalProps> = ({
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
-      <div className={`bg-white dark:bg-gray-900 rounded-3xl shadow-2xl ${modalSize} p-6 relative max-h-[90vh] overflow-hidden`} dir={language === 'ar' ? 'rtl' : 'ltr'}>
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm ">
+      <div className={`bg-white dark:bg-gray-900 rounded-3xl shadow-2xl ${modalSize} p-6 relative max-h-[80vh] overflow-auto`} dir={language === 'ar' ? 'rtl' : 'ltr'}>
         <button 
           onClick={onClose}
           className="absolute top-4 right-4 text-gray-500 dark:text-gray-300 hover:text-gray-800 dark:hover:text-gray-100 text-xl font-bold z-10"
@@ -257,7 +257,7 @@ const FormModal: React.FC<FormModalProps> = ({
         </button>
         
         {/* الهيدر */}
-        <div className="mb-6">
+        <div className="mb-2">
           <h2 className="text-2xl font-semibold text-gray-900 dark:text-gray-100">
             {editingItem ? `${t.edit} ${title}` : `${t.add} ${title}`}
           </h2>

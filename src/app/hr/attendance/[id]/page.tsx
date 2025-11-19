@@ -220,7 +220,7 @@ export default function EmployeeAttendanceReport() {
                         <div className="text-center">
                           <div className="text-sm text-blue-600 mb-1">{t.baseSalary}</div>
                           <div className="text-xl font-bold text-blue-800">
-                            {formatCurrency(monthReport.salary.base_salary)} {t.currency}
+                            {formatCurrency(monthReport.salary?.base_salary)} {t.currency}
                           </div>
                         </div>
                       </div>
@@ -230,7 +230,7 @@ export default function EmployeeAttendanceReport() {
                         <div className="text-center">
                           <div className="text-sm text-green-600 mb-1">{t.bonus}</div>
                           <div className="text-xl font-bold text-green-800">
-                            + {formatCurrency(monthReport.salary.bonus)} {t.currency}
+                            + {formatCurrency(monthReport.salary?.bonus)} {t.currency}
                           </div>
                         </div>
                       </div>
@@ -240,7 +240,7 @@ export default function EmployeeAttendanceReport() {
                         <div className="text-center">
                           <div className="text-sm text-red-600 mb-1">{t.deduction}</div>
                           <div className="text-xl font-bold text-red-800">
-                            - {formatCurrency(monthReport.salary.deduction)} {t.currency}
+                            - {formatCurrency(monthReport.salary?.deduction)} {t.currency}
                           </div>
                         </div>
                       </div>
@@ -250,7 +250,7 @@ export default function EmployeeAttendanceReport() {
                         <div className="text-center">
                           <div className="text-sm text-purple-600 mb-1">{t.finalSalary}</div>
                           <div className="text-xl font-bold text-purple-800">
-                            {formatCurrency(monthReport.salary.final_salary)} {t.currency}
+                            {formatCurrency(monthReport.salary?.final_salary)} {t.currency}
                           </div>
                         </div>
                       </div>
@@ -261,12 +261,12 @@ export default function EmployeeAttendanceReport() {
                       <div className={`flex justify-between items-center ${language === 'ar' ? 'flex-row-reverse' : ''}`}>
                         <div className={language === 'ar' ? 'text-right' : ''}>
                           <span className="text-gray-600">{t.baseSalary}: </span>
-                          <span className="font-semibold">{formatCurrency(monthReport.salary.base_salary)} {t.currency}</span>
+                          <span className="font-semibold">{formatCurrency(monthReport.salary?.base_salary)} {t.currency}</span>
                         </div>
                         <div className={`flex items-center gap-2 ${language === 'ar' ? 'flex-row-reverse' : ''}`}>
-                          <span className="text-green-600">+ {formatCurrency(monthReport.salary.bonus)}</span>
-                          <span className="text-red-600">- {formatCurrency(monthReport.salary.deduction)}</span>
-                          <span className="text-purple-600 font-bold">= {formatCurrency(monthReport.salary.final_salary)}</span>
+                          <span className="text-green-600">+ {formatCurrency(monthReport.salary?.bonus)}</span>
+                          <span className="text-red-600">- {formatCurrency(monthReport.salary?.deduction)}</span>
+                          <span className="text-purple-600 font-bold">= {formatCurrency(monthReport.salary?.final_salary)}</span>
                         </div>
                       </div>
                     </div>

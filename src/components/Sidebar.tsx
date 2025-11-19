@@ -89,6 +89,7 @@ export default function Sidebar({
         { name: t.teachers, icon: User, href: '/manager/teacher', roles: ['manager'] },
         { name: t.supervisors, icon: Shield, href: '/manager/supervisor', roles: ['manager'] },
         { name: t.directors, icon: Crown, href: '/manager/director', roles: ['manager'] },
+
       ]
     },
     
@@ -97,8 +98,10 @@ export default function Sidebar({
       title: t.financialManagement,
       roles: ['accountant','manager'],
       items: [
+                { name: t.accountant, icon: Home, href: '/manager/accountant', roles: ['accountant', 'manager'] },
         { name: t.expenses, icon: FileText, href: '/Account/expent', roles: ['accountant','manager'] },
         { name: t.expensesstudents, icon: FileText, href: '/Account/students', roles: ['accountant','manager'] },
+
       ]
     },
 
