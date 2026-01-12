@@ -11,10 +11,11 @@ const nextConfig: NextConfig = {
   remotePatterns: [
     {
       protocol: 'https',
-      hostname: 'sudadeskbackend.professionalacademyedu.com',
+      hostname: 'suducsback.solunile.com',
       pathname: '/storage/**', // هيشمل كل حاجة في الـ storage
     },
     {
+      
       protocol: 'http',
       hostname: '127.0.0.1',
       port: '8000',

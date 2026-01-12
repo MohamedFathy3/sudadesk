@@ -81,6 +81,28 @@ export interface Payment {
   
 }
 
+export interface GalleryItem {
+  id?: number;
+  title?: string;
+  image?: string;
+  description?: string;
+}
+
+export interface BlogItem {
+  id?: number;
+  title?: string;
+  excerpt?: string;
+  content?: string;
+  image?: string;
+  published_at?: string;
+}
+
+export interface SliderItem {
+  title?: string;
+  image?: string;
+  link?: string;
+}
+
 export interface AuthUser {
   id: number;
   name: string;
@@ -94,7 +116,18 @@ export interface AuthUser {
   school?: SchoolInfo | null;
   created_at: string;
   updated_at: string;
-  
+  des: string | null;
+  about?: {
+    about_us: string;
+    history_vision_values: string;
+    stages_and_activities: string;
+  };
+   why_choose?: { title: string; details: string } | null;
+ activities_gallery?: GalleryItem[] | null;
+  blog_content?: BlogItem[] | null;
+  slider?: SliderItem | null;
+
+
   // Student specific fields
   age?: number;
   classroom?: string;

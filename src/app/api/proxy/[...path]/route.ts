@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-const baseUrl = process.env.TARGET_API || 'https://job.professionalacademyedu.com/api';
+const baseUrl = process.env.TARGET_API || 'https://suducsback.solunile.com/api';
 
 let requestBody: unknown = null;
 let bodyRead = false;

@@ -1,3 +1,0 @@
-blue hex code : # 039fb3
-
-white hex code : # ffffff

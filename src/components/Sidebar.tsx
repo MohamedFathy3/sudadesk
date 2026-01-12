@@ -58,6 +58,7 @@ export default function Sidebar({
     humanResources: language === 'ar' ? 'الموارد البشرية' : 'Human Resources',
     systemSettings: language === 'ar' ? 'إعدادات النظام' : 'System Settings',
     profile: language === 'ar' ? 'ملف النظام' : 'Profile Settings',
+    profileSetting: language === 'ar' ? 'إعدادات الموقع' : ' Site Settings',
   }
 
   const menuGroups = [
@@ -77,6 +78,7 @@ export default function Sidebar({
         { name: t.parent, icon: Home, href: '/Perant', roles: ['Perant'] },
       ]
     },
+    
     {
       id: 'academic',
       title: t.academicManagement,
@@ -89,6 +91,7 @@ export default function Sidebar({
         { name: t.teachers, icon: User, href: '/manager/teacher', roles: ['manager'] },
         { name: t.supervisors, icon: Shield, href: '/manager/supervisor', roles: ['manager'] },
         { name: t.directors, icon: Crown, href: '/manager/director', roles: ['manager'] },
+        { name: t.profileSetting, icon: FileText, href: '/manager/SchoolProfile', roles: ['manager'] },
 
       ]
     },
