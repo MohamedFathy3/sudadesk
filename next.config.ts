@@ -9,25 +9,22 @@ const nextConfig: NextConfig = {
 
  images: {
   remotePatterns: [
-    {
-      protocol: 'https',
-      hostname: 'suducsback.solunile.com',
-      pathname: '/storage/**', // هيشمل كل حاجة في الـ storage
-    },
-    {
-      
-      protocol: 'http',
-      hostname: '127.0.0.1',
-      port: '8000',
-      pathname: '/storage/**',
-    },
-    {
-      protocol: 'http',
-      hostname: 'localhost',
-      port: '8000',
-      pathname: '/storage/**',
-    },
-  ],
+   {
+        protocol: 'http',
+        hostname: 'suducsback.solunile.com',
+        pathname: '/storage/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'suducsback.solunile.com',
+        pathname: '/storage/**',
+      },
+      // يمكن إضافة أكثر من hostname إذا احتجت
+      {
+        protocol: 'https',
+        hostname: '**', // لكل الـ hosts (أخطر لكن أسهل)
+      },
+    ],
   domains: ['127.0.0.1', 'localhost'],
 },
   serverExternalPackages: [

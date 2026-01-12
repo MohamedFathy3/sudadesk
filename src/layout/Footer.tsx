@@ -1,75 +1,100 @@
-import { CallToAction1 } from "@/components/CallToAction";
+// @/layout/Footer.tsx (بديل بدون react-scroll)
 import Image from "next/image";
 import Link from "next/link";
 import { Fragment } from "react";
 
-const Footer = ({ footer }: { footer: number }) => {
+// تعريف واجهة بيانات المدرسة
+interface School {
+  id: number;
+  school_id: number;
+  name: string;
+  slug: string;
+  address: string;
+  phone: string;
+  email: string;
+  des: string;
+  logo: string;
+  manager: {
+    name: string | null;
+    email: string;
+  };
+}
+
+// تعريف واجهة الـ Sections
+interface Section {
+  id: string;
+  label: string;
+}
+
+const Footer = ({ 
+  footer, 
+  schoolData,
+  sections = []
+}: { 
+  footer: number;
+  schoolData?: School;
+  sections?: Section[];
+}) => {
   switch (footer) {
     case 1:
-      return <Footer1 />;
-    case 2:
-      return <Footer2 />;
-
+      return <Footer1 schoolData={schoolData} sections={sections} />;
     default:
-      return <Footer1 />;
+      return <Footer1 schoolData={schoolData} sections={sections} />;
   }
 };
 export default Footer;
 
-const Footer1 = () => {
+const Footer1 = ({ schoolData, sections }: { schoolData?: School; sections?: Section[] }) => {
   return (
     <footer className="ed-footer section-bg-color-1 position-relative">
-      <FooterContent />
+      <FooterContent schoolData={schoolData} sections={sections} />
     </footer>
   );
 };
 
-const Footer2 = () => {
-  return (
-    <div className="footer-bg position-relative">
-      <div className="footer-bg__img">
-        <Image
-          width={1905}
-          height={1032}
-          sizes="100vw"
-          style={{ width: "100%", height: "100%", objectFit: "cover" }}
-          src="/assets/images/footer/footer-2/footer-bg.png"
-          alt="footer-bg-img"
-        />
-      </div>
-      {/* Start Call Action Area */}
-      <CallToAction1 />
-      {/* End Call Action Area */}
-      {/* Start Footer Area */}
-      <footer className="ed-footer position-relative">
-        <FooterContent />
-      </footer>
-      {/* End Footer Area  */}
-    </div>
-  );
-};
-
-const FooterContent = () => {
+const FooterContent = ({ schoolData, sections }: { schoolData?: School; sections?: Section[] }) => {
+  // استخدام بيانات المدرسة إذا وجدت، وإلا استخدام البيانات الافتراضية
   const contact = [
     {
-      icon: "assets/images/icons/icon-phone-blue.svg",
+      icon: "/assets/images/icons/icon-phone-blue.svg",
       title: "24/7 Support",
-      phone: "+532 321 33 33",
-      link: "tel:+532 321 33 33",
+      phone: schoolData?.phone || "+532 321 33 33",
+      link: schoolData?.phone ? `tel:${schoolData.phone}` : "tel:+532 321 33 33",
     },
     {
-      icon: "assets/images/icons/icon-envelope-blue.svg",
+      icon: "/assets/images/icons/icon-envelope-blue.svg",
       title: "Send Message",
-      email: "eduna@gmail.com",
-      link: "mailto:eduna@gmail.com",
+      email: schoolData?.email || "eduna@gmail.com",
+      link: schoolData?.email ? `mailto:${schoolData.email}` : "mailto:eduna@gmail.com",
     },
     {
-      icon: "assets/images/icons/icon-location-blue.svg",
-      title: "Our Locati0n",
-      address: "32/Jenin, London",
+      icon: "/assets/images/icons/icon-location-blue.svg",
+      title: "Our Location",
+      address: schoolData?.address || "32/Jenin, London",
       link: "#",
     },
   ];
+
+  // رابط اللوجو في الفوتر
+  const footerLogo = schoolData?.logo || "/assets/images/logo.svg";
+
+  // دالة للتمرير إلى السكشن
+  const scrollToSection = (sectionId: string) => {
+    if (typeof window !== 'undefined') {
+      const element = document.getElementById(sectionId);
+      if (element) {
+        const headerOffset = 80; // ارتفاع الـ header
+        const elementPosition = element.getBoundingClientRect().top;
+        const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
+
+        window.scrollTo({
+          top: offsetPosition,
+          behavior: 'smooth'
+        });
+      }
+    }
+  };
+
   return (
     <Fragment>
       {/* Footer Top */}
@@ -105,87 +130,40 @@ const FooterContent = () => {
                   <Image
                     width={140}
                     height={34}
-                    src="/assets/images/logo.svg"
+                    src={footerLogo}
                     alt="footer-logo"
                   />
                 </Link>
                 <p className="ed-footer__about-text">
-                  Excepteur sint occaecat cupidatat non proident sunt in culpa
-                  qui officia deserunt mollit.
+                  {schoolData?.des || "Excepteur sint occaecat cupidatat non proident sunt in culpa qui officia deserunt mollit."}
                 </p>
-                <ul className="ed-footer__about-social">
-                  <li>
-                    <a href="https://www.facebook.com/" target="_blank">
-                      <Image
-                        width={25}
-                        height={25}
-                        src="/assets/images/icons/icon-dark-facebook.svg"
-                        alt="icon-dark-facebook"
-                      />
-                    </a>
-                  </li>
-                  <li>
-                    <a href="https://www.twitter.com/" target="_blank">
-                      <Image
-                        width={25}
-                        height={25}
-                        src="/assets/images/icons/icon-dark-twitter.svg"
-                        alt="icon-dark-twitter"
-                      />
-                    </a>
-                  </li>
-                  <li>
-                    <a href="https://www.dribbble.com/" target="_blank">
-                      <Image
-                        width={25}
-                        height={25}
-                        src="/assets/images/icons/icon-dark-dribbble.svg"
-                        alt="icon-dark-dribbble"
-                      />
-                    </a>
-                  </li>
-                  <li>
-                    <a href="https://www.instagram.com/" target="_blank">
-                      <Image
-                        width={25}
-                        height={25}
-                        src="/assets/images/icons/icon-dark-instagram.svg"
-                        alt="icon-dark-instagram"
-                      />
-                    </a>
-                  </li>
-                </ul>
               </div>
             </div>
-            <div className="col-lg-2 col-md-6 col-12">
-              <div className="ed-footer__widget">
-                <h4 className="ed-footer__widget-title">Links</h4>
-                <ul className="ed-footer__widget-links">
-                  <li>
-                    <Link href="/about-1">About Us</Link>
-                  </li>
-                  <li>
-                    <Link href="/course-1">Our Courses</Link>
-                  </li>
-                  <li>
-                    <a href="#">Pricing Plan</a>
-                  </li>
-                  <li>
-                    <Link href="/contact">Contact Us</Link>
-                  </li>
-                  <li>
-                    <Link href="/blog">Our News</Link>
-                  </li>
-                  <li>
-                    <Link href="/faq">FAQ’s</Link>
-                  </li>
-                </ul>
+            
+            {/* عرض Sections */}
+            {sections && sections.length > 0 && (
+              <div className="col-lg-3 col-md-6 col-12">
+                <div className="ed-footer__widget">
+                  <h4 className="ed-footer__widget-title">Quick Links</h4>
+                  <ul className="ed-footer__widget-links">
+                    {sections.map((section) => (
+                      <li key={section.id}>
+                        <button
+                          onClick={() => scrollToSection(section.id)}
+                          className="text-left w-full hover:text-primary transition-colors cursor-pointer bg-transparent border-none p-0"
+                        >
+                          {section.label}
+                        </button>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
               </div>
-            </div>
-            <div className="col-lg-3 col-md-6 col-12">
+            )}
+            
+            <div className={`col-lg-${sections && sections.length > 0 ? '3' : '4'} col-md-6 col-12`}>
               <div className="ed-footer__widget contact-widget">
                 <h4 className="ed-footer__widget-title">Contact</h4>
-                {/* Single Info  */}
                 {contact.map((item, index) => (
                   <div className="ed-footer__contact" key={index}>
                     <div className="ed-footer__contact-icon">
@@ -206,28 +184,25 @@ const FooterContent = () => {
                 ))}
               </div>
             </div>
-            <div className="col-lg-3 col-md-6 col-12">
-              <div className="ed-footer__widget newsletter-widget">
+            
+            {/* Newsletter Section */}
+            <div className={`col-lg-${sections && sections.length > 0 ? '2' : '4'} col-md-6 col-12`}>
+              <div className="ed-footer__widget">
                 <h4 className="ed-footer__widget-title">Subscribe</h4>
                 <div className="ed-footer__newsletter">
                   <p className="ed-footer__about-text">
-                    Enter your email address to register to our newsletter
-                    subscription
+                    Stay updated with our latest news
                   </p>
-                  <form
-                    action="#"
-                    method="post"
-                    className="ed-footer__newsletter-form"
-                  >
+                  <form className="ed-footer__newsletter-form mt-3">
                     <input
                       type="email"
                       name="email"
-                      placeholder="Enter email"
+                      placeholder="Your email"
                       required
+                      className="w-full p-2 border rounded mb-2"
                     />
-                    <button type="submit" className="ed-btn">
-                      Subscribe Now
-                      <i className="fi fi-rr-arrow-small-right" />
+                    <button type="submit" className="ed-btn w-full">
+                      Subscribe
                     </button>
                   </form>
                 </div>
@@ -236,16 +211,18 @@ const FooterContent = () => {
           </div>
         </div>
       </div>
+      
       {/* Footer Bottom */}
       <div className="ed-footer__bottom">
         <div className="container ed-container">
           <div className="row">
             <div className="col-12">
               <p className="ed-footer__copyright-text">
-                Copyright {new Date().getFullYear()} Eduna | Developed By{" "}
+                Copyright {new Date().getFullYear()} {schoolData?.name || "Eduna"} | Developed By{" "}
                 <a
                   href="https://themeforest.net/user/bizantheme"
                   target="_blank"
+                  rel="noopener noreferrer"
                 >
                   BizanTheme
                 </a>

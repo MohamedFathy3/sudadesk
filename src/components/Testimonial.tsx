@@ -1,543 +1,192 @@
+// components/ActivitiesGallery.tsx
 "use client";
-import { sliderProps } from "@/utilities/sliderProps";
-import Image from "next/image";
+
+import { useState, useEffect } from 'react';
 import { Swiper, SwiperSlide } from "swiper/react";
-import Counter from "./Counter";
-export const Testimonial1 = () => {
-  return (
-    <section className="ed-testimonial section-bg-color-1 section-gap">
-      <div className="container ed-container">
-        <div className="row align-items-center">
-          <div className="col-lg-6 col-12">
-            {/* Testimonial Content  */}
-            <div className="ed-testimonial__content">
-              <div className="ed-section-head">
-                <span className="ed-section-head__sm-title">
-                  OUR TESTIMONIAL
-                </span>
-                <h3 className="ed-section-head__title ed-split-text left">
-                  What Student Say About Our Online Education Course
-                </h3>
-              </div>
-              <div className="owl-carousel ed-testimonial__slider">
-                <Swiper {...sliderProps.testimonial}>
-                  {/* Single Testimonial  */}
-                  <SwiperSlide>
-                    <div className="ed-testimonial__slider-item">
-                      <ul className="ed-testimonial__rattings">
-                        <li>
-                          <i className="icofont-star" />
-                        </li>
-                        <li>
-                          <i className="icofont-star" />
-                        </li>
-                        <li>
-                          <i className="icofont-star" />
-                        </li>
-                        <li>
-                          <i className="icofont-star" />
-                        </li>
-                        <li>
-                          <i className="icofont-star" />
-                        </li>
-                      </ul>
-                      <p className="ed-testimonial__text">
-                        “ Attending EduVibe School of Business was one of the
-                        best decisions I've ever made. The curriculum was
-                        practical and industry-focused, and I was able to apply
-                        what I learned in the classroom.”
-                      </p>
-                      <div className="ed-testimonial__author">
-                        <div className="ed-testimonial__author-img">
-                          <Image
-                            width={0}
-                            height={0}
-                            sizes="100vw"
-                            style={{ width: "100%", height: "auto" }}
-                            src="/assets/images/testimonial/testimonial-1/author-1.png"
-                            alt="author-img"
-                          />
-                        </div>
-                        <div className="ed-testimonial__author-info">
-                          <h5>John Smith</h5>
-                          <p>Science Student</p>
-                        </div>
-                      </div>
-                    </div>
-                  </SwiperSlide>
-                  <SwiperSlide>
-                    {/* Single Testimonial  */}
-                    <div className="ed-testimonial__slider-item">
-                      <ul className="ed-testimonial__rattings">
-                        <li>
-                          <i className="icofont-star" />
-                        </li>
-                        <li>
-                          <i className="icofont-star" />
-                        </li>
-                        <li>
-                          <i className="icofont-star" />
-                        </li>
-                        <li>
-                          <i className="icofont-star" />
-                        </li>
-                        <li>
-                          <i className="icofont-star" />
-                        </li>
-                      </ul>
-                      <p className="ed-testimonial__text">
-                        “ Attending EduVibe School of Business was one of the
-                        best decisions I've ever made. The curriculum was
-                        practical and industry-focused, and I was able to apply
-                        what I learned in the classroom.”
-                      </p>
-                      <div className="ed-testimonial__author">
-                        <div className="ed-testimonial__author-img">
-                          <Image
-                            width={0}
-                            height={0}
-                            sizes="100vw"
-                            style={{ width: "100%", height: "auto" }}
-                            src="/assets/images/testimonial/testimonial-1/author-1.png"
-                            alt="author-img"
-                          />
-                        </div>
-                        <div className="ed-testimonial__author-info">
-                          <h5>John Smith</h5>
-                          <p>Science Student</p>
-                        </div>
-                      </div>
-                    </div>
-                  </SwiperSlide>
-                  <div className="owl-nav">
-                    <button
-                      type="button"
-                      role="presentation"
-                      className="owl-prev"
-                    >
-                      <i className="fi fi-rs-arrow-left" />
-                    </button>
-                    <button
-                      type="button"
-                      role="presentation"
-                      className="owl-next"
-                    >
-                      <i className="fi fi-rs-arrow-right" />
-                    </button>
-                  </div>
-                </Swiper>
-              </div>
-            </div>
-          </div>
-          <div className="col-lg-6 col-12">
-            {/* Testimonial Images */}
-            <div className="ed-testimonial__images position-relative">
-              <div className="ed-testimonial__main-img">
-                <Image
-                  width={437}
-                  height={520}
-                  src="/assets/images/testimonial/testimonial-1/testimonial-img.png"
-                  alt="testimonial-img"
-                />
-              </div>
-              {/* Counter Card */}
-              <div className="counter-card updown-ani">
-                <div className="counter-card__icon">
-                  <i className="fi fi-rr-graduation-cap" />
-                </div>
-                <div className="counter-card__info">
-                  <h4>
-                    <span className="counter">
-                      <Counter end={667} />
-                    </span>
-                    K+
-                  </h4>
-                  <p>Satisfied Students</p>
-                </div>
-              </div>
-              {/* Testimonial Shapes */}
-              <div className="ed-testimonial__shapes">
-                <Image
-                  width={177}
-                  height={176}
-                  className="ed-testimonial__shape-1"
-                  src="/assets/images/testimonial/testimonial-1/shape-1.svg"
-                  alt="shape-1"
-                />
-                <Image
-                  width={79}
-                  height={49}
-                  className="ed-testimonial__shape-2"
-                  src="/assets/images/testimonial/testimonial-1/shape-2.svg"
-                  alt="shape-2"
-                />
-                <Image
-                  width={112}
-                  height={107}
-                  className="ed-testimonial__shape-3 rotate-ani"
-                  src="/assets/images/testimonial/testimonial-1/shape-3.svg"
-                  alt="shape-3"
-                />
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-  );
-};
+import { Autoplay, Pagination, Navigation } from "swiper/modules";
+import "swiper/css";
+import "swiper/css/pagination";
+import "swiper/css/navigation";
 
-export const Testimonial2 = () => {
-  return (
-    <section className="ed-testimonial ed-testimonial--style2 section-gap pt-0">
-      <div className="container ed-container">
-        <div className="row align-items-center">
-          <div className="col-12">
-            {/* Testimonial Content  */}
-            <div className="ed-testimonial__content ed-testimonial__content--style2">
-              <div className="ed-testimonial__slider">
-                <Swiper {...sliderProps.testimonial}>
-                  <SwiperSlide>
-                    {/* Single Testimonial  */}
-                    <div className="ed-testimonial__slider-item">
-                      <ul className="ed-testimonial__rattings">
-                        <li>
-                          <i className="icofont-star" />
-                        </li>
-                        <li>
-                          <i className="icofont-star" />
-                        </li>
-                        <li>
-                          <i className="icofont-star" />
-                        </li>
-                        <li>
-                          <i className="icofont-star" />
-                        </li>
-                        <li>
-                          <i className="icofont-star" />
-                        </li>
-                      </ul>
-                      <p className="ed-testimonial__text">
-                        “ Attending EduVibe School of Business was one of the
-                        best decisions I've ever made. The curriculum was
-                        practical and industry-focused, and I was able to apply
-                        what I learned in the classroom.”
-                      </p>
-                      <div className="ed-testimonial__author">
-                        <div className="ed-testimonial__author-img">
-                          <Image
-                            width={0}
-                            height={0}
-                            sizes="100vw"
-                            style={{ width: "100%", height: "auto" }}
-                            src="/assets/images/testimonial/testimonial-1/author-1.png"
-                            alt="author-img"
-                          />
-                        </div>
-                        <div className="ed-testimonial__author-info">
-                          <h5>John Smith</h5>
-                          <p>Science Student</p>
-                        </div>
-                      </div>
-                    </div>
-                  </SwiperSlide>
-                  <SwiperSlide>
-                    {/* Single Testimonial  */}
-                    <div className="ed-testimonial__slider-item">
-                      <ul className="ed-testimonial__rattings">
-                        <li>
-                          <i className="icofont-star" />
-                        </li>
-                        <li>
-                          <i className="icofont-star" />
-                        </li>
-                        <li>
-                          <i className="icofont-star" />
-                        </li>
-                        <li>
-                          <i className="icofont-star" />
-                        </li>
-                        <li>
-                          <i className="icofont-star" />
-                        </li>
-                      </ul>
-                      <p className="ed-testimonial__text">
-                        “ Attending EduVibe School of Business was one of the
-                        best decisions I've ever made. The curriculum was
-                        practical and industry-focused, and I was able to apply
-                        what I learned in the classroom.”
-                      </p>
-                      <div className="ed-testimonial__author">
-                        <div className="ed-testimonial__author-img">
-                          <Image
-                            width={0}
-                            height={0}
-                            sizes="100vw"
-                            style={{ width: "100%", height: "auto" }}
-                            src="/assets/images/testimonial/testimonial-1/author-1.png"
-                            alt="author-img"
-                          />
-                        </div>
-                        <div className="ed-testimonial__author-info">
-                          <h5>John Smith</h5>
-                          <p>Science Student</p>
-                        </div>
-                      </div>
-                    </div>
-                  </SwiperSlide>
-                  <div className="owl-nav">
-                    <button
-                      type="button"
-                      role="presentation"
-                      className="owl-prev"
-                    >
-                      <i className="fi fi-rs-arrow-left" />
-                    </button>
-                    <button
-                      type="button"
-                      role="presentation"
-                      className="owl-next"
-                    >
-                      <i className="fi fi-rs-arrow-right" />
-                    </button>
-                  </div>
-                </Swiper>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-  );
-};
+interface Activity {
+  image: string;
+  caption: string;
+}
 
-export const Testimonial3 = () => {
+interface ActivitiesGalleryProps {
+  activities: Activity[];
+  title?: string;
+  subtitle?: string;
+  autoPlay?: boolean;
+}
+
+export const ActivitiesGallery = ({ 
+  activities, 
+  title = "School Activities",
+  subtitle = "Explore our gallery of school events and activities",
+  autoPlay = true 
+}: ActivitiesGalleryProps) => {
+  const [swiperConfig, setSwiperConfig] = useState({
+    slidesPerView: 1,
+    spaceBetween: 20,
+  });
+
+  // Update swiper config based on screen size
+  useEffect(() => {
+    const updateSwiperConfig = () => {
+      if (window.innerWidth >= 1024) {
+        setSwiperConfig({ slidesPerView: 3, spaceBetween: 30 });
+      } else if (window.innerWidth >= 768) {
+        setSwiperConfig({ slidesPerView: 2, spaceBetween: 20 });
+      } else {
+        setSwiperConfig({ slidesPerView: 1, spaceBetween: 10 });
+      }
+    };
+
+    updateSwiperConfig();
+    window.addEventListener('resize', updateSwiperConfig);
+    
+    return () => window.removeEventListener('resize', updateSwiperConfig);
+  }, []);
+
+  // إذا مفيش activities، نرجع null
+  if (!activities || activities.length === 0) {
+    return null;
+  }
+
   return (
     <section className="ed-testimonial ed-testimonial--style3 section-gap pt-0 overflow-hidden">
       <div className="container ed-container">
         <div className="row justify-content-center">
           <div className="col-lg-8 col-12">
             <div className="ed-section-head text-center">
-              <span className="ed-section-head__sm-title">OUR TESTIMONIAL</span>
+              <span className="ed-section-head__sm-title">SCHOOL GALLERY</span>
               <h3 className="ed-section-head__title ed-split-text left">
-                Student Thinking About Us
+                {title}
               </h3>
+              {subtitle && (
+                <p className="ed-section-head__text mt-3">
+                  {subtitle}
+                </p>
+              )}
             </div>
           </div>
         </div>
       </div>
-      <div className="row">
+      
+      <div className="row mt-8">
         <div className="col-12">
           <Swiper
-            {...sliderProps.testimonial_2}
+            modules={[Autoplay, Pagination, Navigation]}
+            slidesPerView={swiperConfig.slidesPerView}
+            spaceBetween={swiperConfig.spaceBetween}
+            loop={activities.length > 1}
+            autoplay={autoPlay ? {
+              delay: 3000,
+              disableOnInteraction: false,
+            } : false}
+            pagination={{
+              clickable: true,
+              dynamicBullets: true,
+            }}
+            navigation={activities.length > swiperConfig.slidesPerView}
+            breakpoints={{
+              320: {
+                slidesPerView: 1,
+                spaceBetween: 10,
+              },
+              640: {
+                slidesPerView: 1,
+                spaceBetween: 20,
+              },
+              768: {
+                slidesPerView: 2,
+                spaceBetween: 20,
+              },
+              1024: {
+                slidesPerView: 3,
+                spaceBetween: 30,
+              },
+            }}
             className="swiper ed-testimonial__slider-2"
           >
-            <div className="swiper-wrapper">
-              {/* Single Testimonial  */}
-              <SwiperSlide className="swiper-slide">
-                <div className="ed-testimonial__slider-item bg-color-1">
-                  <ul className="ed-testimonial__rattings">
-                    <li>
-                      <i className="icofont-star" />
-                    </li>
-                    <li>
-                      <i className="icofont-star" />
-                    </li>
-                    <li>
-                      <i className="icofont-star" />
-                    </li>
-                    <li>
-                      <i className="icofont-star" />
-                    </li>
-                    <li>
-                      <i className="icofont-star" />
-                    </li>
-                  </ul>
-                  <p className="ed-testimonial__text">
-                    “ Attending EduVibe School of Business was one of the best
-                    decisions I've ever made. The curriculum was practical and
-                    industry-focused, and I was able to apply what I learned in
-                    the classroom.”
-                  </p>
-                  <div className="ed-testimonial__author">
-                    <div className="ed-testimonial__author-img">
-                      <img
-                        src="assets/images/testimonial/testimonial-1/author-1.png"
-                        alt="author-img"
-                      />
-                    </div>
-                    <div className="ed-testimonial__author-info">
-                      <h5>John Smith</h5>
-                      <p>Science Student</p>
+            {activities.map((activity, index) => (
+              <SwiperSlide key={index} className="swiper-slide">
+                <div className="ed-testimonial__slider-item bg-white shadow-lg rounded-xl overflow-hidden">
+                  {/* Activity Image */}
+                  <div className="relative h-64 overflow-hidden">
+                    <img
+                      src={activity.image}
+                      alt={activity.caption}
+                      className="w-full h-full object-cover transition-transform duration-500 hover:scale-110"
+                      loading="lazy"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 hover:opacity-100 transition-opacity duration-300"></div>
+                  </div>
+                  
+                  {/* Activity Caption */}
+                  <div className="p-6">
+                    <h5 className="text-lg font-semibold text-gray-900 mb-2">
+                      {activity.caption}
+                    </h5>
+                    <div className="flex items-center justify-between mt-4">
+                      <span className="text-sm text-blue-600 font-medium">
+                        Activity {index + 1}
+                      </span>
+                      <button 
+                        onClick={() => window.open(activity.image, '_blank')}
+                        className="text-sm text-gray-600 hover:text-blue-600 transition-colors"
+                      >
+                        View Full Size →
+                      </button>
                     </div>
                   </div>
                 </div>
               </SwiperSlide>
-              {/* Single Testimonial  */}
-              <SwiperSlide className="swiper-slide">
-                <div className="ed-testimonial__slider-item bg-color-2">
-                  <ul className="ed-testimonial__rattings">
-                    <li>
-                      <i className="icofont-star" />
-                    </li>
-                    <li>
-                      <i className="icofont-star" />
-                    </li>
-                    <li>
-                      <i className="icofont-star" />
-                    </li>
-                    <li>
-                      <i className="icofont-star" />
-                    </li>
-                    <li>
-                      <i className="icofont-star" />
-                    </li>
-                  </ul>
-                  <p className="ed-testimonial__text">
-                    “ Attending EduVibe School of Business was one of the best
-                    decisions I've ever made. The curriculum was practical and
-                    industry-focused, and I was able to apply what I learned in
-                    the classroom.”
-                  </p>
-                  <div className="ed-testimonial__author">
-                    <div className="ed-testimonial__author-img">
-                      <img
-                        src="assets/images/testimonial/testimonial-1/author-2.png"
-                        alt="author-img"
-                      />
-                    </div>
-                    <div className="ed-testimonial__author-info">
-                      <h5>Franklin Chen</h5>
-                      <p>Art Student</p>
+            ))}
+            
+            {/* إذا مفيش activities كافية، نضيف empty slides */}
+            {activities.length < 3 && (
+              [...Array(3 - activities.length)].map((_, index) => (
+                <SwiperSlide key={`empty-${index}`} className="swiper-slide">
+                  <div className="ed-testimonial__slider-item bg-gray-100 rounded-xl h-full min-h-[300px] flex items-center justify-center">
+                    <div className="text-center text-gray-400">
+                      <i className="fi fi-rr-image text-4xl mb-3"></i>
+                      <p>More activities coming soon</p>
                     </div>
                   </div>
-                </div>
-              </SwiperSlide>
-              {/* Single Testimonial  */}
-              <SwiperSlide className="swiper-slide">
-                <div className="ed-testimonial__slider-item bg-color-3">
-                  <ul className="ed-testimonial__rattings">
-                    <li>
-                      <i className="icofont-star" />
-                    </li>
-                    <li>
-                      <i className="icofont-star" />
-                    </li>
-                    <li>
-                      <i className="icofont-star" />
-                    </li>
-                    <li>
-                      <i className="icofont-star" />
-                    </li>
-                    <li>
-                      <i className="icofont-star" />
-                    </li>
-                  </ul>
-                  <p className="ed-testimonial__text">
-                    “ Attending EduVibe School of Business was one of the best
-                    decisions I've ever made. The curriculum was practical and
-                    industry-focused, and I was able to apply what I learned in
-                    the classroom.”
-                  </p>
-                  <div className="ed-testimonial__author">
-                    <div className="ed-testimonial__author-img">
-                      <img
-                        src="assets/images/testimonial/testimonial-1/author-3.png"
-                        alt="author-img"
-                      />
-                    </div>
-                    <div className="ed-testimonial__author-info">
-                      <h5>James Parker</h5>
-                      <p>Math Student</p>
-                    </div>
-                  </div>
-                </div>
-              </SwiperSlide>
-              {/* Single Testimonial  */}
-              <SwiperSlide className="swiper-slide">
-                <div className="ed-testimonial__slider-item bg-color-4">
-                  <ul className="ed-testimonial__rattings">
-                    <li>
-                      <i className="icofont-star" />
-                    </li>
-                    <li>
-                      <i className="icofont-star" />
-                    </li>
-                    <li>
-                      <i className="icofont-star" />
-                    </li>
-                    <li>
-                      <i className="icofont-star" />
-                    </li>
-                    <li>
-                      <i className="icofont-star" />
-                    </li>
-                  </ul>
-                  <p className="ed-testimonial__text">
-                    “ Attending EduVibe School of Business was one of the best
-                    decisions I've ever made. The curriculum was practical and
-                    industry-focused, and I was able to apply what I learned in
-                    the classroom.”
-                  </p>
-                  <div className="ed-testimonial__author">
-                    <div className="ed-testimonial__author-img">
-                      <img
-                        src="assets/images/testimonial/testimonial-1/author-4.png"
-                        alt="author-img"
-                      />
-                    </div>
-                    <div className="ed-testimonial__author-info">
-                      <h5>Charles Morgan</h5>
-                      <p>Globe Student</p>
-                    </div>
-                  </div>
-                </div>
-              </SwiperSlide>
-              {/* Single Testimonial  */}
-              <SwiperSlide className="swiper-slide">
-                <div className="ed-testimonial__slider-item bg-color-2">
-                  <ul className="ed-testimonial__rattings">
-                    <li>
-                      <i className="icofont-star" />
-                    </li>
-                    <li>
-                      <i className="icofont-star" />
-                    </li>
-                    <li>
-                      <i className="icofont-star" />
-                    </li>
-                    <li>
-                      <i className="icofont-star" />
-                    </li>
-                    <li>
-                      <i className="icofont-star" />
-                    </li>
-                  </ul>
-                  <p className="ed-testimonial__text">
-                    “ Attending EduVibe School of Business was one of the best
-                    decisions I've ever made. The curriculum was practical and
-                    industry-focused, and I was able to apply what I learned in
-                    the classroom.”
-                  </p>
-                  <div className="ed-testimonial__author">
-                    <div className="ed-testimonial__author-img">
-                      <img
-                        src="assets/images/testimonial/testimonial-1/author-2.png"
-                        alt="author-img"
-                      />
-                    </div>
-                    <div className="ed-testimonial__author-info">
-                      <h5>Franklin Chen</h5>
-                      <p>Art Student</p>
-                    </div>
-                  </div>
-                </div>
-              </SwiperSlide>
-            </div>
-            <div className="swiper-pagination" />
+                </SwiperSlide>
+              ))
+            )}
           </Swiper>
         </div>
       </div>
+      
+      {/* Custom CSS for gallery */}
+      <style jsx>{`
+        .swiper-pagination-bullet {
+          background: #3b82f6;
+          opacity: 0.5;
+        }
+        .swiper-pagination-bullet-active {
+          opacity: 1;
+          transform: scale(1.2);
+        }
+        .swiper-button-next,
+        .swiper-button-prev {
+          color: #3b82f6;
+          background: white;
+          width: 40px;
+          height: 40px;
+          border-radius: 50%;
+          box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .swiper-button-next:after,
+        .swiper-button-prev:after {
+          font-size: 16px;
+          font-weight: bold;
+        }
+      `}</style>
     </section>
   );
 };
