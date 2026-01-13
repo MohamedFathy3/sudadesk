@@ -10,6 +10,7 @@ import { Category2 } from "@/components/Category";
 import { ActivitiesGallery } from "@/components/Testimonial";
 import { WhyChooseArea3 } from "@/components/WhyChooseArea";
 import { apiFetch } from '@/lib/api';
+import { Course3 } from './Course';
 
 interface SchoolContentProps {
   slug: string;
@@ -60,6 +61,7 @@ const sections = [
   { id: "categories", label: "Categories" },
   { id: "testimonials", label: "Testimonials" },
   { id: "blog", label: "Blog" },
+  { id: "Activities", label: "Activities" },
 ];
 
 export default function SchoolContent({ slug }: SchoolContentProps) {
@@ -185,7 +187,13 @@ export default function SchoolContent({ slug }: SchoolContentProps) {
       <section id="categories">
         <Category2 />
       </section>
-      
+      <section id="Activities" >
+      <Course3
+        title="Popular Courses"
+        subtitle="Explore our most popular courses"
+        limit={6}
+      />
+      </section>
       {/* Testimonials Section */}
       <section id="testimonials">
   <ActivitiesGallery 
