@@ -45,7 +45,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             }}
           />
         )} 
-  <MainLayout>     <LanguageProvider>  <QueryClientProvider client={queryClient}>
+  <LanguageProvider>  <QueryClientProvider client={queryClient}>
           <AuthProvider>
             <ThemeProvider attribute="class" defaultTheme="light" enableSystem>
               <ErrorBoundary>
@@ -55,7 +55,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             </ThemeProvider>
           </AuthProvider>
           <ReactQueryDevtools initialIsOpen={false} />
-        </QueryClientProvider></LanguageProvider></MainLayout>
+        </QueryClientProvider></LanguageProvider>
    
       
     </>

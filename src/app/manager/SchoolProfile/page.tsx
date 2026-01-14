@@ -357,7 +357,7 @@ const handleSave = async () => {
         'cancel': 'Cancel',
         'aboutSchool': 'About School',
         'whyChooseUs': 'Why Choose Us',
-        'gallery': 'Gallery',
+        'gallery': 'activities Gallery',
         'blog': 'Blog',
         'slider': 'Slider',
         'schoolName': 'School Name',
