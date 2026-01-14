@@ -242,7 +242,7 @@ export const Blog1 = ({ pt = "", schoolId, useApi = true, customBlogs }: Blog1Pr
               const truncatedParagraph = truncateText(paragraph, 120);
               
               return (
-                <div className="col-lg-4 col-md-6 col-12" key={blog.id || index}>
+                <div className="col-lg-4 col-md-6 col-12 mt-4" key={blog.id || index}>
                   <div
                     className="ed-blog__card wow fadeInUp blog-card-enhanced"
                     data-wow-duration="1s"

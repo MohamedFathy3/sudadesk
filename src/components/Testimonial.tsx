@@ -43,7 +43,7 @@ export const ActivitiesGallery = ({
   }
 
   return (
-    <section className="ed-testimonials section-gap">
+    <section className="ed-testimonials mt-5">
       <div className="container ed-container">
         <div className="row justify-content-center">
           <div className="col-lg-8 col-md-10 col-12">

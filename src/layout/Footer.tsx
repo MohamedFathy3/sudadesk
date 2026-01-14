@@ -98,7 +98,7 @@ const FooterContent = ({ schoolData, sections }: { schoolData?: School; sections
   return (
     <Fragment>
       {/* Footer Top */}
-      <div className="ed-footer__top position-relative">
+      <div className=" position-relative">
         <div className="ed-footer__shapes">
           <Image
             width={95}

@@ -17,7 +17,7 @@ export const WhyChooseArea3 = ({
       <div className="container ed-container">
         <div className="row justify-content-center">
           {/* Text Content Only - Takes half width */}
-          <div className="col-lg-6 col-12">
+          <div className="col-lg-10 col-12">
             <div className="ed-w-choose__content text-center">
               <div className="ed-section-head">
                 {/* Optional Small Title - يمكن حذفه لو مش محتاج */}

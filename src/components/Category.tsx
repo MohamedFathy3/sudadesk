@@ -109,7 +109,7 @@ export const Category2 = ({
   }
 
   return (
-    <section className="ed-category ed-category--style2 section-gap overflow-hidden">
+    <section className="ed-category ed-category--style2 mt-3 overflow-hidden">
       <div className="container ed-container">
         <div className="row">
           <div className="col-12">
