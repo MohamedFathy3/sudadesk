@@ -12,6 +12,7 @@ export const Animation = ({
   delay: number;
   duration: number;
 }) => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const variants: { [key: string]: any } = {
     fadeInUp: {
       hidden: { opacity: 0, y: 60 },

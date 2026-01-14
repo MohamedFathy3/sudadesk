@@ -1,6 +1,5 @@
 "use client";
 
-import { eduna_config } from "@/utilities";
 import Image from "next/image";
 import Link from "next/link";
 import { Fragment, useEffect, useState } from "react";
@@ -30,23 +29,32 @@ interface HeaderProps {
   };
 }
 
+// تعريف القيم الافتراضية خارج المكون
+const defaultLoginButton = {
+  text: "Log In",
+  href: "/auth",
+  className: "login-btn"
+};
+
+const defaultLogo = {
+  src: "assets/images/logo.svg",
+  alt: "logo",
+  width: 140,
+  height: 34,
+  href: "/"
+};
+
 const Header = ({ 
   header, 
   sections = [], 
   logo,
   showLoginButton = true,
-  loginButton = {
-    text: "Log In",
-    href: "/auth",
-    className: "login-btn"
-  }
+  loginButton = defaultLoginButton
 }: HeaderProps) => {
   const [showMobileMenu, setShowMobileMenu] = useState<boolean>(false);
   const [activeSection, setActiveSection] = useState<string>("");
   
   useEffect(() => {
-    eduna_config.sticky_header();
-    
     // Track active section on scroll
     const handleScroll = () => {
       sections.forEach(section => {
@@ -64,11 +72,7 @@ const Header = ({
     return () => window.removeEventListener('scroll', handleScroll);
   }, [sections]);
 
-  const HeaderComponent =
-      header === 4
-      ? Header4
-      : Header4;
-      
+  const HeaderComponent = header === 4 ? Header4 : Header4;
 
   return (
     <Fragment>
@@ -77,16 +81,16 @@ const Header = ({
         setShowMobileMenu={() => setShowMobileMenu(true)}
         sections={sections}
         activeSection={activeSection}
-        logo={logo}
+        logo={logo || defaultLogo}
         showLoginButton={showLoginButton}
-        loginButton={loginButton}
+        loginButton={loginButton || defaultLoginButton}
       />
       <MobileMenu
         show={showMobileMenu}
         onHide={() => setShowMobileMenu(false)}
         sections={sections}
-        logo={logo}
-        loginButton={loginButton}
+        logo={logo || defaultLogo}
+        loginButton={loginButton || defaultLoginButton}
       />
     </Fragment>
   );
@@ -120,20 +124,23 @@ const Header4 = ({
   setShowMobileMenu: (show: boolean) => void;
   sections: Section[];
   activeSection: string;
-  logo?: HeaderProps['logo'];
-  showLoginButton: boolean;
-  loginButton: HeaderProps['loginButton'];
-}) => {
-  // Default logo if not provided
-  const defaultLogo = {
-    src: "assets/images/logo.svg",
-    alt: "logo",
-    width: 140,
-    height: 34,
-    href: "/"
+  logo: {
+    src: string;
+    alt?: string;
+    width?: number;
+    height?: number;
+    href?: string;
   };
-
-  const logoConfig = logo || defaultLogo;
+  showLoginButton: boolean;
+  loginButton: {
+    text?: string;
+    href?: string;
+    className?: string;
+  };
+}) => {
+  // ✅ استخدام القيم الافتراضية داخل المكون
+  const logoConfig = logo;
+  const loginButtonConfig = loginButton;
 
   return (
     <header className="ed-header ed-header--style2 ed-header--style4">
@@ -172,10 +179,10 @@ const Header4 = ({
                 {/* Conditional Login Button */}
                 {showLoginButton && (
                   <Link 
-                    href={loginButton.href || "/auth"}
-                    className={loginButton.className || "login-btn"}
+                    href={loginButtonConfig.href || "/auth"}
+                    className={loginButtonConfig.className || "login-btn"}
                   >
-                    {loginButton.text || "Log In"}
+                    {loginButtonConfig.text || "Log In"}
                   </Link>
                 )}
               </div>
@@ -238,8 +245,18 @@ const MobileMenu = ({
   show: boolean;
   onHide: () => void;
   sections: Section[];
-  logo?: HeaderProps['logo'];
-  loginButton?: HeaderProps['loginButton'];
+  logo: {
+    src: string;
+    alt?: string;
+    width?: number;
+    height?: number;
+    href?: string;
+  };
+  loginButton: {
+    text?: string;
+    href?: string;
+    className?: string;
+  };
 }) => {
   const [activeMenu, setActiveMenu] = useState<string>("");
   
@@ -249,25 +266,9 @@ const MobileMenu = ({
   const activeLi = (value: string) =>
     value === activeMenu ? { display: "block" } : { display: "none" };
 
-  // Default logo if not provided
-  const defaultLogo = {
-    src: "/assets/images/logo.svg",
-    alt: "logo",
-    width: 140,
-    height: 34,
-    href: "/"
-  };
-
-  const logoConfig = logo || defaultLogo;
-
-  // Default login button if not provided
-  const defaultLoginButton = {
-    text: "Log In",
-    href: "/auth",
-    className: "login-btn"
-  };
-
-  const loginButtonConfig = loginButton || defaultLoginButton;
+  // ✅ استخدام القيم الممررة مباشرة
+  const logoConfig = logo;
+  const loginButtonConfig = loginButton;
 
   return (
     <Modal
@@ -338,11 +339,11 @@ const MobileMenu = ({
             {/* Login Button in Mobile Menu */}
             <li className="offcanvas__menu_li">
               <Link 
-                href={loginButton.href || "/auth"}
+                href={loginButtonConfig.href || "/auth"}
                 className="offcanvas__menu_item"
                 onClick={onHide}
               >
-                {loginButton.text || "Log In"}
+                {loginButtonConfig.text || "Log In"}
               </Link>
             </li>
           </ul>

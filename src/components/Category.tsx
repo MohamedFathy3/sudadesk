@@ -1,250 +1,383 @@
+// components/Category2.tsx
 "use client";
-import { sliderProps } from "@/utilities/sliderProps";
-import Image from "next/image";
-import Link from "next/link";
-import { Swiper, SwiperSlide } from "swiper/react";
 
-export const Category1 = ({
-  pt = "pt-0",
-  titleCenter = false,
-  findCourses = true,
-}: {
-  pt?: string;
+import { Swiper, SwiperSlide } from "swiper/react";
+import { Navigation, Pagination, Autoplay } from "swiper/modules";
+import Image from "next/image";
+import { useEffect, useState } from "react";
+import "swiper/css";
+import "swiper/css/navigation";
+import "swiper/css/pagination";
+
+// تعريف interface للموظف
+interface Employee {
+  id: number;
+  name: string;
+  email: string;
+  phone: string;
+  role: string;
+  school_id: number;
+  attendance_count: number;
+  absent_count: number;
+  last_salary: string | null;
+}
+
+interface Category2Props {
   titleCenter?: boolean;
-  findCourses?: boolean;
-}) => {
-  const categories: {
-    id: number;
-    name: string;
-    courses: number;
-    bg: string;
-  }[] = [
-    { id: 1, name: "Business", courses: 4, bg: "bg-1" },
-    { id: 2, name: "Marketing", courses: 88, bg: "bg-2" },
-    { id: 3, name: "Design", courses: 23, bg: "bg-3" },
-    { id: 4, name: "Finance", courses: 2, bg: "bg-4" },
-    { id: 5, name: "Lifestyle", courses: 29, bg: "bg-5" },
-    { id: 6, name: "Cyber", courses: 45, bg: "bg-6" },
-    { id: 7, name: "Development", courses: 28, bg: "bg-7" },
-    { id: 8, name: "Photography", courses: 3, bg: "bg-8" },
-  ];
-  return (
-    <section className={`ed-category section-gap ${pt}`}>
-      <div className="container ed-container">
-        <div className="row">
-          <div className="col-12">
-            <div
-              className={`ed-section-head ${
-                titleCenter ? "text-center" : "text-left"
-              } ${findCourses ? "d-flex-between" : ""}`}
-            >
-              <div className="ed-section-head__info">
-                <span className="ed-section-head__sm-title">
-                  COURSE CATEGORIES
-                </span>
-                <h3 className={`ed-section-head__title m-0 ed-split-text`}>
-                  Top Categories You Want to&nbsp;Learn
-                </h3>
-              </div>
-              {findCourses && (
-                <div className="ed-section-head__btn">
-                  <Link href="/course-1" className="ed-btn">
-                    Find Courses
-                    <i className="fi fi-rr-arrow-small-right" />
-                  </Link>
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-        <div className="row">
-          <div className="col-12">
-            <div className="ed-category__wrapper">
-              {/* Single Coure Card  */}
-              {categories.map((category) => (
-                <Link
-                  href="/course-1"
-                  className="ed-category__card wow fadeInUp"
-                  data-wow-duration="1s"
-                  key={category.id}
-                >
-                  <div className={`ed-category__icon ${category.bg}`}>
-                    <Image
-                      width={30}
-                      height={30}
-                      sizes="100vw"
-                      style={{ width: "30px", height: "30px" }}
-                      src={`/assets/images/category/category-1/${category.id}.svg`}
-                      alt="icon"
-                    />
-                  </div>
-                  <div className="ed-category__info">
-                    <h4>{category.name}</h4>
-                    <p>{category.courses} Courses</p>
-                  </div>
-                </Link>
-              ))}
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-  );
-};
+  employees?: Employee[];
+}
 
 export const Category2 = ({
   titleCenter = true,
-}: {
-  titleCenter?: boolean;
-}) => {
-  const categories: {
-    id: number;
-    name: string;
-    courses: number;
-    img: string;
-    icon: string;
-  }[] = [
-    {
-      id: 1,
-      name: "Business",
-      courses: 4,
-      img: "/assets/images/category/category-2/img-1.png",
-      icon: "/assets/images/category/category-1/1.svg",
-    },
-    {
-      id: 2,
-      name: "Marketing",
-      courses: 88,
-      img: "/assets/images/category/category-2/img-2.png",
-      icon: "/assets/images/category/category-1/2.svg",
-    },
-    {
-      id: 3,
-      name: "Design",
-      courses: 23,
-      img: "/assets/images/category/category-2/img-3.png",
-      icon: "/assets/images/category/category-1/3.svg",
-    },
-    {
-      id: 4,
-      name: "Finance",
-      courses: 2,
-      img: "/assets/images/category/category-2/img-4.png",
-      icon: "/assets/images/category/category-1/4.svg",
-    },
-    {
-      id: 5,
-      name: "Lifestyle",
-      courses: 29,
-      img: "/assets/images/category/category-2/img-5.png",
-      icon: "/assets/images/category/category-1/5.svg",
-    },
-    {
-      id: 6,
-      name: "Cyber",
-      courses: 45,
-      img: "/assets/images/category/category-2/img-6.jpg",
-      icon: "/assets/images/category/category-1/6.svg",
-    },
-    {
-      id: 7,
-      name: "Development",
-      courses: 28,
-      img: "/assets/images/category/category-2/img-5.png",
-      icon: "/assets/images/category/category-1/7.svg",
-    },
-    {
-      id: 8,
-      name: "Photography",
-      courses: 3,
-      img: "/assets/images/category/category-2/img-8.png",
-      icon: "/assets/images/category/category-1/8.svg",
-    },
-    {
-      id: 9,
-      name: "Finance",
-      courses: 2,
-      img: "/assets/images/category/category-2/img-4.png",
-      icon: "/assets/images/category/category-1/4.svg",
-    },
-    {
-      id: 10,
-      name: "Lifestyle",
-      courses: 29,
-      img: "/assets/images/category/category-2/img-5.png",
-      icon: "/assets/images/category/category-1/5.svg",
-    },
+  employees: propEmployees = []
+}: Category2Props) => {
+  const [employees, setEmployees] = useState<Employee[]>([]);
+
+  // صور فريق من Unsplash - صور مجانية عالية الجودة
+  const teamImages = [
+    "https://images.unsplash.com/photo-1560250097-0b93528c311a?w=400&h=300&fit=crop&crop=face", // مدرس 1
+    "https://images.unsplash.com/photo-1544717305-2782549b5136?w=400&h=300&fit=crop&crop=face", // مدرس 2
+    "https://images.unsplash.com/photo-1547425260-76bcadfb4f2c?w=400&h=300&fit=crop&crop=face", // مدير
+    "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=400&h=300&fit=crop&crop=face", // محاسب
+    "https://images.unsplash.com/photo-1551836026-d5c2e3145b7c?w=400&h=300&fit=crop&crop=face", // استقبال
+    "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=300&fit=crop&crop=face", // مشرف
+    "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&h=300&fit=crop&crop=face", // معلم
+    "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400&h=300&fit=crop&crop=face", // مدير قسم
   ];
+
+  // أيقونات من Flaticon أو FontAwesome (بدائل مجانية)
+  const roleIcons: Record<string, string> = {
+    teacher: "/assets/images/category/category-1/3.svg",
+    reception: "/assets/images/category/category-1/1.svg",
+    class_supervisor: "/assets/images/category/category-1/7.svg",
+    director: "/assets/images/category/category-1/4.svg",
+    accountant: "/assets/images/category/category-1/5.svg",
+  };
+
+  // ترجمة الأدوار إلى الإنجليزية
+  const roleTranslations: Record<string, string> = {
+    teacher: "Teacher",
+    reception: "Receptionist",
+    class_supervisor: "Class Supervisor",
+    director: "Director",
+    accountant: "Accountant",
+  };
+
+  useEffect(() => {
+    if (propEmployees && propEmployees.length > 0) {
+      setEmployees(propEmployees);
+    } else {
+      setEmployees([]);
+    }
+  }, [propEmployees]);
+
+  // الحصول على صورة من Unsplash حسب ID الموظف
+  const getTeamImage = (id: number) => {
+    return teamImages[(id - 1) % teamImages.length];
+  };
+
+  // الحصول على أيقونة الدور
+  const getRoleIcon = (role: string) => {
+    return roleIcons[role] || "/assets/images/category/category-1/1.svg";
+  };
+
+  // ترجمة الدور
+  const translateRole = (role: string) => {
+    return roleTranslations[role] || role.charAt(0).toUpperCase() + role.slice(1);
+  };
+
+  if (employees.length === 0) {
+    return (
+      <section className="ed-category ed-category--style2 section-gap overflow-hidden">
+        <div className="container ed-container">
+          <div className="row">
+            <div className="col-12">
+              <div className={`ed-section-head ${titleCenter ? "text-center" : "text-left"}`}>
+                <span className="ed-section-head__sm-title">OUR TEAM</span>
+                <h3 className="ed-section-head__title m-0 ed-split-text left">
+                  Meet Our Professional Team
+                </h3>
+                <p className="text-muted mt-3 text-center">
+                  No team members available at the moment
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    );
+  }
+
   return (
     <section className="ed-category ed-category--style2 section-gap overflow-hidden">
       <div className="container ed-container">
         <div className="row">
           <div className="col-12">
-            <div
-              className={`ed-section-head ${
-                titleCenter ? "text-center" : "text-left"
-              }`}
-            >
-              <span className="ed-section-head__sm-title">
-                COURSE CATEGORIES
-              </span>
+            <div className={`ed-section-head ${titleCenter ? "text-center" : "text-left"}`}>
+              <span className="ed-section-head__sm-title">OUR TEAM</span>
               <h3 className="ed-section-head__title m-0 ed-split-text left">
-                Top Categories You Want to&nbsp;Learn
+                Meet Our Professional Team
               </h3>
             </div>
           </div>
         </div>
       </div>
+      
       <div className="row">
         <div className="col-12">
           <Swiper
-            {...sliderProps.category__slider}
-            className="swiper ed-category__slider"
+            modules={[Navigation, Pagination, Autoplay]}
+            spaceBetween={30}
+            slidesPerView={1}
+            loop={true}
+            autoplay={{
+              delay: 3000,
+              disableOnInteraction: false,
+            }}
+            pagination={{
+              clickable: true,
+              el: '.team-pagination',
+            }}
+            navigation={{
+              nextEl: '.team-next',
+              prevEl: '.team-prev',
+            }}
+            breakpoints={{
+              576: {
+                slidesPerView: 2,
+                spaceBetween: 20,
+              },
+              768: {
+                slidesPerView: 3,
+                spaceBetween: 25,
+              },
+              992: {
+                slidesPerView: 4,
+                spaceBetween: 30,
+              },
+            }}
+            className="team-slider"
           >
-            <div className="swiper-wrapper">
-              {/* Single Coure Card  */}
-              {categories.map((category) => (
-                <SwiperSlide className="swiper-slide" key={category.id}>
-                  <div className="ed-category__card ed-category__card--style2">
-                    <div className="ed-category__img">
-                      <Image
-                        width={271}
-                        height={232}
-                        sizes="100vw"
-                        style={{ width: "271px", height: "232px" }}
-                        src={category.img}
-                        alt="category-img"
+            {employees.map((employee) => (
+              <SwiperSlide key={employee.id}>
+                <div className="team-card">
+                  <div className="team-image">
+                    <img
+                      src={getTeamImage(employee.id)}
+                      alt={`${employee.name} - ${translateRole(employee.role)}`}
+                      className="team-img"
+                      onError={(e) => {
+                        // Fallback to placeholder if image fails
+                        e.currentTarget.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(employee.name)}&background=4F46E5&color=fff&size=200`;
+                      }}
+                    />
+                    <div className="team-role-badge">
+                      {translateRole(employee.role)}
+                    </div>
+                  </div>
+                  <div className="team-content">
+                    <div className="team-icon">
+                      <img
+                        src={getRoleIcon(employee.role)}
+                        alt={employee.role}
+                        className="role-icon"
                       />
                     </div>
-                    <Link href="/course-1" className="ed-category__content">
-                      <div className="ed-category__icon">
-                        <Image
-                          width={30}
-                          height={30}
-                          sizes="100vw"
-                          style={{ width: "30px", height: "30px" }}
-                          src={category.icon}
-                          alt="icon"
-                        />
-                      </div>
-                      <div className="ed-category__info">
-                        <h4>{category.name}</h4>
-                        <p>
-                          {category.courses > 9
-                            ? category.courses
-                            : `0${category.courses}`}{" "}
-                          Courses
+                    <div className="team-info">
+                      <h4 className="team-name">{employee.name}</h4>
+                      <div className="team-contact">
+                        <p className="team-email">
+                          <i className="fi fi-rr-envelope me-2"></i>
+                          {employee.email}
                         </p>
+                    
                       </div>
-                    </Link>
+                    </div>
                   </div>
-                </SwiperSlide>
-              ))}
-            </div>
-            <div className="swiper-pagination" />
+                </div>
+              </SwiperSlide>
+            ))}
           </Swiper>
+
+   
         </div>
       </div>
+
+      <style jsx>{`
+        .team-slider {
+          padding: 20px 10px 50px;
+        }
+        
+        .team-card {
+          background: white;
+          border-radius: 12px;
+          overflow: hidden;
+          box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+          transition: transform 0.3s ease, box-shadow 0.3s ease;
+          height: 100%;
+        }
+        
+        .team-card:hover {
+          transform: translateY(-5px);
+          box-shadow: 0 15px 30px rgba(0,0,0,0.15);
+        }
+        
+        .team-image {
+          position: relative;
+          height: 200px;
+          overflow: hidden;
+        }
+        
+        .team-img {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+        }
+        
+        .team-role-badge {
+          position: absolute;
+          bottom: 15px;
+          left: 15px;
+          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+          color: white;
+          padding: 5px 15px;
+          border-radius: 20px;
+          font-size: 12px;
+          font-weight: 600;
+          backdrop-filter: blur(10px);
+        }
+        
+        .team-content {
+          padding: 20px;
+        }
+        
+        .team-icon {
+          margin-bottom: 15px;
+        }
+        
+        .role-icon {
+          width: 40px;
+          height: 40px;
+          object-fit: contain;
+        }
+        
+        .team-name {
+          font-size: 18px;
+          font-weight: 700;
+          color: #333;
+          margin-bottom: 10px;
+        }
+        
+        .team-contact {
+          margin-bottom: 15px;
+        }
+        
+        .team-email, .team-phone {
+          font-size: 13px;
+          color: #666;
+          margin-bottom: 5px;
+          display: flex;
+          align-items: center;
+        }
+        
+        .team-stats {
+          display: flex;
+          justify-content: space-between;
+          padding-top: 15px;
+          border-top: 1px solid #eee;
+        }
+        
+        .stat-item {
+          text-align: center;
+        }
+        
+        .stat-label {
+          display: block;
+          font-size: 11px;
+          color: #888;
+          margin-bottom: 3px;
+        }
+        
+        .stat-value {
+          display: block;
+          font-size: 16px;
+          font-weight: 700;
+        }
+        
+        .stat-value.success {
+          color: #10b981;
+        }
+        
+        .stat-value.warning {
+          color: #f59e0b;
+        }
+        
+        .slider-controls {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 20px;
+        }
+        
+        .slider-nav-btn {
+          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+          color: white;
+          border: none;
+          width: 40px;
+          height: 40px;
+          border-radius: 50%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          cursor: pointer;
+          transition: all 0.3s ease;
+        }
+        
+        .slider-nav-btn:hover {
+          transform: scale(1.1);
+          box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+        
+        .team-pagination {
+          position: static !important;
+          display: flex;
+          justify-content: center;
+          gap: 8px;
+        }
+        
+        .team-pagination :global(.swiper-pagination-bullet) {
+          width: 8px;
+          height: 8px;
+          background: #ddd;
+          opacity: 1;
+        }
+        
+        .team-pagination :global(.swiper-pagination-bullet-active) {
+          background: #667eea;
+          width: 20px;
+          border-radius: 10px;
+        }
+        
+        @media (max-width: 768px) {
+          .team-slider {
+            padding: 10px 5px 40px;
+          }
+          
+          .team-image {
+            height: 180px;
+          }
+          
+          .team-content {
+            padding: 15px;
+          }
+          
+          .team-name {
+            font-size: 16px;
+          }
+        }
+      `}</style>
     </section>
   );
 };
+
+export default Category2;

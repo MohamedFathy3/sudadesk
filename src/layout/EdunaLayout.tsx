@@ -1,12 +1,8 @@
 // @/layout/EdunaLayout.tsx
 "use client";
 import ImageView from "@/components/ImageView";
-import ScrollTop from "@/components/ScrollTop";
 import VideoPopup from "@/components/VideoPopup";
-import { eduna_config } from "@/utilities";
 import { Fragment, useEffect } from "react";
-// @ts-ignore
-import niceSelect from "react-nice-select";
 import Footer from "./Footer";
 import Header from "./Header";
 
@@ -63,11 +59,6 @@ const EdunaLayout = ({
   schoolData?: School; // بيانات المدرسة
 }) => {
   useEffect(() => {
-    eduna_config.animation();
-    eduna_config.movie_animation();
-    eduna_config.smooth_scroll();
-    eduna_config.scroll_animation();
-    niceSelect();
   }, []);
 
   return (
@@ -87,7 +78,6 @@ const EdunaLayout = ({
           <Footer footer={footer ?? 1} schoolData={schoolData} sections={sections} />
         </div>
       </div>
-      <ScrollTop />
     </Fragment>
   );
 };

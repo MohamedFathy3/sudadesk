@@ -181,6 +181,7 @@ const CourseItem = ({
   course,
   containerClass = "col-lg-6 col-xl-4 col-md-6 col-12",
 }: {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
   course: any;
   containerClass?: string;
 }) => {

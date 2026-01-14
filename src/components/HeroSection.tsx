@@ -29,7 +29,7 @@ interface HeroSectionProps {
   // Styling
   overlay?: boolean;
   overlayColor?: string;
-  textAlign?: 'left' | 'center' | 'right';
+  textAlign?: 'left' | 'center' | 'right' | 'bottom-left' | 'bottom-center' | 'bottom-right';
   showScrollIndicator?: boolean;
   
   // Functionality
@@ -49,29 +49,32 @@ interface HeroSectionProps {
 
 // 2. Default Button Configs
 const defaultPrimaryButton: ButtonProps = {
-  text: "Browse Courses",
-  link: "/courses",
+  text: "Browse Activities",
+  link: "#Activities",
   variant: "primary"
 };
 
 const defaultSecondaryButton: ButtonProps = {
-  text: "Learn More",
-  link: "/about",
+  text: "Our Team",
+  link: "#Team",
   variant: "secondary"
 };
 
 // 3. Button Variant Styles
 const buttonVariants = {
-  primary: "bg-yellow-500 hover:bg-yellow-600 text-black font-bold py-4 px-8 rounded-full text-lg transition-all transform hover:scale-105 shadow-lg",
-  secondary: "bg-transparent border-2 border-white text-white hover:bg-white/10 font-bold py-4 px-8 rounded-full text-lg transition-all",
-  outline: "border-2 border-gray-300 text-gray-800 hover:bg-gray-100 font-bold py-4 px-8 rounded-full text-lg transition-all"
+  primary: "bg-yellow-500 hover:bg-yellow-600 text-black font-bold py-2 px-4 rounded-lg text-sm transition-all transform hover:scale-105 shadow-lg md:py-3 md:px-6 md:text-base",
+  secondary: "bg-transparent border border-white text-white hover:bg-white/10 font-bold py-2 px-4 rounded-lg text-sm transition-all md:py-3 md:px-6 md:text-base",
+  outline: "border border-gray-300 text-gray-800 hover:bg-gray-100 font-bold py-2 px-4 rounded-lg text-sm transition-all md:py-3 md:px-6 md:text-base"
 };
 
 // 4. Text Alignment Classes
 const textAlignClasses = {
   left: "text-left",
   center: "text-center mx-auto",
-  right: "text-right ml-auto"
+  right: "text-right ml-auto",
+  'bottom-left': "text-left self-end mb-8 ml-8",
+  'bottom-center': "text-center mx-auto self-end mb-8",
+  'bottom-right': "text-right ml-auto self-end mb-8 mr-8"
 };
 
 const HeroSection: React.FC<HeroSectionProps> = ({
@@ -80,24 +83,24 @@ const HeroSection: React.FC<HeroSectionProps> = ({
   title,
   
   // Optional with defaults
-  subtitle = "Join thousands of students learning new skills every day",
+  subtitle = "",
   highlightText,
   
   primaryButton = defaultPrimaryButton,
   secondaryButton = defaultSecondaryButton,
   
   overlay = true,
-  overlayColor = "from-black/60 to-transparent",
+  overlayColor = "from-black/40 via-black/20 to-transparent",
   textAlign = "center",
   showScrollIndicator = true,
   
   autoSlide = true,
   slideInterval = 5000,
-  fullHeight = true,
-  customHeight = "100vh",
+  fullHeight = false,
+  customHeight = "250px", // جعلها أصغر قليلاً
   
-  // Header adjustment default (تعديل)
-  headerHeight = 80, // افتراضي 80px
+  // Header adjustment default
+  headerHeight = 80,
   
   containerClassName = "",
   titleClassName = "",
@@ -155,19 +158,17 @@ const HeroSection: React.FC<HeroSectionProps> = ({
     );
   };
 
-  // Calculate height with header adjustment
-  const heightClass = fullHeight 
-    ? `min-h-[calc(100vh-${calculatedHeaderHeight}px)] mt-[${calculatedHeaderHeight}px]` 
-    : `min-h-[${customHeight}]`;
+  // Check if textAlign is bottom variant
+  const isBottomAlign = textAlign.includes('bottom');
 
   return (
     <section 
-      className={`relative ${heightClass} overflow-hidden ${containerClassName}`}
+      className={`relative overflow-hidden ${containerClassName}`}
       role="banner"
       aria-label="Hero section"
       style={{
-        marginTop: `${calculatedHeaderHeight}px`,
-        minHeight: fullHeight ? `calc(100vh - ${calculatedHeaderHeight}px)` : customHeight
+        minHeight: fullHeight ? `calc(100vh - ${calculatedHeaderHeight}px)` : customHeight,
+        paddingTop: '0.5rem'
       }}
     >
       {/* Background Images */}
@@ -193,10 +194,11 @@ const HeroSection: React.FC<HeroSectionProps> = ({
               }`}
               quality={90}
               onLoadingComplete={() => setIsLoaded(true)}
+              style={{ objectPosition: 'center center' }}
             />
             {overlay && (
               <div 
-                className={`absolute inset-0 bg-gradient-to-r ${overlayColor}`}
+                className={`absolute inset-0 bg-gradient-to-b ${overlayColor}`}
                 aria-hidden="true"
               />
             )}
@@ -222,10 +224,11 @@ const HeroSection: React.FC<HeroSectionProps> = ({
                   sizes="100vw"
                   className="object-cover"
                   quality={85}
+                  style={{ objectPosition: 'center center' }}
                 />
                 {overlay && (
                   <div 
-                    className={`absolute inset-0 bg-gradient-to-r ${overlayColor}`}
+                    className={`absolute inset-0 bg-gradient-to-b ${overlayColor}`}
                     aria-hidden="true"
                   />
                 )}
@@ -233,27 +236,29 @@ const HeroSection: React.FC<HeroSectionProps> = ({
             ))}
             
             {/* Navigation Dots */}
-            <div 
-              className="absolute bottom-8 left-1/2 transform -translate-x-1/2 flex gap-3 z-20"
-              role="tablist"
-              aria-label="Slider navigation"
-            >
-              {images.map((_, index) => (
-                <button
-                  key={index}
-                  onClick={() => setCurrentSlide(index)}
-                  className={`w-3 h-3 rounded-full transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-white ${
-                    index === currentSlide 
-                      ? 'bg-white w-8' 
-                      : 'bg-white/50 hover:bg-white/80'
-                  }`}
-                  role="tab"
-                  aria-selected={index === currentSlide}
-                  aria-label={`Go to slide ${index + 1}`}
-                  tabIndex={0}
-                />
-              ))}
-            </div>
+            {images.length > 1 && (
+              <div 
+                className="absolute bottom-2 left-1/2 transform -translate-x-1/2 flex gap-2 z-20"
+                role="tablist"
+                aria-label="Slider navigation"
+              >
+                {images.map((_, index) => (
+                  <button
+                    key={index}
+                    onClick={() => setCurrentSlide(index)}
+                    className={`w-2 h-2 rounded-full transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-white ${
+                      index === currentSlide 
+                        ? 'bg-white w-4' 
+                        : 'bg-white/50 hover:bg-white/80'
+                    }`}
+                    role="tab"
+                    aria-selected={index === currentSlide}
+                    aria-label={`Go to slide ${index + 1}`}
+                    tabIndex={0}
+                  />
+                ))}
+              </div>
+            )}
             
             {/* Previous/Next Buttons */}
             {images.length > 1 && (
@@ -262,7 +267,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({
                   onClick={() => setCurrentSlide((prev) => 
                     prev === 0 ? images.length - 1 : prev - 1
                   )}
-                  className="absolute left-4 top-1/2 transform -translate-y-1/2 z-20 bg-black/30 hover:bg-black/50 text-white p-3 rounded-full transition-all"
+                  className="absolute left-1 top-1/2 transform -translate-y-1/2 z-20 bg-black/30 hover:bg-black/50 text-white p-1 rounded-full transition-all text-xs md:p-2 md:text-sm"
                   aria-label="Previous slide"
                 >
                   ←
@@ -271,7 +276,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({
                   onClick={() => setCurrentSlide((prev) => 
                     (prev + 1) % images.length
                   )}
-                  className="absolute right-4 top-1/2 transform -translate-y-1/2 z-20 bg-black/30 hover:bg-black/50 text-white p-3 rounded-full transition-all"
+                  className="absolute right-1 top-1/2 transform -translate-y-1/2 z-20 bg-black/30 hover:bg-black/50 text-white p-1 rounded-full transition-all text-xs md:p-2 md:text-sm"
                   aria-label="Next slide"
                 >
                   →
@@ -282,11 +287,12 @@ const HeroSection: React.FC<HeroSectionProps> = ({
         )}
       </div>
 
-      {/* Content */}
-      <div className="relative z-10 flex items-center justify-center h-full px-4">
-        <div className={`max-w-6xl w-full ${textAlignClasses[textAlign]}`}>
+      {/* Content Container */}
+      <div className={`relative z-10 h-full flex ${isBottomAlign ? 'items-end' : 'items-center'} px-4 py-4`} style={{bottom:"-497px"}}>
+        <div className={`w-full ${textAlignClasses[textAlign]}`}>
           <h1 className={`
-            text-4xl md:text-6xl lg:text-7xl font-bold text-white mb-6 
+            ${isBottomAlign ? 'text-xl md:text-2xl lg:text-3xl' : 'text-2xl md:text-3xl lg:text-4xl'} 
+            font-bold text-white mb-2
             ${isLoaded ? 'animate-fade-in-up' : 'opacity-0'}
             ${titleClassName}
           `}>
@@ -295,7 +301,8 @@ const HeroSection: React.FC<HeroSectionProps> = ({
           
           {subtitle && (
             <p className={`
-              text-xl md:text-2xl text-gray-200 mb-10 max-w-3xl 
+              ${isBottomAlign ? 'text-sm md:text-base' : 'text-base md:text-lg'} 
+              text-gray-200 mb-3 max-w-xl
               ${isLoaded ? 'animate-fade-in-up animation-delay-200' : 'opacity-0'}
               ${subtitleClassName}
             `}>
@@ -304,58 +311,41 @@ const HeroSection: React.FC<HeroSectionProps> = ({
           )}
           
           {/* Call to Action Buttons */}
-          <div className={`
-            flex flex-col sm:flex-row gap-4 ${textAlign === 'center' ? 'justify-center' : 'justify-start'}
-            ${isLoaded ? 'animate-fade-in-up animation-delay-400' : 'opacity-0'}
-          `}>
-            <Link
-              href={primaryButton.link}
-              className={buttonVariants[primaryButton.variant || 'primary']}
-            >
-              {primaryButton.icon && (
-                <span className="mr-2">{primaryButton.icon}</span>
+          {(primaryButton || secondaryButton) && (
+            <div className={`
+              ${isBottomAlign ? 'gap-2' : 'gap-3'} 
+              flex flex-wrap ${textAlign.includes('center') ? 'justify-center' : textAlign.includes('right') ? 'justify-end' : 'justify-start'}
+              ${isLoaded ? 'animate-fade-in-up animation-delay-400' : 'opacity-0'}
+            `}>
+              {primaryButton && (
+                <Link
+                  href={primaryButton.link}
+                  className={buttonVariants[primaryButton.variant || 'primary']}
+                >
+                  {primaryButton.icon && (
+                    <span className="mr-1">{primaryButton.icon}</span>
+                  )}
+                  {primaryButton.text}
+                </Link>
               )}
-              {primaryButton.text}
-            </Link>
-            
-            {secondaryButton && (
-              <Link
-                href={secondaryButton.link}
-                className={buttonVariants[secondaryButton.variant || 'secondary']}
-              >
-                {secondaryButton.icon && (
-                  <span className="mr-2">{secondaryButton.icon}</span>
-                )}
-                {secondaryButton.text}
-              </Link>
-            )}
-          </div>
+              
+              {secondaryButton && (
+                <Link
+                  href={secondaryButton.link}
+                  className={buttonVariants[secondaryButton.variant || 'secondary']}
+                >
+                  {secondaryButton.icon && (
+                    <span className="mr-1">{secondaryButton.icon}</span>
+                  )}
+                  {secondaryButton.text}
+                </Link>
+              )}
+            </div>
+          )}
         </div>
       </div>
 
-      {/* Scroll Indicator */}
-      {showScrollIndicator && (
-        <div 
-          className="absolute bottom-10 left-1/2 transform -translate-x-1/2 z-10"
-          aria-hidden="true"
-        >
-          <div className="animate-bounce">
-            <svg 
-              className="w-6 h-6 text-white" 
-              fill="none" 
-              stroke="currentColor" 
-              viewBox="0 0 24 24"
-            >
-              <path 
-                strokeLinecap="round" 
-                strokeLinejoin="round" 
-                strokeWidth="2" 
-                d="M19 14l-7 7m0 0l-7-7m7 7V3"
-              />
-            </svg>
-          </div>
-        </div>
-      )}
+     
     </section>
   );
 };

@@ -6,7 +6,6 @@ export const useScrollTop = () => {
   const pathLength = progressPath?.getTotalLength() ?? 0;
 
   // Set up the progress path
-  progressPath.style.transition = progressPath.style.webkitTransition = "none";
   progressPath.style.strokeDasharray = `${pathLength} ${pathLength}`;
   progressPath.style.strokeDashoffset = `${pathLength}`;
   progressPath.getBoundingClientRect(); // Force render

@@ -32,7 +32,6 @@ import {
   Loader2,
   Plus,
   Trash2,
-  Upload,
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 
@@ -99,37 +98,68 @@ function SchoolProfile() {
   const { language } = useLanguage();
   const [activeTab, setActiveTab] = useState('about');
   const [isSaving, setIsSaving] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [newGalleryImage, setNewGalleryImage] = useState<File | string | null>(null);
   const [newGalleryCaption, setNewGalleryCaption] = useState('');
   
-  // تهيئة البيانات الأولية
-  const initialFormData: EditingSchoolProfileData = {
-    about: {
-      about_us: user?.about?.about_us || '',
-      history_vision_values: user?.about?.history_vision_values || '',
-      stages_and_activities: user?.about?.stages_and_activities || '',
-    },
-    why_choose: {
-      title: user?.why_choose?.title || '',
-      details: user?.why_choose?.details || '',
-    },
-    activities_gallery: (user?.activities_gallery || []).map((item) => ({
-      id: item.id,
-      image: item.image || '',
-      caption: item.caption || '',
-    })),
-    blog_content: (user?.blog_content || []).map((item) => ({
-      id: item.id,
-      title: item.title || '',
-      text: item.text || '',
-    })),
-    slider: {
-      title: user?.slider?.title || '',
-      image: user?.slider?.image || '',
-    },
+  // تهيئة البيانات الأولية من user
+  const getInitialFormData = (): EditingSchoolProfileData => {
+    if (!user) {
+      return {
+        about: {
+          about_us: '',
+          history_vision_values: '',
+          stages_and_activities: '',
+        },
+        why_choose: {
+          title: '',
+          details: '',
+        },
+        activities_gallery: [],
+        blog_content: [],
+        slider: {
+          title: '',
+          image: '',
+        },
+      };
+    }
+
+    return {
+      about: {
+        about_us: user?.about?.about_us || '',
+        history_vision_values: user?.about?.history_vision_values || '',
+        stages_and_activities: user?.about?.stages_and_activities || '',
+      },
+      why_choose: {
+        title: user?.why_choose?.title || '',
+        details: user?.why_choose?.details || '',
+      },
+      activities_gallery: (user?.activities_gallery || []).map((item) => ({
+        id: item.id,
+        image: item.image && item.image !== 'null' ? item.image : '',
+        caption: item.caption || '',
+      })),
+      blog_content: (user?.blog_content || []).map((item) => ({
+        id: item.id,
+        title: item.title || '',
+        text: item.text || '',
+      })),
+      slider: {
+        title: user?.slider?.title || '',
+        image: user?.slider?.image || '',
+      },
+    };
   };
 
-  const [formData, setFormData] = useState<EditingSchoolProfileData>(initialFormData);
+  const [formData, setFormData] = useState<EditingSchoolProfileData>(getInitialFormData());
+
+  // تحديث formData عندما يتغير user
+  useEffect(() => {
+    if (user) {
+      setFormData(getInitialFormData());
+      setIsLoading(false);
+    }
+  }, [user]);
 
   // ==================== الدوال المساعدة ====================
   
@@ -151,109 +181,132 @@ function SchoolProfile() {
     };
   };
 
-  // تحضير البيانات للـ API
-  const prepareApiData = () => {
-    const formDataToSend = new FormData();
+  // ==================== تحضير البيانات للـ API ====================
+const prepareApiData = () => {
+  const formDataToSend = new FormData();
+  
+  // البيانات النصية
+  formDataToSend.append('about_us', formData.about.about_us);
+  formDataToSend.append('history_vision_values', formData.about.history_vision_values);
+  formDataToSend.append('stages_and_activities', formData.about.stages_and_activities);
+  
+  formDataToSend.append('why_choose_title', formData.why_choose.title);
+  formDataToSend.append('why_choose_details', formData.why_choose.details);
+  
+  formDataToSend.append('slider_title', formData.slider.title);
+  
+  // صور السلايدر
+  if (formData.slider.image instanceof File) {
+    formDataToSend.append('slider_image', formData.slider.image);
+  } else if (formData.slider.image) {
+    formDataToSend.append('slider_image_url', formData.slider.image);
+  }
+  
+  // blog_content
+  formData.blog_content.forEach((blog, index) => {
+    formDataToSend.append(`blog_content[${index}][title]`, blog.title);
+    formDataToSend.append(`blog_content[${index}][text]`, blog.text);
+    if (blog.id) {
+      formDataToSend.append(`blog_content[${index}][id]`, blog.id.toString());
+    }
+  });
+  
+  // ============ الحل النهائي ============
+  formData.activities_gallery.forEach((item, index) => {
+    formDataToSend.append(`activities_gallery[${index}][caption]`, item.caption || '');
     
-    // البيانات النصية
-    formDataToSend.append('about_us', formData.about.about_us);
-    formDataToSend.append('history_vision_values', formData.about.history_vision_values);
-    formDataToSend.append('stages_and_activities', formData.about.stages_and_activities);
-    
-    formDataToSend.append('why_choose_title', formData.why_choose.title);
-    formDataToSend.append('why_choose_details', formData.why_choose.details);
-    
-    formDataToSend.append('slider_title', formData.slider.title);
-    
-    // صور السلايدر
-    if (formData.slider.image instanceof File) {
-      formDataToSend.append('slider_image', formData.slider.image);
-    } else if (formData.slider.image) {
-      formDataToSend.append('slider_image_url', formData.slider.image);
+    if (item.id && item.id > 0) {
+      formDataToSend.append(`activities_gallery[${index}][id]`, item.id.toString());
     }
     
-    // blog_content
-    formData.blog_content.forEach((blog, index) => {
-      formDataToSend.append(`blog_content[${index}][title]`, blog.title);
-      formDataToSend.append(`blog_content[${index}][text]`, blog.text);
-      if (blog.id) {
-        formDataToSend.append(`blog_content[${index}][id]`, blog.id.toString());
-      }
-    });
-    
-    // activities_gallery
-    formData.activities_gallery.forEach((item, index) => {
-      if (item.image instanceof File) {
-        formDataToSend.append(`activities_gallery[${index}][image]`, item.image);
-      } else if (item.image) {
-        formDataToSend.append(`activities_gallery[${index}][image_url]`, item.image);
-      }
-      
-      formDataToSend.append(`activities_gallery[${index}][caption]`, item.caption);
-      
-      if (item.id) {
-        formDataToSend.append(`activities_gallery[${index}][id]`, item.id.toString());
-      }
-    });
-
-    // school_id و user_id
-    if (user?.school_id) {
-      formDataToSend.append('school_id', user.school_id.toString());
+    // التعامل مع الصور
+    if (item.image instanceof File) {
+      // صورة جديدة: أرسلها مباشرة
+      formDataToSend.append(`activities_gallery[${index}][image]`, item.image);
+    } 
+    else {
+      // صورة قديمة أو لا توجد صورة: أرسل string فارغ
+      formDataToSend.append(`activities_gallery[${index}][image]`, '');
     }
-    
-    if (user?.id) {
-      formDataToSend.append('user_id', user.id.toString());
-    }
-
-    return formDataToSend;
-  };
+  });
+  
+  // school_id و user_id
+  if (user?.school_id) {
+    formDataToSend.append('school_id', user.school_id.toString());
+  }
+  
+  if (user?.id) {
+    formDataToSend.append('user_id', user.id.toString());
+  }
+  
+  console.log('📤 FormData جاهز للإرسال');
+  
+  return formDataToSend;
+};
 
   // ==================== معالجة الحفظ ====================
-  const handleSave = async () => {
-    try {
-      setIsSaving(true);
+const handleSave = async () => {
+  try {
+    setIsSaving(true);
+    
+    const formDataToSend = prepareApiData();
+    const response = await apiFetch('/update-schools/profie', {
+      method: 'POST',
+      body: formDataToSend,
+    });
+
+    console.log('✅ Server response:', response);
+
+    if (response.result === 'Success') {
+      toast.success(getTranslation('saveSuccess'));
       
-      const formDataToSend = prepareApiData();
-
-      const response = await apiFetch('/update-schools/profie', {
-        method: 'POST',
-        body: formDataToSend,
-      });
-
-      if (response.result === 'Success') {
-        // تحضير البيانات المحدثة
-        const updatedUser = {
-          ...user,
-          about: formData.about,
-          why_choose: formData.why_choose,
-          blog_content: formData.blog_content,
-          slider: convertToSliderData(formData.slider),
-          activities_gallery: formData.activities_gallery.map(convertToGalleryItem),
-          school: user?.school ? {
-            ...user.school,
-            name: user.school.name || '',
-          } : undefined
-        };
-
-        updateUser(updatedUser);
-        toast.success(getTranslation('saveSuccess'));
-      } else {
-        if (response.errors) {
-          const errorMessages = Object.entries(response.errors)
-            .map(([field, errors]) => `${field}: ${Array.isArray(errors) ? errors.join(', ') : errors}`)
-            .join(' | ');
-          toast.error(errorMessages || getTranslation('saveError'));
-        } else {
-          toast.error(response.message || getTranslation('saveError'));
+      // بعد الحفظ الناجح، جلب البيانات المحدثة من السيرفر
+      try {
+        const authResponse = await apiFetch('/user/check-auth');
+        
+        if (authResponse.result === 'Success' && authResponse.data) {
+          // تحديث user state بالبيانات الجديدة من السيرفر
+          updateUser(authResponse.data);
+          
+          // تحديث formData بالبيانات الجديدة
+          setFormData({
+            about: authResponse.data.about || getInitialFormData().about,
+            why_choose: authResponse.data.why_choose || getInitialFormData().why_choose,
+                  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            activities_gallery: (authResponse.data.activities_gallery || []).map((item: { id: any; image: string; caption: any; }) => ({
+              id: item.id,
+              image: item.image && item.image !== 'null' ? item.image : '',
+              caption: item.caption || '',
+            })),
+            blog_content: authResponse.data.blog_content || getInitialFormData().blog_content,
+            slider: {
+              title: authResponse.data.slider?.title || '',
+              image: authResponse.data.slider?.image || '',
+            },
+          });
         }
+      } catch (refreshError) {
+        console.error('❌ Error refreshing data:', refreshError);
       }
-    } catch (error: any) {
-      console.error('Save error:', error);
-      toast.error(error.message || getTranslation('saveError'));
-    } finally {
-      setIsSaving(false);
+    } else {
+      console.error('❌ Server errors:', response.errors);
+      if (response.errors) {
+        const errorMessages = Object.entries(response.errors)
+          .map(([field, errors]) => `${field}: ${Array.isArray(errors) ? errors.join(', ') : errors}`)
+          .join(' | ');
+        toast.error(errorMessages || getTranslation('saveError'));
+      } else {
+        toast.error(response.message || getTranslation('saveError'));
+      }
     }
-  };
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  } catch (error: any) {
+    console.error('💥 Save error:', error);
+    toast.error(error.message || getTranslation('saveError'));
+  } finally {
+    setIsSaving(false);
+  }
+};
 
   // ==================== الترجمة ====================
   const getTranslation = (key: string): string => {
@@ -290,6 +343,7 @@ function SchoolProfile() {
         'confirmDelete': 'هل أنت متأكد من الحذف؟',
         'noImages': 'لا توجد صور في المعرض',
         'noArticles': 'لا توجد مقالات',
+        'saving': 'جاري الحفظ...',
       },
       en: {
         'schoolProfile': 'School Profile',
@@ -323,6 +377,7 @@ function SchoolProfile() {
         'confirmDelete': 'Are you sure you want to delete?',
         'noImages': 'No images in gallery',
         'noArticles': 'No articles',
+        'saving': 'Saving...',
       }
     };
     
@@ -361,8 +416,13 @@ function SchoolProfile() {
   };
 
   const handleAddGalleryItem = () => {
-    if (!newGalleryImage || !newGalleryCaption) {
-      toast.error('يجب إضافة صورة ووصف');
+    if (!newGalleryImage) {
+      toast.error('يجب إضافة صورة');
+      return;
+    }
+    
+    if (!newGalleryCaption.trim()) {
+      toast.error('يجب إضافة وصف للصورة');
       return;
     }
     
@@ -374,8 +434,8 @@ function SchoolProfile() {
         ...prev.activities_gallery,
         { 
           tempId,
-          image: newGalleryImage, 
-          caption: newGalleryCaption 
+          image: newGalleryImage instanceof File ? newGalleryImage : '',
+          caption: newGalleryCaption.trim(),
         }
       ],
     }));
@@ -395,15 +455,20 @@ function SchoolProfile() {
   };
 
   const handleAddBlogItem = (title: string, text: string) => {
-    if (!title || !text) return;
+    if (!title.trim() || !text.trim()) {
+      toast.error('يجب إدخال عنوان ومحتوى للمقال');
+      return;
+    }
     
     setFormData(prev => ({
       ...prev,
       blog_content: [
         ...prev.blog_content,
-        { title, text }
+        { title: title.trim(), text: text.trim() }
       ],
     }));
+    
+    toast.success('تمت إضافة المقال');
   };
 
   const handleRemoveBlogItem = (index: number) => {
@@ -416,10 +481,11 @@ function SchoolProfile() {
   };
 
   // ==================== التحميل ====================
-  if (!user) {
+  if (isLoading || !user) {
     return (
       <div className="flex items-center justify-center h-96">
         <Loader2 className="h-8 w-8 animate-spin" />
+        <span className="mr-2">{getTranslation('loading')}</span>
       </div>
     );
   }
@@ -446,7 +512,7 @@ function SchoolProfile() {
           {isSaving ? (
             <>
               <Loader2 className={`h-4 w-4 animate-spin ${isRTL ? 'ml-2' : 'mr-2'}`} />
-              {getTranslation('loading')}
+              {getTranslation('saving')}
             </>
           ) : (
             <>
@@ -469,6 +535,7 @@ function SchoolProfile() {
             <span className="hidden sm:inline">{getTranslation('whyChooseUs')}</span>
           </TabsTrigger>
           <TabsTrigger value="gallery">
+            <ImageIcon className="w-4 h-4 mr-2" />
             <span className="hidden sm:inline">{getTranslation('gallery')}</span>
           </TabsTrigger>
           <TabsTrigger value="blog">
@@ -590,13 +657,15 @@ function SchoolProfile() {
                         value={newGalleryCaption}
                         onChange={(e) => setNewGalleryCaption(e.target.value)}
                         placeholder={getTranslation('details')}
+                        dir={dir}
                       />
                     </div>
                     <Button 
                       onClick={handleAddGalleryItem}
-                      disabled={!newGalleryImage || !newGalleryCaption}
+                      disabled={!newGalleryImage || !newGalleryCaption.trim()}
+                      className={isRTL ? 'flex-row-reverse' : ''}
                     >
-                      <Plus className="w-4 h-4 mr-2" />
+                      <Plus className={`w-4 h-4 ${isRTL ? 'ml-2' : 'mr-2'}`} />
                       {getTranslation('add')}
                     </Button>
                   </div>
@@ -605,7 +674,7 @@ function SchoolProfile() {
 
               {/* المعرض الحالي */}
               <div>
-                <h3 className="font-medium mb-4">
+                <h3 className={`font-medium mb-4 ${isRTL ? 'text-right' : 'text-left'}`}>
                   {getTranslation('gallery')} ({formData.activities_gallery.length})
                 </h3>
                 {formData.activities_gallery.length === 0 ? (
@@ -619,6 +688,7 @@ function SchoolProfile() {
                         key={item.id || item.tempId || index}
                         item={item}
                         onRemove={() => handleRemoveGalleryItem(index)}
+                        language={language}
                       />
                     ))}
                   </div>
@@ -648,7 +718,7 @@ function SchoolProfile() {
 
               {/* المقالات الحالية */}
               <div>
-                <h3 className="font-medium mb-4">
+                <h3 className={`font-medium mb-4 ${isRTL ? 'text-right' : 'text-left'}`}>
                   {getTranslation('blog')} ({formData.blog_content.length})
                 </h3>
                 {formData.blog_content.length === 0 ? (
@@ -662,6 +732,7 @@ function SchoolProfile() {
                         key={item.id || index}
                         item={item}
                         onRemove={() => handleRemoveBlogItem(index)}
+                        language={language}
                       />
                     ))}
                   </div>
@@ -753,10 +824,12 @@ function SchoolProfile() {
 interface GalleryItemProps {
   item: EditingGalleryItem;
   onRemove: () => void;
+  language: string;
 }
 
-function GalleryItemComponent({ item, onRemove }: GalleryItemProps) {
+function GalleryItemComponent({ item, onRemove, language }: GalleryItemProps) {
   const [imageUrl, setImageUrl] = useState<string>('');
+  const isRTL = language === 'ar';
 
   useEffect(() => {
     if (item.image instanceof File) {
@@ -772,7 +845,14 @@ function GalleryItemComponent({ item, onRemove }: GalleryItemProps) {
   }, [item.image]);
 
   return (
-    <div className="border rounded-lg overflow-hidden">
+    <div className="border rounded-lg overflow-hidden relative">
+      {/* علامة جديدة */}
+      {item.image instanceof File && (
+        <span className={`absolute top-2 ${isRTL ? 'left-2' : 'right-2'} bg-blue-500 text-white text-xs px-2 py-1 rounded z-10`}>
+          جديد
+        </span>
+      )}
+      
       <div className="relative aspect-video">
         {imageUrl ? (
           <img
@@ -790,17 +870,19 @@ function GalleryItemComponent({ item, onRemove }: GalleryItemProps) {
         )}
         <button
           onClick={onRemove}
-          className="absolute top-2 right-2 p-1 bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors"
-          aria-label="حذف الصورة"
+          className={`absolute top-2 ${isRTL ? 'left-2' : 'right-2'} p-1 bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors z-10`}
+          aria-label={isRTL ? "حذف الصورة" : "Delete image"}
         >
           <Trash2 className="w-4 h-4" />
         </button>
       </div>
       <div className="p-3">
-        <p className="text-sm font-medium">{item.caption}</p>
-        {item.tempId && (
-          <span className="text-xs text-blue-600">جديد</span>
-        )}
+        <p className="text-sm font-medium text-center">{item.caption}</p>
+        {item.image instanceof File ? (
+          <p className="text-xs text-blue-600 text-center">(صورة جديدة)</p>
+        ) : item.id ? (
+          <p className="text-xs text-gray-500 text-center">ID: {item.id}</p>
+        ) : null}
       </div>
     </div>
   );
@@ -814,9 +896,10 @@ interface BlogFormProps {
 function BlogForm({ onAdd, language }: BlogFormProps) {
   const [title, setTitle] = useState('');
   const [text, setText] = useState('');
+  const isRTL = language === 'ar';
 
   const getTranslation = (key: string): string => {
-    const translations = {
+    const translations: Record<string, Record<string, string>> = {
       ar: {
         'articleTitle': 'عنوان المقال',
         'articleContent': 'محتوى المقال',
@@ -828,7 +911,8 @@ function BlogForm({ onAdd, language }: BlogFormProps) {
         'add': 'Add'
       }
     };
-    return translations[language][key] || key;
+    
+    return translations[language]?.[key] || key;
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -849,6 +933,7 @@ function BlogForm({ onAdd, language }: BlogFormProps) {
           value={title}
           onChange={(e) => setTitle(e.target.value)}
           placeholder={getTranslation('articleTitle')}
+          dir={isRTL ? 'rtl' : 'ltr'}
         />
       </div>
       <div>
@@ -859,10 +944,11 @@ function BlogForm({ onAdd, language }: BlogFormProps) {
           onChange={(e) => setText(e.target.value)}
           placeholder={getTranslation('articleContent')}
           rows={4}
+          dir={isRTL ? 'rtl' : 'ltr'}
         />
       </div>
-      <Button type="submit" disabled={!title || !text}>
-        <Plus className="w-4 h-4 mr-2" />
+      <Button type="submit" disabled={!title || !text} className={isRTL ? 'flex-row-reverse' : ''}>
+        <Plus className={`w-4 h-4 ${isRTL ? 'ml-2' : 'mr-2'}`} />
         {getTranslation('add')}
       </Button>
     </form>
@@ -872,13 +958,16 @@ function BlogForm({ onAdd, language }: BlogFormProps) {
 interface BlogItemProps {
   item: BlogItem;
   onRemove: () => void;
+  language: string;
 }
 
-function BlogItemComponent({ item, onRemove }: BlogItemProps) {
+function BlogItemComponent({ item, onRemove, language }: BlogItemProps) {
+  const isRTL = language === 'ar';
+
   return (
     <div className="border rounded-lg p-4">
-      <div className="flex items-start justify-between">
-        <div className="space-y-2 flex-1">
+      <div className={`flex items-start justify-between ${isRTL ? 'flex-row-reverse' : ''}`}>
+        <div className={`space-y-2 flex-1 ${isRTL ? 'text-right' : 'text-left'}`}>
           <h4 className="font-medium text-lg">{item.title}</h4>
           <p className="text-gray-600 dark:text-gray-400 line-clamp-3">
             {item.text}
@@ -886,8 +975,8 @@ function BlogItemComponent({ item, onRemove }: BlogItemProps) {
         </div>
         <button
           onClick={onRemove}
-          className="ml-4 text-red-500 hover:text-red-600 transition-colors"
-          aria-label="حذف المقال"
+          className={`${isRTL ? 'mr-4' : 'ml-4'} text-red-500 hover:text-red-600 transition-colors`}
+          aria-label={isRTL ? "حذف المقال" : "Delete article"}
         >
           <Trash2 className="w-5 h-5" />
         </button>

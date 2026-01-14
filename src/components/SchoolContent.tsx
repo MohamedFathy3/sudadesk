@@ -10,10 +10,21 @@ import { Category2 } from "@/components/Category";
 import { ActivitiesGallery } from "@/components/Testimonial";
 import { WhyChooseArea3 } from "@/components/WhyChooseArea";
 import { apiFetch } from '@/lib/api';
-import { Course3 } from './Course';
 
 interface SchoolContentProps {
   slug: string;
+}
+
+interface Employee {
+  id: number;
+  name: string;
+  email: string;
+  phone: string;
+  role: string;
+  school_id: number;
+  attendance_count: number;
+  absent_count: number;
+  last_salary: string | null;
 }
 
 interface School {
@@ -56,51 +67,74 @@ interface School {
   updated_at: string;
 }
 
+interface ApiResponse {
+  result: string;
+  data: {
+    school: School;
+    employees: Employee[];
+  };
+  message: string;
+  status: number;
+}
+
 const sections = [
   { id: "why-choose", label: "Why Choose Us" },
-  { id: "categories", label: "Categories" },
-  { id: "testimonials", label: "Testimonials" },
-  { id: "blog", label: "Blog" },
+  { id: "Team", label: "Our Team" },
   { id: "Activities", label: "Activities" },
+  { id: "blog", label: "Blog" },
 ];
 
 export default function SchoolContent({ slug }: SchoolContentProps) {
   const [school, setSchool] = useState<School | null>(null);
+  const [employees, setEmployees] = useState<Employee[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
 
   useEffect(() => {
-    async function fetchSchool() {
+    async function fetchSchoolWithEmployees() {
       try {
         setLoading(true);
         console.log(`📡 Fetching school with slug: ${slug}`);
         
-        // جلب كل المدارس
-        const response = await apiFetch('/schools');
+        // ✅ استخدام الـ API الجديد الذي يجلب المدرسة مع الموظفين
+        const response = await apiFetch(`/${slug}`) as ApiResponse;
         
-        if (!response.data || response.data.length === 0) {
-          throw new Error('No schools found');
+        if (response.result === 'Success' && response.data) {
+          setSchool(response.data.school);
+          setEmployees(response.data.employees || []);
+          setError(null);
+        } else {
+          throw new Error('Failed to fetch school data');
         }
-        
-        // البحث عن المدرسة بالـ slug
-        const foundSchool = response.data.find((s: School) => s.slug === slug);
-        
-        if (!foundSchool) {
-          throw new Error(`School with slug "${slug}" not found`);
-        }
-        
-        setSchool(foundSchool);
-        setError(null);
       } catch (err) {
         console.error('Error fetching school:', err);
-        setError(err instanceof Error ? err.message : 'Failed to load school');
+        // ✅ حاول استخدام الـ API القديم كبديل
+        try {
+          console.log('Trying old API...');
+          const oldResponse = await apiFetch('/schools');
+          
+          if (oldResponse.result === 'Success' && oldResponse.data) {
+            const foundSchool = oldResponse.data.find((s: School) => s.slug === slug);
+            
+            if (foundSchool) {
+              setSchool(foundSchool);
+              setEmployees([]); // لا يوجد موظفين في الـ API القديم
+            } else {
+              throw new Error(`School with slug "${slug}" not found`);
+            }
+          } else {
+            throw new Error('No schools found');
+          }
+        } catch (fallbackErr) {
+          setError(fallbackErr instanceof Error ? fallbackErr.message : 'Failed to load school');
+        }
       } finally {
         setLoading(false);
       }
     }
 
-    fetchSchool();
+    fetchSchoolWithEmployees();
   }, [slug]);
 
   if (loading) {
@@ -142,36 +176,20 @@ export default function SchoolContent({ slug }: SchoolContentProps) {
         width: 150,
         height: 40,
         href: `/${school.slug}`
-      }}
-      showLoginButton={true}
-      loginButton={{
-        text: "Sign In",
-        href: "/auth",
-        className: "login-btn"
-      }}
-       schoolData={school} 
+      }}  
+      showLoginButton={false}
+      schoolData={school} 
     >
       {/* Hero Section */}
       <section id="hero">
         <HeroSection
           images={[school.slider.image]}
           title={school.slider.title}
-          subtitle={school.des}
-          highlightText={school.name}
-          primaryButton={{
-            text: "Explore Courses",
-            link: "#categories",
-            variant: "primary",
-          }}
-          secondaryButton={{
-            text: "Contact Us",
-            link: `tel:${school.phone}`,
-            variant: "outline"
-          }}
-          textAlign="center"
-          fullHeight={true}
+          textAlign="bottom-left"
+          fullHeight={false}
+          customHeight="650px"
           autoSlide={false}
-          overlayColor="from-blue-900/70 to-purple-900/50"
+          containerClassName="rounded-b-xl overflow-hidden"
         />
       </section>
       
@@ -183,29 +201,29 @@ export default function SchoolContent({ slug }: SchoolContentProps) {
         />
       </section>
       
-      {/* Categories Section */}
-      <section id="categories">
-        <Category2 />
+      {/* Our Team Section - ✅ تمرير الموظفين مباشرة */}
+      <section id="Team">
+        <Category2 
+          titleCenter={true}
+          employees={employees} // ✅ تمرير الموظفين مباشرة من الـ API الجديد
+        />
       </section>
-      <section id="Activities" >
-      <Course3
-        title="Popular Courses"
-        subtitle="Explore our most popular courses"
-        limit={6}
-      />
+   
+      {/* Activities Section */}
+      <section id="Activities">
+        <ActivitiesGallery 
+          activities={school?.activities_gallery || []}
+          title="Our School Activities"
+          subtitle="Discover the vibrant activities and events at our school"
+        />
       </section>
-      {/* Testimonials Section */}
-      <section id="testimonials">
-  <ActivitiesGallery 
-    activities={school.activities_gallery}
-    title="Our School Activities"
-    subtitle="Discover the vibrant activities and events at our school"
-    autoPlay={true}
-  />      </section>
       
       {/* Blog Section */}
       <section id="blog">
-        {/* <Blog1 posts={school.blog_content} /> */}
+        <Blog1 
+          schoolId={school?.id} 
+          useApi={true}
+        />
       </section>
     </EdunaLayout>
   );

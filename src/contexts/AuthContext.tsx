@@ -86,6 +86,7 @@ export interface GalleryItem {
   title?: string;
   image?: string;
   description?: string;
+  caption?: string;
 }
 
 export interface BlogItem {
@@ -95,6 +96,7 @@ export interface BlogItem {
   content?: string;
   image?: string;
   published_at?: string;
+  text?: string;
 }
 
 export interface SliderItem {

@@ -8,7 +8,6 @@ import "@plugin_css/swiper-bundle.min.css";
 import "@plugin_css/uicons.css";
 import "@css/style.css"
 import "./globals.css";
-import Preloader from "@/components/Preloader";
 import { Poppins } from "next/font/google";
 
 const poppins = Poppins({
@@ -30,7 +29,6 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={poppins.variable}>
-        <Preloader />
         {children}
       </body>
     </html>
