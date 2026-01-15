@@ -55,8 +55,8 @@ const defaultPrimaryButton: ButtonProps = {
 };
 
 const defaultSecondaryButton: ButtonProps = {
-  text: "Our Team",
-  link: "#Team",
+  text: "Log In",
+  link: "/auth",
   variant: "secondary"
 };
 

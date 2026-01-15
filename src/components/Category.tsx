@@ -176,13 +176,7 @@ export const Category2 = ({
                     </div>
                   </div>
                   <div className="team-content">
-                    <div className="team-icon">
-                      <img
-                        src={getRoleIcon(employee.role)}
-                        alt={employee.role}
-                        className="role-icon"
-                      />
-                    </div>
+                    
                     <div className="team-info">
                       <h4 className="team-name">{employee.name}</h4>
                       <div className="team-contact">

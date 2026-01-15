@@ -101,8 +101,8 @@ const FooterContent = ({ schoolData, sections }: { schoolData?: School; sections
       <div className=" position-relative">
         <div className="ed-footer__shapes">
           <Image
-            width={95}
-            height={154}
+            width={150}
+            height={354}
             className="ed-footer__shape-1"
             src="/assets/images/footer/footer-1/shape-1.svg"
             alt="shape-1"
@@ -126,10 +126,10 @@ const FooterContent = ({ schoolData, sections }: { schoolData?: School; sections
           <div className="row g-0">
             <div className="col-lg-4 col-md-6 col-12">
               <div className="ed-footer__widget ed-footer__about">
-                <Link href="/" className="ed-footer__logo">
+                <Link href="#" className="ed-footer__logo">
                   <Image
-                    width={140}
-                    height={34}
+                    width={210}
+                    height={320}
                     src={footerLogo}
                     alt="footer-logo"
                   />
@@ -218,13 +218,13 @@ const FooterContent = ({ schoolData, sections }: { schoolData?: School; sections
           <div className="row">
             <div className="col-12">
               <p className="ed-footer__copyright-text">
-                Copyright {new Date().getFullYear()} {schoolData?.name || "Eduna"} | Developed By{" "}
+                Copyright {new Date().getFullYear()} | Developed By{" "}
                 <a
-                  href="https://themeforest.net/user/bizantheme"
+                  href="https://starplus.agency/"
                   target="_blank"
                   rel="noopener noreferrer"
                 >
-                  BizanTheme
+                starplus
                 </a>
                 . All Rights Reserved
               </p>

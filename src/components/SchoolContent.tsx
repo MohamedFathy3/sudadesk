@@ -10,6 +10,7 @@ import { Category2 } from "@/components/Category";
 import { ActivitiesGallery } from "@/components/Testimonial";
 import { WhyChooseArea3 } from "@/components/WhyChooseArea";
 import { apiFetch } from '@/lib/api';
+import AboutSection from './AboutSection';
 
 interface SchoolContentProps {
   slug: string;
@@ -78,6 +79,7 @@ interface ApiResponse {
 }
 
 const sections = [
+    { id: "about", label: "About Us" },
   { id: "why-choose", label: "Why Choose Us" },
   { id: "Team", label: "Our Team" },
   { id: "Activities", label: "Activities" },
@@ -192,7 +194,9 @@ export default function SchoolContent({ slug }: SchoolContentProps) {
           containerClassName="rounded-b-xl overflow-hidden"
         />
       </section>
-      
+         <section id="about">
+        <AboutSection aboutData={school.about} />
+      </section>
       {/* Why Choose Us Section */}
       <section id="why-choose">
         <WhyChooseArea3 

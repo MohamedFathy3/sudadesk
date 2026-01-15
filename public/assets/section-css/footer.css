@@ -5,9 +5,10 @@
   padding: 288px 0px 110px;
 }
 .ed-footer__logo img {
-  max-width: 140px;
-  height: 34px;
-  object-fit: contain;
+   object-fit: contain;
+    max-width: 109px;
+    height: 110px;
+    border-radius: 230px;
 }
 
 .ed-footer__logo {
@@ -27,6 +28,7 @@
   width: 20px;
   height: 20px;
   object-fit: contain;
+  border-radius: 20%  ;
 }
 
 .ed-footer__about-social {

@@ -20,10 +20,7 @@ export const WhyChooseArea3 = ({
           <div className="col-lg-10 col-12">
             <div className="ed-w-choose__content text-center">
               <div className="ed-section-head">
-                {/* Optional Small Title - يمكن حذفه لو مش محتاج */}
-                <span className="ed-section-head__sm-title text-primary">
-                  WHY CHOOSE US
-                </span>
+            
                 
                 {/* Main Title */}
                 <h3 className="ed-section-head__title ed-split-text left mt-3 mb-4">
