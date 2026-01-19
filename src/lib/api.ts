@@ -104,7 +104,6 @@ export async function apiFetch(endpoint: string, options: RequestInit = {}) {
 
     // Get response content type
     const contentType = res.headers.get("content-type");
-    debugger;
     // Parse response based on content type
     let data: any = null;
     if (contentType?.includes("application/json")) {

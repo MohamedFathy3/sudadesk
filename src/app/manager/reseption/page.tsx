@@ -86,25 +86,21 @@ export default function ReceptionsPage() {
           required: true,
           placeholder: t.enterReceptionName,
         },
-        // {
-        //   name: 'role',
-        //   label: t.role,
-        //   type: 'custom',
-        //   component: 'checkbox-group',
-        //   required: true,
-        //   placeholder: t.enterRole,
-        //   options: [
-        //     { label: 'Reception', value: 'reception' },
-        //     { label: 'Admin', value: 'admin' },
-        //   ],
-        // },
-           {
-          name: 'role',
+        {
+          name: 'secound_role',
           label: t.role,
-          type: 'text',
+          type: 'custom',
+          component: 'checkbox-group',
           required: true,
           placeholder: t.enterRole,
+          options: [
+            { label: 'Reception', value: 'reception' },
+            { label: 'accountant', value: 'accountant' },
+            { label: 'teacher', value: 'teacher' },
+            { label: 'hr', value: 'hr' },
+          ],
         },
+       
         { 
           name: 'email', 
           label: t.email, 

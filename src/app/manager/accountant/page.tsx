@@ -12,6 +12,7 @@ export default function TeachersPage() {
   const { language } = useLanguage();
 
   const t = {
+    
     title: language === 'ar' ? 'إدارة المحاسبين' : 'Accountants Management',
     id: language === 'ar' ? 'الرقم' : 'ID',
     name: language === 'ar' ? 'اسم المحاسب' : 'Accountant Name',
@@ -31,6 +32,8 @@ export default function TeachersPage() {
     password: language === 'ar' ? 'كلمة المرور' : 'Password',
     address: language === 'ar' ? 'العنوان' : 'Address',
     activeStatus: language === 'ar' ? 'الحالة النشطة' : 'Active Status',
+    role: language === 'ar' ? 'الدور' : 'Role',
+    enterRole: language === 'ar' ? 'أدخل دور المحاسب' : 'Enter accountant role',
   };
 
   return (
@@ -81,6 +84,20 @@ export default function TeachersPage() {
           type: 'text',
           required: true,
           placeholder: t.enterAccountantName
+        },
+        {
+          name: 'secound_role',
+          label: t.role,
+          type: 'custom',
+          component: 'checkbox-group',
+          required: true,
+          placeholder: t.enterRole,
+          options: [
+            { label: 'Reception', value: 'reception' },
+            { label: 'accountant', value: 'accountant' },
+            { label: 'teacher', value: 'teacher' },
+            { label: 'hr', value: 'hr' },
+          ],
         },
         {
           name: 'email',

@@ -35,6 +35,9 @@ export default function TeachersPage() {
     password: language === 'ar' ? 'كلمة المرور' : 'Password',
     assignedClasses: language === 'ar' ? 'الفصول الموكلة' : 'Assigned Classes',
     activeStatus: language === 'ar' ? 'الحالة النشطة' : 'Active Status',
+    role: language === 'ar' ? 'الدور' : 'Role',
+    enterRole: language === 'ar' ? 'أدخل دور المدرس' : 'Enter teacher role',
+
   };
 
   return (
@@ -91,6 +94,20 @@ export default function TeachersPage() {
           type: 'text',
           required: true,
           placeholder: t.enterTeacherName
+        },
+        {
+          name: 'secound_role',
+          label: t.role,
+          type: 'custom',
+          component: 'checkbox-group',
+          required: true,
+          placeholder: t.enterRole,
+          options: [
+            { label: 'Reception', value: 'reception' },
+            { label: 'accountant', value: 'accountant' },
+            { label: 'teacher', value: 'teacher' },
+            { label: 'hr', value: 'hr' },
+          ],
         },
         {
           name: 'email',

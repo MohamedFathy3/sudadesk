@@ -1,4 +1,3 @@
-// app/(dashboard)/profile/page.tsx
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
@@ -46,7 +45,6 @@ interface EditingGalleryItem {
   id?: number;
   image: string | File;
   caption: string;
-  tempId?: string;
 }
 
 interface BlogItem {
@@ -103,11 +101,6 @@ function SchoolProfile() {
   const [isLoading, setIsLoading] = useState(true);
   const [newGalleryImage, setNewGalleryImage] = useState<File | string | null>(null);
   const [newGalleryCaption, setNewGalleryCaption] = useState('');
-  
-  // دالة لإضافة log للتصحيح بدون إحداث infinite loop
-  const addDebugLog = useCallback((message: string) => {
-    console.log(`🔍 ${message}`);
-  }, []);
 
   // تهيئة البيانات الأولية من user
   const getInitialFormData = useCallback((): EditingSchoolProfileData => {
@@ -131,17 +124,25 @@ function SchoolProfile() {
       };
     }
 
-    addDebugLog(`تهيئة البيانات - عدد الصور من user: ${user?.activities_gallery?.length || 0}`);
+    console.log('🎯 تهيئة البيانات من السيرفر:', {
+      hasGallery: !!user.activities_gallery,
+      galleryCount: user.activities_gallery?.length || 0,
+    });
     
-    const galleryItems = (user?.activities_gallery || []).map((item, index) => {
-      const imageValue = item.image && item.image !== 'null' && item.image !== 'undefined' ? item.image : '';
+    // ⭐⭐ معالجة معرض الصور
+    const galleryItems: EditingGalleryItem[] = (user?.activities_gallery || []).map((item) => {
+      // تأكد من أن الصورة موجودة وصالحة
+      const imageValue = item.image && 
+                        item.image !== 'null' && 
+                        item.image !== 'undefined' && 
+                        item.image.trim() !== '' 
+                        ? item.image 
+                        : '';
       
-      console.log(`صورة ${index}:`, {
+      console.log('📷 صورة من السيرفر:', {
         id: item.id,
         caption: item.caption,
-        image: item.image,
-        imageType: typeof item.image,
-        imageValue: imageValue
+        image: imageValue ? 'رابط موجود' : 'لا يوجد رابط'
       });
       
       return {
@@ -151,7 +152,7 @@ function SchoolProfile() {
       };
     });
 
-    console.log('المعرض المحمل:', galleryItems);
+    console.log('📦 المعرض المحمل:', galleryItems);
     
     return {
       about: {
@@ -174,30 +175,21 @@ function SchoolProfile() {
         image: user?.slider?.image || '',
       },
     };
-  }, [user, addDebugLog]);
+  }, [user]);
 
   const [formData, setFormData] = useState<EditingSchoolProfileData>(() => getInitialFormData());
 
   // تحديث formData عندما يتغير user
   useEffect(() => {
     if (user) {
-      console.log('🎯 تحديث formData عند تغيير user');
-      console.log('بيانات user:', {
-        activities_gallery: user?.activities_gallery,
-        slider: user?.slider,
-        about: user?.about
-      });
-      
+      console.log('🔄 تحديث البيانات من السيرفر');
       setFormData(getInitialFormData());
       setIsLoading(false);
     }
   }, [user, getInitialFormData]);
 
- // ==================== تحضير البيانات للـ API ====================
-// استبدل دالة prepareApiData بهذا:
-
-const prepareApiData = async () => {
-  console.log('🔧 بدء تحضير البيانات للإرسال');
+const prepareApiData = (): FormData => {
+  console.log('🔧 تحضير البيانات - بدون حاجات وهمية');
   
   const formDataToSend = new FormData();
   
@@ -227,116 +219,32 @@ const prepareApiData = async () => {
     }
   });
   
-  // ============ الحل النهائي الصحيح ============
-  console.log(`📸 إعداد ${formData.activities_gallery.length} صورة`);
+  // ============ ⭐⭐ المشكلة: الباكيند مش مصمم صح ⭐⭐ ============
+  console.log(`❌ المشكلة: الباكيند عايز ملفات فقط في activities_gallery`);
   
-  // دالة لإنشاء ملف PNG حقيقي صغير
-  const createSmallImageFile = async (caption: string, index: number): Promise<File> => {
-    return new Promise((resolve) => {
-      const canvas = document.createElement('canvas');
-      canvas.width = 100;
-      canvas.height = 100;
-      const ctx = canvas.getContext('2d');
-      
-      if (ctx) {
-        // خلفية بيضاء
-        ctx.fillStyle = '#ffffff';
-        ctx.fillRect(0, 0, 100, 100);
-        
-        // حدود خفيفة
-        ctx.strokeStyle = '#e0e0e0';
-        ctx.lineWidth = 1;
-        ctx.strokeRect(2, 2, 96, 96);
-        
-        // نص بسيط
-        ctx.fillStyle = '#666666';
-        ctx.font = '10px Arial';
-        ctx.textAlign = 'center';
-        ctx.fillText('Keep', 50, 40);
-        ctx.fillText('Image', 50, 55);
-        
-        // نص الوصف المختصر
-        if (caption) {
-          const shortCaption = caption.length > 10 ? caption.substring(0, 10) + '...' : caption;
-          ctx.font = '8px Arial';
-          ctx.fillText(shortCaption, 50, 70);
-        }
-        
-        ctx.font = '6px Arial';
-        ctx.fillText('Exists', 50, 80);
-      }
-      
-      canvas.toBlob((blob) => {
-        if (blob) {
-          const file = new File([blob], `image_${index}.png`, { type: 'image/png' });
-          console.log(`✅ تم إنشاء ملف PNG صغير ${index}: ${file.size} bytes`);
-          resolve(file);
-        } else {
-          // ملف PNG احتياطي (1x1 بكسل شفاف)
-          const tinyPng = 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=';
-          const binaryString = window.atob(tinyPng);
-          const bytes = new Uint8Array(binaryString.length);
-          for (let i = 0; i < binaryString.length; i++) {
-            bytes[i] = binaryString.charCodeAt(i);
-          }
-          const blob = new Blob([bytes], { type: 'image/png' });
-          const file = new File([blob], `tiny_${index}.png`, { type: 'image/png' });
-          resolve(file);
-        }
-      }, 'image/png');
-    });
-  };
-  
-  // معالجة كل صورة
-  for (let i = 0; i < formData.activities_gallery.length; i++) {
-    const item = formData.activities_gallery[i];
-    
-    console.log(`📸 معالجة الصورة ${i}:`, {
+  // ⭐⭐ الحل: نبعت الـ URL في حقل image ونشوف هيشتغل ولا لا
+  formData.activities_gallery.forEach((item, index) => {
+    console.log(`📷 صورة ${index}:`, {
       caption: item.caption,
-      isFile: item.image instanceof File,
-      isString: typeof item.image === 'string',
-      hasImage: !!item.image
+      type: item.image instanceof File ? 'ملف' : 'رابط'
     });
     
-    // إضافة caption
-    formDataToSend.append(`activities_gallery[${i}][caption]`, item.caption || '');
+    formDataToSend.append(`activities_gallery[${index}][caption]`, item.caption || '');
     
-    // إضافة id إذا كان موجوداً
     if (item.id) {
-      formDataToSend.append(`activities_gallery[${i}][id]`, item.id.toString());
+      formDataToSend.append(`activities_gallery[${index}][id]`, item.id.toString());
     }
     
-    // ⭐⭐ التعامل مع الصور - الحل النهائي
     if (item.image instanceof File) {
-      // ✅ صورة جديدة: أرسلها مباشرة
-      formDataToSend.append(`activities_gallery[${i}][image]`, item.image);
-      console.log(`✅ صورة ${i} جديدة: ${item.image.name}`);
+      // صورة جديدة
+      formDataToSend.append(`activities_gallery[${index}][image]`, item.image);
     } 
-    else if (typeof item.image === 'string' && item.image.trim() !== '' && 
-             item.image !== 'null' && item.image !== 'undefined') {
-      // ⭐ صورة قديمة (رابط): أنشئ ملف PNG صغير
-      const file = await createSmallImageFile(item.caption, i);
-      formDataToSend.append(`activities_gallery[${i}][image]`, file);
-      console.log(`🔄 صورة ${i} قديمة: ملف PNG صغير`);
-      
-      // ⭐⭐ لا ترسل image_url أبداً! هذا ما كان يسبب فقدان الصور
-      // إذا أردت إضافة معلومات إضافية، يمكنك استخدام field مختلف:
-      // formDataToSend.append(`activities_gallery[${i}][original_url]`, item.image);
+    else if (typeof item.image === 'string' && item.image.startsWith('http')) {
+      // ⭐⭐ جرب نبعت الـ URL عادي - ممكن الباكيند يرفض
+      formDataToSend.append(`activities_gallery[${index}][image]`, item.image);
+      console.log(`⚠️ جربت أرسل URL في حقل image: ${item.image.substring(0, 50)}...`);
     }
-    else {
-      // ⭐ صورة فارغة: ملف PNG شفاف صغير
-      const transparentPng = 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=';
-      const binaryString = window.atob(transparentPng);
-      const bytes = new Uint8Array(binaryString.length);
-      for (let j = 0; j < binaryString.length; j++) {
-        bytes[j] = binaryString.charCodeAt(j);
-      }
-      const blob = new Blob([bytes], { type: 'image/png' });
-      const file = new File([blob], `empty_${i}.png`, { type: 'image/png' });
-      formDataToSend.append(`activities_gallery[${i}][image]`, file);
-      console.log(`⚠️ صورة ${i} فارغة: ملف PNG شفاف`);
-    }
-  }
+  });
   
   // school_id و user_id
   if (user?.school_id) {
@@ -347,99 +255,77 @@ const prepareApiData = async () => {
     formDataToSend.append('user_id', user.id.toString());
   }
   
-  // تحقق من محتويات FormData
-  console.log('📦 محتويات FormData النهائية:');
-  let hasImageUrl = false;
-  for (let [key, value] of formDataToSend.entries()) {
-    if (value instanceof File) {
-      console.log(`${key}: [File: ${value.name}, Size: ${value.size} bytes, Type: ${value.type}]`);
-    } else if (key.includes('image_url')) {
-      console.log(`❌ ${key}: ${value} - هذا يجب ألا يكون موجوداً!`);
-      hasImageUrl = true;
-    } else {
-      console.log(`${key}: ${value}`);
-    }
-  }
-  
-  if (hasImageUrl) {
-    console.warn('⚠️ تحذير: يوجد image_url في البيانات، هذا قد يسبب فقدان الصور!');
-  }
-  
   return formDataToSend;
 };
 
-// ==================== معالجة الحفظ ====================
-const handleSave = async () => {
-  try {
-    setIsSaving(true);
-    console.log('💾 بدء عملية الحفظ...');
-    
-    const formDataToSend = await prepareApiData(); // ⭐ لاحظ async هنا
-    
-    const response = await apiFetch('/update-schools/profie', {
-      method: 'POST',
-      body: formDataToSend,
-    });
-
-    console.log('✅ Server response:', response);
-
-    if (response.result === 'Success') {
-      toast.success(getTranslation('saveSuccess'));
-      console.log('تم الحفظ بنجاح');
+  // ==================== معالجة الحفظ ====================
+  const handleSave = async () => {
+    try {
+      setIsSaving(true);
+      console.log('💾 بدء عملية الحفظ...');
       
-      // تحديث البيانات من السيرفر
-      try {
-        console.log('🔄 جلب البيانات المحدثة...');
-        const authResponse = await apiFetch('/user/check-auth');
+      const formDataToSend = prepareApiData();
+      
+      const response = await apiFetch('/update-schools/profie', {
+        method: 'POST',
+        body: formDataToSend,
+      });
+
+      console.log('✅ استجابة السيرفر:', response);
+
+      if (response.result === 'Success') {
+        toast.success(getTranslation('saveSuccess'));
         
-        if (authResponse.result === 'Success' && authResponse.data) {
-          updateUser(authResponse.data);
+        // ⭐⭐ تحديث البيانات من السيرفر
+        try {
+          console.log('🔄 جلب البيانات المحدثة من السيرفر...');
+          const authResponse = await apiFetch('/user/check-auth');
           
-          // تحديث formData
-          const newGalleryFromServer = authResponse.data.activities_gallery || [];
-          const updatedFormData = {
-            about: authResponse.data.about || formData.about,
-            why_choose: authResponse.data.why_choose || formData.why_choose,
-            activities_gallery: newGalleryFromServer.map((item: any) => ({
-              id: item.id,
-              image: item.image && item.image !== 'null' && item.image !== 'undefined' 
-                ? item.image 
-                : '',
-              caption: item.caption || '',
-              originalImage: item.image || ''
-            })),
-            blog_content: authResponse.data.blog_content || formData.blog_content,
-            slider: {
-              title: authResponse.data.slider?.title || formData.slider.title,
-              image: authResponse.data.slider?.image || formData.slider.image,
-            },
-          };
-          
-          setFormData(updatedFormData);
-          console.log('🔄 تم تحديث formData:', updatedFormData);
+          if (authResponse.result === 'Success' && authResponse.data) {
+            // تحديث بيانات المستخدم
+            updateUser(authResponse.data);
+            
+            // ⭐⭐ تحديث formData بالبيانات الجديدة من السيرفر
+            const updatedFormData = {
+              about: authResponse.data.about || formData.about,
+              why_choose: authResponse.data.why_choose || formData.why_choose,
+              activities_gallery: (authResponse.data.activities_gallery || []).map((item: any) => ({
+                id: item.id,
+                image: item.image || '',
+                caption: item.caption || '',
+              })),
+              blog_content: authResponse.data.blog_content || formData.blog_content,
+              slider: {
+                title: authResponse.data.slider?.title || formData.slider.title,
+                image: authResponse.data.slider?.image || formData.slider.image,
+              },
+            };
+            
+            setFormData(updatedFormData);
+            console.log('✅ تم تحديث البيانات بنجاح');
+          }
+        } catch (refreshError) {
+          console.error('❌ خطأ في تحديث البيانات:', refreshError);
         }
-      } catch (refreshError) {
-        console.error('❌ Error refreshing data:', refreshError);
-      }
-    } else {
-      console.error('❌ Server errors:', response.errors);
-      
-      if (response.errors) {
-        const errorMessages = Object.entries(response.errors)
-          .map(([field, errors]) => `${field}: ${Array.isArray(errors) ? errors.join(', ') : errors}`)
-          .join(' | ');
-        toast.error(errorMessages || getTranslation('saveError'));
       } else {
-        toast.error(response.message || getTranslation('saveError'));
+        console.error('❌ أخطاء السيرفر:', response.errors);
+        
+        if (response.errors) {
+          const errorMessages = Object.entries(response.errors)
+            .map(([field, errors]) => `${field}: ${Array.isArray(errors) ? errors.join(', ') : errors}`)
+            .join(' | ');
+          toast.error(errorMessages || getTranslation('saveError'));
+        } else {
+          toast.error(response.message || getTranslation('saveError'));
+        }
       }
+    } catch (error: any) {
+      console.error('💥 خطأ في الحفظ:', error);
+      toast.error(error.message || getTranslation('saveError'));
+    } finally {
+      setIsSaving(false);
     }
-  } catch (error: any) {
-    console.error('💥 Save error:', error);
-    toast.error(error.message || getTranslation('saveError'));
-  } finally {
-    setIsSaving(false);
-  }
-};
+  };
 
   // ==================== الترجمة ====================
   const getTranslation = (key: string): string => {
@@ -456,7 +342,7 @@ const handleSave = async () => {
         'cancel': 'إلغاء',
         'aboutSchool': 'عن المدرسة',
         'whyChooseUs': 'لماذا تختارنا',
-        'gallery': 'المعرض',
+        'gallery': 'معرض الأنشطة',
         'blog': 'المدونة',
         'slider': 'السلايدر',
         'schoolName': 'اسم المدرسة',
@@ -490,7 +376,7 @@ const handleSave = async () => {
         'cancel': 'Cancel',
         'aboutSchool': 'About School',
         'whyChooseUs': 'Why Choose Us',
-        'gallery': 'activities Gallery',
+        'gallery': 'Activities Gallery',
         'blog': 'Blog',
         'slider': 'Slider',
         'schoolName': 'School Name',
@@ -548,40 +434,44 @@ const handleSave = async () => {
     }));
   };
 
-const handleAddGalleryItem = () => {
-  console.log('➕ محاولة إضافة صورة جديدة للمعرض');
-  
-  if (!newGalleryImage) {
-    toast.error('يجب إضافة صورة');
-    return;
-  }
-  
-  if (!newGalleryCaption.trim()) {
-    toast.error('يجب إضافة وصف للصورة');
-    return;
-  }
-  
-  // ⭐⭐ لا تضيف tempId - هذا ما يسبب المشكلة
-  setFormData(prev => {
-    const newItem = { 
-      image: newGalleryImage,
-      caption: newGalleryCaption.trim(),
-    };
+  const handleAddGalleryItem = () => {
+    console.log('➕ إضافة صورة جديدة للمعرض');
     
-    const newGallery = [...prev.activities_gallery, newItem];
+    if (!newGalleryImage) {
+      toast.error('يجب إضافة صورة');
+      return;
+    }
     
-    console.log('✅ تمت إضافة صورة جديدة. الإجمالي:', newGallery.length, 'صورة');
+    if (!newGalleryCaption.trim()) {
+      toast.error('يجب إضافة وصف للصورة');
+      return;
+    }
     
-    return {
-      ...prev,
-      activities_gallery: newGallery,
-    };
-  });
-  
-  setNewGalleryImage(null);
-  setNewGalleryCaption('');
-  toast.success('تمت إضافة الصورة للمعرض');
-};
+    if (!(newGalleryImage instanceof File)) {
+      toast.error('يجب اختيار صورة جديدة');
+      return;
+    }
+    
+    setFormData(prev => {
+      const newItem = { 
+        image: newGalleryImage,
+        caption: newGalleryCaption.trim(),
+      };
+      
+      const newGallery = [...prev.activities_gallery, newItem];
+      
+      console.log('✅ تمت إضافة صورة جديدة. الإجمالي:', newGallery.length, 'صورة');
+      
+      return {
+        ...prev,
+        activities_gallery: newGallery,
+      };
+    });
+    
+    setNewGalleryImage(null);
+    setNewGalleryCaption('');
+    toast.success('تمت إضافة الصورة للمعرض');
+  };
 
   const handleRemoveGalleryItem = (index: number) => {
     console.log(`🗑️ طلب حذف الصورة رقم ${index}`);
@@ -664,34 +554,6 @@ const handleAddGalleryItem = () => {
               {getTranslation('save')}
             </>
           )}
-        </Button>
-      </div>
-
-      {/* زر لاختبار البيانات */}
-      <div className="bg-gray-50 p-4 rounded-lg">
-        <Button 
-          onClick={() => {
-            console.log('🧪 === اختبار البيانات الحالية ===');
-            console.log('user:', user);
-            console.log('formData:', formData);
-            console.log('activities_gallery:', formData.activities_gallery);
-            
-            formData.activities_gallery.forEach((item, index) => {
-              console.log(`الصورة ${index}:`, {
-                id: item.id,
-                caption: item.caption,
-                image: item.image,
-                type: typeof item.image,
-                isFile: item.image instanceof File,
-                isString: typeof item.image === 'string',
-                stringValue: typeof item.image === 'string' ? item.image.substring(0, 100) : 'N/A'
-              });
-            });
-          }}
-          variant="outline"
-          size="sm"
-        >
-          اختبار البيانات في الكونسول
         </Button>
       </div>
 
@@ -859,7 +721,7 @@ const handleAddGalleryItem = () => {
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                     {formData.activities_gallery.map((item, index) => (
                       <GalleryItemComponent
-                        key={item.id || item.tempId || index}
+                        key={index}
                         item={item}
                         onRemove={() => handleRemoveGalleryItem(index)}
                         language={language}
@@ -1033,8 +895,16 @@ function GalleryItemComponent({ item, onRemove, language }: GalleryItemProps) {
             alt={item.caption}
             className="object-cover w-full h-full"
             onError={(e) => {
-              console.log('❌ خطأ في تحميل الصورة:', imageUrl);
-              e.currentTarget.src = '/assets/images/default-gallery.jpg';
+              console.log('❌ خطأ في تحميل الصورة');
+              e.currentTarget.style.display = 'none';
+              e.currentTarget.parentElement!.innerHTML = `
+                <div class="w-full h-full bg-gray-200 flex items-center justify-center">
+                  <div class="text-center">
+                    <ImageIcon class="w-8 h-8 text-gray-400 mx-auto" />
+                    <p class="text-xs text-gray-500 mt-2">لا يمكن تحميل الصورة</p>
+                  </div>
+                </div>
+              `;
             }}
           />
         ) : (
@@ -1056,9 +926,9 @@ function GalleryItemComponent({ item, onRemove, language }: GalleryItemProps) {
         <div className="text-xs text-center mt-1">
           {item.image instanceof File ? (
             <p className="text-blue-600">(صورة جديدة)</p>
-          ) : item.id ? (
-            <p className="text-gray-500">ID: {item.id}</p>
-          ) : null}
+          ) : (
+            <p className="text-gray-500">صورة موجودة</p>
+          )}
         </div>
       </div>
     </div>
