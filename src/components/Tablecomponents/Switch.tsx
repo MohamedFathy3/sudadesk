@@ -8,6 +8,9 @@ interface SwitchProps {
   className?: string;
   disabled?: boolean;
 }
+const isRTL =
+  typeof document !== 'undefined' &&
+  document.documentElement.dir === 'rtl';
 
 export const Switch: React.FC<SwitchProps> = ({
   checked,
@@ -17,25 +20,32 @@ export const Switch: React.FC<SwitchProps> = ({
 }) => {
   return (
     <button
-      type="button"
-      role="switch"
-      aria-checked={checked}
-      disabled={disabled}
-      onClick={() => onChange(!checked)}
-      className={`
-        relative inline-flex h-6 w-11 items-center rounded-full transition-colors
-        focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2
-        ${checked ? 'bg-indigo-600' : 'bg-gray-200 dark:bg-gray-700'}
-        ${disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}
-        ${className}
-      `}
-    >
-      <span
-        className={`
-          inline-block h-4 w-4 transform rounded-full bg-white transition-transform
-          ${checked ? 'translate-x-6' : 'translate-x-1'}
-        `}
-      />
+    type="button"
+    role="switch"
+    aria-checked={checked}
+    disabled={disabled}
+    onClick={() => onChange(!checked)}
+    className={`
+      relative inline-flex h-6 w-11 items-center rounded-full transition-colors
+      focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2
+      ${checked ? 'bg-indigo-600' : 'bg-gray-200 dark:bg-gray-700'}
+      ${disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}
+      ${className}
+      rtl:flex-row-reverse
+    `}
+  >
+  
+  <span
+  className={`
+    inline-block h-4 w-4 transform rounded-full bg-white transition-transform
+    ${checked
+      ? isRTL ? '-translate-x-6' : 'translate-x-6'
+      : 'translate-x-1'}
+  `}
+/>
+
+
+
     </button>
   );
 };

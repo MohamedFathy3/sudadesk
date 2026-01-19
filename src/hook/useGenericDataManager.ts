@@ -101,7 +101,6 @@ export function useGenericDataManager({
           }
           return [];
         } catch (error) {
-          console.error(`Error fetching ${data.endpoint}:`, error);
           return [];
         }
       },
@@ -177,7 +176,6 @@ export function useGenericDataManager({
           }
         };
       } else {
-        console.warn("Unexpected API response structure");
         return {
           data: [],
           meta: {
@@ -227,7 +225,6 @@ export function useGenericDataManager({
       setSelectedItems(new Set());
       toast.success(`All ${selectedIds.length} items permanently deleted!`);
     } catch (error) {
-      console.error("Error force deleting selected items:", error);
       toast.error("Error permanently deleting items");
     }
   };
@@ -262,7 +259,6 @@ export function useGenericDataManager({
   };
 
   const handleToggleDeleted = (): void => {
-    console.log('🎯 TOGGLE DELETED - Clearing selections');
     setSelectedItems(new Set());
     setShowingDeleted(prev => !prev);
     setCurrentPage(1);
@@ -271,7 +267,6 @@ export function useGenericDataManager({
 
   useEffect(() => {
     if (selectedItems.size > 0) {
-      console.log('🔄 AUTO-CLEAR on view change');
       setSelectedItems(new Set());
     }
   }, [showingDeleted]);
@@ -299,7 +294,6 @@ export function useGenericDataManager({
           toast.success(`All ${allIds.length} items permanently deleted!`);
         })
         .catch(err => {
-          console.error(err);
           toast.error("Error permanently deleting items");
         });
     } else {
@@ -438,7 +432,6 @@ export function useGenericDataManager({
       queryClient.invalidateQueries({ queryKey: [endpoint] });
       toast.success(`${currentActive ? 'Deactivated' : 'Activated'} successfully!`);
     } catch (error) {
-      console.error(error);
       toast.error('Error updating status');
     }
   };
@@ -482,16 +475,13 @@ export function useGenericDataManager({
       if (typeof currentValue === 'string' && currentValue === originalValue) {
         // احذف الحقل تماماً حتى لا يرسل للـ API
         delete itemData[fieldName];
-        console.log(`🖼️ Removed unchanged ${fieldName} field`);
       }
       // إذا كانت الصورة null أو ''، أرسلها كـ null لحذف الصورة
       else if (currentValue === null || currentValue === '') {
         itemData[fieldName] = null;
-        console.log(`🖼️ Set ${fieldName} to null for deletion`);
       }
       // إذا كانت File جديدة، احتفظ بها
       else if (currentValue instanceof File) {
-        console.log(`🖼️ Keeping new ${fieldName} file`);
       }
     }
   });
@@ -513,7 +503,6 @@ export function useGenericDataManager({
     Object.entries(itemData).forEach(([key, value]) => {
       if (value instanceof File) {
         formDataObj.append(key, value);
-        console.log(`📤 Appending file for ${key}:`, value.name);
       } else if (value !== null && value !== undefined && value !== '') {
         formDataObj.append(key, String(value));
       }
@@ -530,7 +519,6 @@ export function useGenericDataManager({
     dataToSend = clean as Entity;
   }
 
-  console.log('📦 Final data to send:', dataToSend);
   saveItemMutation.mutate({ 
     data: dataToSend, 
     isFormData, 
@@ -550,7 +538,6 @@ export function useGenericDataManager({
       queryClient.invalidateQueries({ queryKey: [endpoint] });
       toast.success(`"${title}" has been successfully restored!`);
     } catch (error) {
-      console.error(error);
       toast.error("An error occurred while restoring the item.");
     }
   };
@@ -567,7 +554,6 @@ export function useGenericDataManager({
       queryClient.invalidateQueries({ queryKey: [endpoint] });
       toast.success(`"${title}" has been permanently deleted!`);
     } catch (error) {
-      console.error(error);
       toast.error("An error occurred while permanently deleting the item.");
     }
   };

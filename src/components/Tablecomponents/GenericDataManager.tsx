@@ -346,10 +346,6 @@ export default function GenericDataManager(props: GenericDataManagerProps): Reac
     noDeletedItems: language === 'ar' ? 'لا توجد عناصر محذوفة' : 'No deleted items available'
   };
 
-  console.log('🔍 GenericDataManager - formFields:', formFields);
-  console.log('🔍 GenericDataManager - typeof formFields:', typeof formFields);
-  console.log('🔍 GenericDataManager - Array.isArray(formFields):', Array.isArray(formFields));
-  console.log('🔍 GenericDataManager - props:', props);
   
   // استخدام pagination آمن مع قيمة افتراضية
   const safePagination: PaginationMeta = pagination || defaultPagination;

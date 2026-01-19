@@ -97,12 +97,7 @@ export default function StudentsPage() {
         endpoint="payments"
         title={t.title}
         columns={[
-          { 
-            key: 'id', 
-            label: t.payment_id, 
-            sortable: true,
-            render: (item) => `PAY${String(item.id).padStart(3, '0')}`
-          },
+        
           { 
             key: 'student.name', 
             label: t.student_name, 

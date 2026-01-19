@@ -35,6 +35,16 @@ export default function ReceptionsPage() {
     loading: language === 'ar' ? 'جاري التحميل...' : 'Loading...',
     save: language === 'ar' ? 'حفظ' : 'Save',
     cancel: language === 'ar' ? 'إلغاء' : 'Cancel',
+    role: language === 'ar' ? 'الدور' : 'Role',
+    enterRole: language === 'ar' ? 'أدخل دور مسئول الاستقبال' : 'Enter reception role',
+  };
+  const validateRole = (value: string) => {
+    const validRoles = ['reception', 'admin'];
+    const normalizedValue = value.trim().toLowerCase();
+    
+    if (!validRoles.includes(normalizedValue)) {
+      return t.role + ' must be either "reception" or "admin".';}
+    return null;
   };
 
   return (
@@ -66,19 +76,7 @@ export default function ReceptionsPage() {
           sortable: false,
           render: (item) => item.phone || t.notAvailable
         },
-        { 
-          key: 'address', 
-          label: t.address, 
-          sortable: false,
-          render: (item) => (
-            <div 
-              className="max-w-[200px] truncate" 
-              title={item.address || t.notAvailable}
-            >
-              {item.address || t.notAvailable}
-            </div>
-          )
-        }
+        
       ]}
       formFields={[
         { 
@@ -87,6 +85,25 @@ export default function ReceptionsPage() {
           type: 'text', 
           required: true,
           placeholder: t.enterReceptionName,
+        },
+        // {
+        //   name: 'role',
+        //   label: t.role,
+        //   type: 'custom',
+        //   component: 'checkbox-group',
+        //   required: true,
+        //   placeholder: t.enterRole,
+        //   options: [
+        //     { label: 'Reception', value: 'reception' },
+        //     { label: 'Admin', value: 'admin' },
+        //   ],
+        // },
+           {
+          name: 'role',
+          label: t.role,
+          type: 'text',
+          required: true,
+          placeholder: t.enterRole,
         },
         { 
           name: 'email', 
