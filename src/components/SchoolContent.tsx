@@ -82,7 +82,7 @@ const sections = [
     { id: "about", label: "About Us" },
   { id: "why-choose", label: "Why Choose Us" },
   { id: "Team", label: "Our Team" },
-  { id: "Activities", label: "Activities" },
+  // { id: "Activities", label: "Activities" },
   { id: "blog", label: "Blog" },
 ];
 
@@ -214,13 +214,13 @@ export default function SchoolContent({ slug }: SchoolContentProps) {
       </section>
    
       {/* Activities Section */}
-      <section id="Activities">
+      {/* <section id="Activities">
         <ActivitiesGallery 
           activities={school?.activities_gallery || []}
           title="Our School Activities"
           subtitle="Discover the vibrant activities and events at our school"
         />
-      </section>
+      </section> */}
       
       {/* Blog Section */}
       <section id="blog">

@@ -378,7 +378,7 @@ const prepareApiData = (): FormData => {
         'cancel': 'Cancel',
         'aboutSchool': 'About School',
         'whyChooseUs': 'Why Choose Us',
-        'gallery': 'Activities Gallery',
+        // 'gallery': 'Activities Gallery',
         'blog': 'Blog',
         'slider': 'Slider',
         'schoolName': 'School Name',
@@ -570,10 +570,10 @@ const prepareApiData = (): FormData => {
             <BookOpen className="w-4 h-4 mr-2" />
             <span className="hidden sm:inline">{getTranslation('whyChooseUs')}</span>
           </TabsTrigger>
-          <TabsTrigger value="gallery">
+          {/* <TabsTrigger value="gallery">
             <ImageIcon className="w-4 h-4 mr-2" />
             <span className="hidden sm:inline">{getTranslation('gallery')}</span>
-          </TabsTrigger>
+          </TabsTrigger> */}
           <TabsTrigger value="blog">
             <BookOpen className="w-4 h-4 mr-2" />
             <span className="hidden sm:inline">{getTranslation('blog')}</span>

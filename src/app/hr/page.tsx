@@ -2,6 +2,8 @@
 
 import { useState, useEffect } from 'react';
 import { apiFetch } from '@/lib/api';
+import MainLayout from '@/components/MainLayout';
+
 import { 
   Search, 
   Filter, 
@@ -531,6 +533,7 @@ export default function ClassesView() {
   };
 
   return (
+    <MainLayout>
     <div className="min-h-screen  via-white to-emerald-50 py-8">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
@@ -835,5 +838,6 @@ export default function ClassesView() {
         />
       )}
     </div>
+    </MainLayout>
   );
 }

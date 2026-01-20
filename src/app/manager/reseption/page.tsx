@@ -93,11 +93,12 @@ export default function ReceptionsPage() {
           component: 'checkbox-group',
           required: true,
           placeholder: t.enterRole,
-          options: [
+                options: [
             { label: 'Reception', value: 'reception' },
             { label: 'accountant', value: 'accountant' },
             { label: 'teacher', value: 'teacher' },
             { label: 'hr', value: 'hr' },
+      
           ],
         },
        

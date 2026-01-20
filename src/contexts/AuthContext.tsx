@@ -112,6 +112,7 @@ export interface AuthUser {
   phone: string | null;
   address: string | null;
   role: string;
+  secound_role: string[];
   school_id: number | null;
   active: boolean;
   logo?: string | null;
@@ -180,11 +181,22 @@ const AuthContext = createContext<AuthContextType>({
 async function fetchUser(): Promise<{ user: AuthUser | null; role: string | null }> {
   try {
     const res = await apiFetch('/user/check-auth'); 
+    
+    // تحقق من هيكل البيانات
+    console.log('API Response:', res);
+    
+    // إذا كانت البيانات تأتي بشكل مختلف
+    const userData = res.data || res;
+    
     return {
-      user: res.data,
-      role: res.role // نجيب الـ role من البره
+      user: {
+        ...userData,
+        secound_role: userData.secound_role || [] // تأكد من وجود secound_role
+      },
+      role: res.role || userData.role
     };
   } catch (error) {
+    console.error('Error fetching user:', error);
     return { user: null, role: null };
   }
 }
@@ -261,18 +273,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     queryClient.setQueryData(['user'], { user: newUser, role: authData?.role || null });
   };
 
-  // دالة للتحقق من الصلاحيات
-  const hasRole = (requiredRole: string | string[]): boolean => {
-    if (!authData?.role) return false;
+const hasRole = (requiredRole: string | string[]): boolean => {
+    if (!authData?.user) return false;
     
-    const userRole = authData.role;
+    const userMainRole = authData.role;
+    const userSecondRoles = authData.user.secound_role || []; // غيرت هنا أيضاً
+    
+    const allUserRoles = [userMainRole, ...userSecondRoles];
     
     if (Array.isArray(requiredRole)) {
-      return requiredRole.includes(userRole);
+        return requiredRole.some(role => allUserRoles.includes(role));
     }
     
-    return userRole === requiredRole;
-  };
+    return allUserRoles.includes(requiredRole);
+};
 
   return (
     <AuthContext.Provider

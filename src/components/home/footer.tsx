@@ -110,19 +110,9 @@ const Footer = () => {
         <div className="border-t border-gray-800 pt-8">
           <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
             <div className="text-gray-400 text-sm">
-              © {currentYear} ePathsala. All rights reserved.
+              © {currentYear} ePathsala. All rights reserved Sudadesk.  <a href="https://starplus.agency/">powered by Starplus</a>
             </div>
-            <div className="flex space-x-6 text-sm text-gray-400">
-              <Link href="/privacy" className="hover:text-green-400 transition-colors duration-200">
-                Privacy Policy
-              </Link>
-              <Link href="/terms" className="hover:text-green-400 transition-colors duration-200">
-                Terms of Service
-              </Link>
-              <Link href="/cookies" className="hover:text-green-400 transition-colors duration-200">
-                Cookie Policy
-              </Link>
-            </div>
+         
           </div>
         </div>
 

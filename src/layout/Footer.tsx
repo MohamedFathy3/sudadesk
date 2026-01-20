@@ -226,7 +226,7 @@ const FooterContent = ({ schoolData, sections }: { schoolData?: School; sections
                 >
                 starplus
                 </a>
-                . All Rights Reserved
+                . All Rights Reserved :{schoolData?.name || "School"}
               </p>
             </div>
           </div>

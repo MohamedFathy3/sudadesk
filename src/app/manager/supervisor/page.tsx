@@ -34,6 +34,8 @@ export default function TeachersPage() {
     password: language === 'ar' ? 'كلمة المرور' : 'Password',
     assignedClasses: language === 'ar' ? 'الفصول الموكلة' : 'Assigned Classes',
     activeStatus: language === 'ar' ? 'الحالة النشطة' : 'Active Status',
+        role: language === 'ar' ? 'الدور' : 'Role',
+    enterRole: language === 'ar' ? 'أدخل دور المشرف' : 'Enter supervisor role',
   };
 
   return (
@@ -89,6 +91,19 @@ export default function TeachersPage() {
           type: 'password',
           required: true,
           placeholder: t.enterPassword
+        },
+           {
+          name: 'secound_role',
+          label: t.role,
+          type: 'custom',
+          component: 'checkbox-group',
+          required: true,
+          placeholder: t.enterRole,
+          options: [
+     
+            { label: 'Director', value: 'director' },
+            { label: 'Supervisor', value: 'class_supervisor' },
+          ],
         },
         {
           name: 'phone',
