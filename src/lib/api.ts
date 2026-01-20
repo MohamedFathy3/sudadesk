@@ -105,6 +105,7 @@ export async function apiFetch(endpoint: string, options: RequestInit = {}) {
     // Get response content type
     const contentType = res.headers.get("content-type");
     // Parse response based on content type
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
     let data: any = null;
     if (contentType?.includes("application/json")) {
       data = await res.json().catch(() => null);
@@ -226,13 +227,13 @@ export async function apiFetchBlob(endpoint: string, options: RequestInit = {}) 
 export const apiClient = {
   get: (endpoint: string, options?: RequestInit) => 
     apiFetch(endpoint, { ...options, method: 'GET' }),
-  
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
   post: (endpoint: string, data?: any, options?: RequestInit) => 
     apiFetch(endpoint, { ...options, method: 'POST', body: data }),
-  
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
   put: (endpoint: string, data?: any, options?: RequestInit) => 
     apiFetch(endpoint, { ...options, method: 'PUT', body: data }),
-  
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
   patch: (endpoint: string, data?: any, options?: RequestInit) => 
     apiFetch(endpoint, { ...options, method: 'PATCH', body: data }),
   
@@ -242,7 +243,7 @@ export const apiClient = {
   // Blob methods
   getBlob: (endpoint: string, options?: RequestInit) =>
     apiFetchBlob(endpoint, { ...options, method: 'GET' }),
-  
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
   postBlob: (endpoint: string, data?: any, options?: RequestInit) =>
     apiFetchBlob(endpoint, { ...options, method: 'POST', body: data }),
 };

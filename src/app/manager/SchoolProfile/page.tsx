@@ -289,6 +289,7 @@ const prepareApiData = (): FormData => {
             const updatedFormData = {
               about: authResponse.data.about || formData.about,
               why_choose: authResponse.data.why_choose || formData.why_choose,
+                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
               activities_gallery: (authResponse.data.activities_gallery || []).map((item: any) => ({
                 id: item.id,
                 image: item.image || '',
@@ -319,6 +320,7 @@ const prepareApiData = (): FormData => {
           toast.error(response.message || getTranslation('saveError'));
         }
       }
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       console.error('💥 خطأ في الحفظ:', error);
       toast.error(error.message || getTranslation('saveError'));
