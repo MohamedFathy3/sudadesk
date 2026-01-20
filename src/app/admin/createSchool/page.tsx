@@ -89,41 +89,21 @@ export default function SchoolsPage() {
             <code className="bg-gray-100 px-2 py-1 rounded text-sm">{item.slug}</code>
           )
         },
+      
         { 
-          key: 'email', 
-          label: t.email, 
-          sortable: false,
-          render: (item) => item.email || t.notAvailable
-        },
-        { 
-          key: 'phone', 
-          label: t.phone, 
-          sortable: false,
-          render: (item) => item.phone || t.notAvailable
-        },
-        { 
-          key: 'manager_name', 
+          key: 'manager.name', 
           label: t.manager, 
           sortable: true,
           render: (item) => (
             <div>
-              <div className="font-medium">{item.manager_name || t.notAvailable}</div>
+              <div className="font-medium">{item.name || t.notAvailable}</div>
               {item.manager_email && (
                 <div className="text-xs text-gray-500">{item.manager_email}</div>
               )}
             </div>
           )
         },
-        { 
-          key: 'address', 
-          label: t.address, 
-          sortable: false,
-          render: (item) => (
-            <div className="max-w-[200px] truncate" title={item.address}>
-              {item.address || t.notAvailable}
-            </div>
-          )
-        },
+    
         {
           key: 'actions',
           label: t.actions,
@@ -207,14 +187,14 @@ export default function SchoolsPage() {
           rows: 4
         },
         { 
-          name: 'manager_name', 
+          name: 'manager.name', 
           label: t.managerName, 
           type: 'text', 
           required: true,
           placeholder: t.enterManagerName,
         },
         { 
-          name: 'manager_email', 
+          name: 'manager.email', 
           label: t.managerEmail, 
           type: 'email', 
           required: true,

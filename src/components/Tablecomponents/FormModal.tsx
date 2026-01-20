@@ -1,7 +1,7 @@
 // @/components/Tablecomponents/FormModal.tsx
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { FormFieldComponent } from "@/components/Tablecomponents/formmodelcommpoinnet";
 import { Button } from "@/components/ui/button";
 
@@ -80,13 +80,48 @@ const FormModal: React.FC<FormModalProps> = ({
     noTabsMessage: language === 'ar' ? `لا توجد حقول نموذج مكونة لـ ${title}.` : `There are no form fields configured for ${title}.`
   };
 
+  // ✅ فلترة البيانات للحقول المسموح بها فقط
+  const filterAllowedFormData = useMemo(() => {
+    return (data: Record<string, any>) => {
+      if (!Array.isArray(safeFormFields) || safeFormFields.length === 0) {
+        console.log('🎯 No form fields defined, returning empty data');
+        return {};
+      }
+      
+      // استخرج أسماء الحقول المسموح بها فقط
+      const allowedFields = safeFormFields
+        .filter(field => field && field.name && typeof field.name === 'string')
+        .map(field => field.name);
+      
+      console.log('🎯 ALLOWED FIELDS:', allowedFields);
+      
+      const filteredData: Record<string, any> = {};
+      
+      // فقط أضف الحقول الموجودة في allowedFields
+      allowedFields.forEach(fieldName => {
+        if (data && data.hasOwnProperty(fieldName)) {
+          filteredData[fieldName] = data[fieldName];
+        }
+      });
+      
+      console.log('🎯 FILTERED DATA (from', Object.keys(data || {}).length, 'to', Object.keys(filteredData).length, 'fields):', filteredData);
+      
+      return filteredData;
+    };
+  }, [safeFormFields]);
+
   useEffect(() => {
     console.log('🎯 EDITING ITEM DATA:', editingItem);
     console.log('🎯 CURRENT FORM DATA:', formData);
     console.log('🎯 FORM FIELDS:', safeFormFields);
+    console.log('🎯 FORM FIELDS COUNT:', safeFormFields.length);
     
     if (editingItem) {
-      const processedData = { ...editingItem };
+      // 🔥 أولاً: فلترة البيانات للحقول المسموح بها فقط
+      const allowedData = filterAllowedFormData(editingItem);
+      
+      // 🔥 ثانياً: معالجة خاصة للحقول
+      const processedData = { ...allowedData };
       
       safeFormFields.forEach(field => {
         if (!field || !field.name) return;
@@ -94,6 +129,7 @@ const FormModal: React.FC<FormModalProps> = ({
         // 🔥 تجاهل كلمة المرور عند التعديل
         if (field.type === 'password' && editingItem.id) {
           processedData[field.name] = '';
+          console.log(`🔐 Cleared password field: ${field.name}`);
           return;
         }
         
@@ -144,16 +180,19 @@ const FormModal: React.FC<FormModalProps> = ({
         }
       });
       
-      console.log('🎯 PROCESSED FORM DATA:', processedData);
+      console.log('🎯 FINAL PROCESSED FORM DATA:', processedData);
+      console.log('🎯 TOTAL FIELDS IN FINAL DATA:', Object.keys(processedData).length);
       setLocalFormData(processedData);
     } else {
+      console.log('🎯 No editing item, setting empty form data');
       setLocalFormData({});
     }
-  }, [editingItem, safeFormFields]);
+  }, [editingItem, safeFormFields, filterAllowedFormData]);
 
   // ✅ تحديث formData الرئيسي
   useEffect(() => {
     if (Object.keys(localFormData).length > 0) {
+      console.log('📤 Sending form data to parent:', localFormData);
       onFormDataChange(localFormData);
     }
   }, [localFormData, onFormDataChange]);
@@ -202,6 +241,18 @@ const FormModal: React.FC<FormModalProps> = ({
   // ✅ دالة محلية لتحديث البيانات
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const handleLocalFormDataChange = (fieldName: string, value: any) => {
+    // 🔥 تأكد أن الحقل مسموح به
+    const isFieldAllowed = safeFormFields.some(
+      field => field && field.name === fieldName
+    );
+    
+    if (!isFieldAllowed) {
+      console.warn(`⚠️ Field "${fieldName}" is not in allowed form fields! Skipping.`);
+      return;
+    }
+    
+    console.log(`🔄 Updating field "${fieldName}":`, value);
+    
     setLocalFormData(prev => {
       const newData = { ...prev, [fieldName]: value };
       onFormDataChange(newData);
@@ -302,8 +353,25 @@ const FormModal: React.FC<FormModalProps> = ({
             }}>
               <div className="min-h-[400px] max-h-[60vh] overflow-y-auto custom-scrollbar pr-2">
                 <div className={`grid gap-6 ${compactLayout ? 'grid-cols-2' : 'grid-cols-1'}`}>
-                  {currentTab?.fields?.map((field) => (
-                    field && (
+                  {currentTab?.fields?.map((field) => {
+                    // 🔥 تأكد من أن الحقل موجود في safeFormFields
+                    if (!field || !field.name) {
+                      console.warn('⚠️ Skipping field - no name');
+                      return null;
+                    }
+                    
+                    const isFieldAllowed = safeFormFields.some(
+                      f => f && f.name === field.name
+                    );
+                    
+                    if (!isFieldAllowed) {
+                      console.warn(`⚠️ Skipping field "${field.name}" - not in allowed fields`);
+                      return null;
+                    }
+                    
+                    console.log(`✅ Rendering allowed field: ${field.name}`);
+                    
+                    return (
                       <FormFieldComponent
                         key={field.name}
                         field={field}
@@ -315,8 +383,8 @@ const FormModal: React.FC<FormModalProps> = ({
                         isEditing={!!editingItem}
                         language={language}
                       />
-                    )
-                  ))}
+                    );
+                  })}
                 </div>
 
                 {(!currentTab?.fields || currentTab.fields.length === 0) && (
