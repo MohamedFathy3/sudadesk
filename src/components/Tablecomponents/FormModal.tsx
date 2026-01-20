@@ -82,6 +82,7 @@ const FormModal: React.FC<FormModalProps> = ({
 
   // ✅ فلترة البيانات للحقول المسموح بها فقط
   const filterAllowedFormData = useMemo(() => {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
     return (data: Record<string, any>) => {
       if (!Array.isArray(safeFormFields) || safeFormFields.length === 0) {
         console.log('🎯 No form fields defined, returning empty data');
@@ -94,7 +95,7 @@ const FormModal: React.FC<FormModalProps> = ({
         .map(field => field.name);
       
       console.log('🎯 ALLOWED FIELDS:', allowedFields);
-      
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const filteredData: Record<string, any> = {};
       
       // فقط أضف الحقول الموجودة في allowedFields

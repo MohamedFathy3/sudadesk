@@ -88,6 +88,7 @@ export default function Sidebar({
     const roleInfo: Record<string, { 
       en: string, 
       ar: string, 
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
       icon: any,
       color: string,
       bgColor: string
