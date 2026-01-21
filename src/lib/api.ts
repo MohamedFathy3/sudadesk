@@ -2,42 +2,42 @@
  * Redirect to authentication page and clear user data
  * @throws {Error} Always throws an error to stop execution
  */
-const redirectToAuth = (): never => {
-  if (typeof window === 'undefined') {
-    throw new Error('Authentication required');
-  }
+// const redirectToAuth = (): never => {
+//   if (typeof window === 'undefined') {
+//     throw new Error('Authentication required');
+//   }
 
 
-  if(window.location.pathname === '/auth') {
-    throw new Error('Authentication required');
-  }
+//   if(window.location.pathname === '/auth') {
+//     throw new Error('Authentication required');
+//   }
 
-  try {
-    // Clear essential storage
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
-    sessionStorage.clear();
+//   try {
+//     // Clear essential storage
+//     localStorage.removeItem('token');
+//     localStorage.removeItem('user');
+//     sessionStorage.clear();
     
-    // Clear cookies
-    document.cookie.split(';').forEach(cookie => {
-      const name = cookie.split('=')[0].trim();
-      document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/;`;
-    });
+//     // Clear cookies
+//     document.cookie.split(';').forEach(cookie => {
+//       const name = cookie.split('=')[0].trim();
+//       document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/;`;
+//     });
 
-    // Redirect with current page
-    const currentPath = window.location.pathname + window.location.search;
-    const authUrl = `/auth?redirect=${encodeURIComponent(currentPath)}`;
+//     // Redirect with current page
+//     const currentPath = window.location.pathname + window.location.search;
+//     const authUrl = `/auth?redirect=${encodeURIComponent(currentPath)}`;
     
-    console.log('🔐 Redirecting to auth page:', authUrl);
-    window.location.href = authUrl;
+//     console.log('🔐 Redirecting to auth page:', authUrl);
+//     window.location.href = authUrl;
     
-    throw new Error('Redirecting to authentication page');
-  } catch (error) {
-    // Fallback redirect
-    window.location.href = '/auth';
-    throw new Error('Authentication required');
-  }
-};
+//     throw new Error('Redirecting to authentication page');
+//   } catch (error) {
+//     // Fallback redirect
+//     window.location.href = '/auth';
+//     throw new Error('Authentication required');
+//   }
+// };
 
 /**
  * Enhanced fetch function with automatic 401 handling
@@ -99,7 +99,7 @@ export async function apiFetch(endpoint: string, options: RequestInit = {}) {
     // Handle 401 Unauthorized
     if (res.status === 401) {
       console.warn('⚠️ Session expired, redirecting to login');
-      redirectToAuth();
+      // redirectToAuth();
     }
 
     // Get response content type
@@ -202,7 +202,7 @@ export async function apiFetchBlob(endpoint: string, options: RequestInit = {}) 
     // Handle 401
     if (res.status === 401) {
       console.warn('⚠️ Session expired for blob request');
-      redirectToAuth();
+      // redirectToAuth();
     }
 
     if (!res.ok) {
