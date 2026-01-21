@@ -17,7 +17,7 @@ const cleanImageUrl = (url: string | null): string => {
     return '/assets/images/default-activity.jpg';
   }
 
-  let cleanedUrl = url.trim();
+  const cleanedUrl = url.trim();
   
   // حالة: URL مزدوج كامل
   if (cleanedUrl.includes('http://suducsback.solunile.com/storage/http://suducsback.solunile.com/storage/')) {
