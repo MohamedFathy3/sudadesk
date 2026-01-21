@@ -12,6 +12,7 @@ const nextConfig: NextConfig = {
    {
         protocol: 'http',
         hostname: 'suducsback.solunile.com',
+        port: '',
         pathname: '/storage/**',
       },
       {

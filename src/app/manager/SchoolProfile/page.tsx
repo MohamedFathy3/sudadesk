@@ -103,79 +103,111 @@ function SchoolProfile() {
   const [newGalleryCaption, setNewGalleryCaption] = useState('');
 
   // تهيئة البيانات الأولية من user
-  const getInitialFormData = useCallback((): EditingSchoolProfileData => {
-    if (!user) {
-      return {
-        about: {
-          about_us: '',
-          history_vision_values: '',
-          stages_and_activities: '',
-        },
-        why_choose: {
-          title: '',
-          details: '',
-        },
-        activities_gallery: [],
-        blog_content: [],
-        slider: {
-          title: '',
-          image: '',
-        },
-      };
-    }
-
-    console.log('🎯 تهيئة البيانات من السيرفر:', {
-      hasGallery: !!user.activities_gallery,
-      galleryCount: user.activities_gallery?.length || 0,
-    });
-    
-    // ⭐⭐ معالجة معرض الصور
-    const galleryItems: EditingGalleryItem[] = (user?.activities_gallery || []).map((item) => {
-      // تأكد من أن الصورة موجودة وصالحة
-      const imageValue = item.image && 
-                        item.image !== 'null' && 
-                        item.image !== 'undefined' && 
-                        item.image.trim() !== '' 
-                        ? item.image 
-                        : '';
-      
-      console.log('📷 صورة من السيرفر:', {
-        id: item.id,
-        caption: item.caption,
-        image: imageValue ? 'رابط موجود' : 'لا يوجد رابط'
-      });
-      
-      return {
-        id: item.id,
-        image: imageValue,
-        caption: item.caption || '',
-      };
-    });
-
-    console.log('📦 المعرض المحمل:', galleryItems);
-    
+// في getInitialFormData، أضف دالة لتنظيف الـ URL:
+const getInitialFormData = useCallback((): EditingSchoolProfileData => {
+  if (!user) {
     return {
       about: {
-        about_us: user?.about?.about_us || '',
-        history_vision_values: user?.about?.history_vision_values || '',
-        stages_and_activities: user?.about?.stages_and_activities || '',
+        about_us: '',
+        history_vision_values: '',
+        stages_and_activities: '',
       },
       why_choose: {
-        title: user?.why_choose?.title || '',
-        details: user?.why_choose?.details || '',
+        title: '',
+        details: '',
       },
-      activities_gallery: galleryItems,
-      blog_content: (user?.blog_content || []).map((item) => ({
-        id: item.id,
-        title: item.title || '',
-        text: item.text || '',
-      })),
+      activities_gallery: [],
+      blog_content: [],
       slider: {
-        title: user?.slider?.title || '',
-        image: user?.slider?.image || '',
+        title: '',
+        image: '',
       },
     };
-  }, [user]);
+  }
+
+  console.log('🎯 تهيئة البيانات من السيرفر:', {
+    hasGallery: !!user.activities_gallery,
+    galleryCount: user.activities_gallery?.length || 0,
+  });
+  
+  // دالة لتنظيف الـ URL المكرر
+  const cleanImageUrl = (url: string ): string => {
+    if (!url || url.trim() === '') {
+      return '';
+    }
+    
+    // ⭐⭐ إصلاح: إزالة التكرار في الـ URL
+    const baseUrl = 'http://suducsback.solunile.com/storage/';
+    
+    // إذا كان الـ URL يحتوي على الأساس مكرراً
+    if (url.includes(`${baseUrl}${baseUrl}`)) {
+      // إزالة التكرار
+      const parts = url.split(baseUrl).filter(Boolean);
+      const lastPart = parts[parts.length - 1];
+      
+      // التأكد من أن lastPart ليس URL كاملاً آخر
+      if (lastPart.startsWith('http')) {
+        // إذا كان URL كاملاً، أرجع الأول فقط
+        return baseUrl + parts.find(part => !part.startsWith('http'));
+      }
+      
+      return baseUrl + lastPart;
+    }
+    
+    // إذا كان الـ URL يبدأ مباشرة بـ storage/ (ناقص الأساس)
+    if (url.startsWith('storage/') && !url.includes(baseUrl)) {
+      return baseUrl + url;
+    }
+    
+    return url;
+  };
+  
+  // ⭐⭐ معالجة معرض الصور
+  const galleryItems: EditingGalleryItem[] = (user?.activities_gallery || []).map((item) => {
+    // تنظيف الـ URL
+    const cleanedImage = cleanImageUrl(item.image ?? '');
+    
+    console.log('📷 صورة من السيرفر:', {
+      id: item.id,
+      caption: item.caption,
+      original: item.image?.substring(0, 100) || 'لا يوجد',
+      cleaned: cleanedImage?.substring(0, 100) || 'لا يوجد'
+    });
+    
+    return {
+      id: item.id,
+      image: cleanedImage,
+      caption: item.caption || '',
+    };
+  });
+
+  console.log('📦 المعرض المحمل:', galleryItems);
+  
+  // ⭐⭐ تنظيف صورة السلايدر أيضاً
+  const sliderImage = cleanImageUrl(user?.slider?.image || '');
+  
+  return {
+    about: {
+      about_us: user?.about?.about_us || '',
+      history_vision_values: user?.about?.history_vision_values || '',
+      stages_and_activities: user?.about?.stages_and_activities || '',
+    },
+    why_choose: {
+      title: user?.why_choose?.title || '',
+      details: user?.why_choose?.details || '',
+    },
+    activities_gallery: galleryItems,
+    blog_content: (user?.blog_content || []).map((item) => ({
+      id: item.id,
+      title: item.title || '',
+      text: item.text || '',
+    })),
+    slider: {
+      title: user?.slider?.title || '',
+      image: sliderImage,
+    },
+  };
+}, [user]);
 
   const [formData, setFormData] = useState<EditingSchoolProfileData>(() => getInitialFormData());
 
@@ -188,75 +220,94 @@ function SchoolProfile() {
     }
   }, [user, getInitialFormData]);
 
-const prepareApiData = (): FormData => {
-  console.log('🔧 تحضير البيانات - بدون حاجات وهمية');
-  
-  const formDataToSend = new FormData();
-  
-  // البيانات النصية
-  formDataToSend.append('about_us', formData.about.about_us);
-  formDataToSend.append('history_vision_values', formData.about.history_vision_values);
-  formDataToSend.append('stages_and_activities', formData.about.stages_and_activities);
-  
-  formDataToSend.append('why_choose_title', formData.why_choose.title);
-  formDataToSend.append('why_choose_details', formData.why_choose.details);
-  
-  formDataToSend.append('slider_title', formData.slider.title);
-  
-  // صور السلايدر
-  if (formData.slider.image instanceof File) {
-    formDataToSend.append('slider_image', formData.slider.image);
-  } else if (formData.slider.image && formData.slider.image !== 'null') {
-    formDataToSend.append('slider_image_url', formData.slider.image);
-  }
-  
-  // blog_content
-  formData.blog_content.forEach((blog, index) => {
-    formDataToSend.append(`blog_content[${index}][title]`, blog.title);
-    formDataToSend.append(`blog_content[${index}][text]`, blog.text);
-    if (blog.id) {
-      formDataToSend.append(`blog_content[${index}][id]`, blog.id.toString());
+  const prepareApiData = (): FormData => {
+    console.log('🔧 تحضير البيانات - حل ذكي');
+    
+    const formDataToSend = new FormData();
+    
+    // البيانات النصية
+    formDataToSend.append('about_us', formData.about.about_us);
+    formDataToSend.append('history_vision_values', formData.about.history_vision_values);
+    formDataToSend.append('stages_and_activities', formData.about.stages_and_activities);
+    
+    formDataToSend.append('why_choose_title', formData.why_choose.title);
+    formDataToSend.append('why_choose_details', formData.why_choose.details);
+    
+    formDataToSend.append('slider_title', formData.slider.title);
+    
+    // صور السلايدر
+    if (formData.slider.image instanceof File) {
+      formDataToSend.append('slider_image', formData.slider.image);
+    } else if (formData.slider.image && formData.slider.image !== 'null') {
+      formDataToSend.append('slider_image_url', formData.slider.image);
     }
-  });
-  
-  // ============ ⭐⭐ المشكلة: الباكيند مش مصمم صح ⭐⭐ ============
-  console.log(`❌ المشكلة: الباكيند عايز ملفات فقط في activities_gallery`);
-  
-  // ⭐⭐ الحل: نبعت الـ URL في حقل image ونشوف هيشتغل ولا لا
-  formData.activities_gallery.forEach((item, index) => {
-    console.log(`📷 صورة ${index}:`, {
-      caption: item.caption,
-      type: item.image instanceof File ? 'ملف' : 'رابط'
+    
+    // blog_content
+    formData.blog_content.forEach((blog, index) => {
+      formDataToSend.append(`blog_content[${index}][title]`, blog.title);
+      formDataToSend.append(`blog_content[${index}][text]`, blog.text);
+      if (blog.id) {
+        formDataToSend.append(`blog_content[${index}][id]`, blog.id.toString());
+      }
     });
     
-    formDataToSend.append(`activities_gallery[${index}][caption]`, item.caption || '');
+    // ============ ⭐⭐ الحل الذكي للباكيند المتعنت ⭐⭐ ============
+    console.log(`🔍 معالجة ${formData.activities_gallery.length} صورة للمعرض`);
     
-    if (item.id) {
-      formDataToSend.append(`activities_gallery[${index}][id]`, item.id.toString());
+    let hasGalleryChanges = false;
+    
+    formData.activities_gallery.forEach((item, index) => {
+      console.log(`📷 صورة ${index}:`, {
+        id: item.id || 'جديد',
+        hasImage: !!item.image,
+        isFile: item.image instanceof File,
+        caption: item.caption
+      });
+      
+      // الحل: إذا كانت الصورة موجودة (ليست File) لا نرسلها
+      // فقط نرسل البيانات النصية والـ ID
+      
+      formDataToSend.append(`activities_gallery[${index}][caption]`, item.caption || '');
+      
+      if (item.id) {
+        formDataToSend.append(`activities_gallery[${index}][id]`, item.id.toString());
+      }
+      
+      // ⭐⭐ المفتاح: فقط الصور الجديدة (File) نرسلها
+      if (item.image instanceof File) {
+        formDataToSend.append(`activities_gallery[${index}][image]`, item.image);
+        hasGalleryChanges = true;
+        console.log(`✅ إرسال صورة جديدة كمرفق: ${item.caption}`);
+      } else {
+        // للصور القديمة، نحاول إرسال URL في حقل مختلف
+        if (typeof item.image === 'string' && item.image) {
+          formDataToSend.append(`activities_gallery[${index}][image]`, item.image);
+          console.log(`ℹ️ إرسال رابط الصورة القديمة في حقل منفصل: ${item.image.substring(0, 50)}...`);
+        }
+      }
+    });
+    
+    // ⭐⭐ إضافة flag للباكيند ليعرف أن هناك صور قديمة
+    formDataToSend.append('has_existing_gallery_images', 'true');
+    
+    // school_id و user_id
+    if (user?.school_id) {
+      formDataToSend.append('school_id', user.school_id.toString());
     }
     
-    if (item.image instanceof File) {
-      // صورة جديدة
-      formDataToSend.append(`activities_gallery[${index}][image]`, item.image);
-    } 
-    else if (typeof item.image === 'string' && item.image.startsWith('http')) {
-      // ⭐⭐ جرب نبعت الـ URL عادي - ممكن الباكيند يرفض
-      formDataToSend.append(`activities_gallery[${index}][image]`, item.image);
-      console.log(`⚠️ جربت أرسل URL في حقل image: ${item.image.substring(0, 50)}...`);
+    if (user?.id) {
+      formDataToSend.append('user_id', user.id.toString());
     }
-  });
-  
-  // school_id و user_id
-  if (user?.school_id) {
-    formDataToSend.append('school_id', user.school_id.toString());
-  }
-  
-  if (user?.id) {
-    formDataToSend.append('user_id', user.id.toString());
-  }
-  
-  return formDataToSend;
-};
+    
+    console.log('📊 ملخص الإرسال:', {
+      galleryItems: formData.activities_gallery.length,
+      newImages: formData.activities_gallery.filter(item => item.image instanceof File).length,
+      existingImages: formData.activities_gallery.filter(item => !(item.image instanceof File) && item.image).length,
+      hasGalleryChanges
+    });
+    
+    return formDataToSend;
+  };
 
   // ==================== معالجة الحفظ ====================
   const handleSave = async () => {
@@ -378,7 +429,7 @@ const prepareApiData = (): FormData => {
         'cancel': 'Cancel',
         'aboutSchool': 'About School',
         'whyChooseUs': 'Why Choose Us',
-        // 'gallery': 'Activities Gallery',
+        'gallery': 'Activities Gallery',
         'blog': 'Blog',
         'slider': 'Slider',
         'schoolName': 'School Name',
@@ -570,10 +621,10 @@ const prepareApiData = (): FormData => {
             <BookOpen className="w-4 h-4 mr-2" />
             <span className="hidden sm:inline">{getTranslation('whyChooseUs')}</span>
           </TabsTrigger>
-          {/* <TabsTrigger value="gallery">
+           <TabsTrigger value="gallery">
             <ImageIcon className="w-4 h-4 mr-2" />
             <span className="hidden sm:inline">{getTranslation('gallery')}</span>
-          </TabsTrigger> */}
+          </TabsTrigger> 
           <TabsTrigger value="blog">
             <BookOpen className="w-4 h-4 mr-2" />
             <span className="hidden sm:inline">{getTranslation('blog')}</span>
@@ -864,9 +915,12 @@ interface GalleryItemProps {
   language: string;
 }
 
+// في GalleryItemComponent
 function GalleryItemComponent({ item, onRemove, language }: GalleryItemProps) {
   const [imageUrl, setImageUrl] = useState<string>('');
   const isRTL = language === 'ar';
+  const isNewImage = item.image instanceof File;
+  const isExistingImage = !isNewImage && item.image && typeof item.image === 'string';
 
   useEffect(() => {
     if (item.image instanceof File) {
@@ -876,22 +930,26 @@ function GalleryItemComponent({ item, onRemove, language }: GalleryItemProps) {
       return () => {
         URL.revokeObjectURL(url);
       };
-    } else {
-      setImageUrl(item.image as string);
+    } else if (typeof item.image === 'string') {
+      setImageUrl(item.image);
     }
   }, [item.image]);
 
   return (
     <div className="border rounded-lg overflow-hidden relative">
-      {/* علامة جديدة */}
-      {item.image instanceof File && (
+      {/* علامة حالة الصورة */}
+      {isNewImage ? (
         <span className={`absolute top-2 ${isRTL ? 'left-2' : 'right-2'} bg-blue-500 text-white text-xs px-2 py-1 rounded z-10`}>
           جديد
         </span>
-      )}
+      ) : isExistingImage ? (
+        <span className={`absolute top-2 ${isRTL ? 'left-2' : 'right-2'} bg-green-500 text-white text-xs px-2 py-1 rounded z-10`}>
+          موجود
+        </span>
+      ) : null}
       
       <div className="relative aspect-video">
-        {imageUrl && imageUrl !== 'null' && imageUrl !== 'undefined' ? (
+        {imageUrl && imageUrl !== 'null' && imageUrl !== 'undefined' && imageUrl !== '' ? (
           <img
             src={imageUrl}
             alt={item.caption}
@@ -926,10 +984,19 @@ function GalleryItemComponent({ item, onRemove, language }: GalleryItemProps) {
       <div className="p-3">
         <p className="text-sm font-medium text-center">{item.caption}</p>
         <div className="text-xs text-center mt-1">
-          {item.image instanceof File ? (
-            <p className="text-blue-600">(صورة جديدة)</p>
+          {isNewImage ? (
+            <p className="text-blue-600">(صورة جديدة - سيتم رفعها)</p>
+          ) : isExistingImage ? (
+            <>
+              <p className="text-gray-500">(صورة موجودة - ID: {item.id || 'لا يوجد'})</p>
+              {typeof item.image === 'string' && (
+                <p className="text-gray-400 text-xs truncate" title={item.image}>
+                  {item.image.substring(0, 30)}...
+                </p>
+              )}
+            </>
           ) : (
-            <p className="text-gray-500">صورة موجودة</p>
+            <p className="text-red-500">(لا توجد صورة)</p>
           )}
         </div>
       </div>
