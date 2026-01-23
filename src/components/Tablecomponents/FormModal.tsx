@@ -82,7 +82,7 @@ const FormModal: React.FC<FormModalProps> = ({
 
   // ✅ فلترة البيانات للحقول المسموح بها فقط
   const filterAllowedFormData = useMemo(() => {
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     return (data: Record<string, any>) => {
       if (!Array.isArray(safeFormFields) || safeFormFields.length === 0) {
         console.log('🎯 No form fields defined, returning empty data');
@@ -95,7 +95,7 @@ const FormModal: React.FC<FormModalProps> = ({
         .map(field => field.name);
       
       console.log('🎯 ALLOWED FIELDS:', allowedFields);
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const filteredData: Record<string, any> = {};
       
       // فقط أضف الحقول الموجودة في allowedFields
@@ -156,15 +156,89 @@ const FormModal: React.FC<FormModalProps> = ({
           processedData.mother_job = editingItem.mother.job;
         }
         
-        // معالجة class-selector
+        // معالجة class-selector للفصول
         if (field.type === 'custom' && field.component === 'class-selector') {
-          if (editingItem.class_ids) {
-            processedData.class_ids = Array.isArray(editingItem.class_ids) 
-              ? editingItem.class_ids 
-              : [editingItem.class_ids];
-          } else if (editingItem.classes) {
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            processedData.class_ids = editingItem.classes.map((cls: any) => cls.id);
+          if (field.name === 'class_ids') {
+            console.log(`🎯 Found class_ids field`);
+            console.log(`🎯 Editing item has classes:`, editingItem.classes);
+            
+            if (editingItem.class_ids) {
+              processedData.class_ids = Array.isArray(editingItem.class_ids) 
+                ? editingItem.class_ids 
+                : [editingItem.class_ids];
+              console.log(`🎯 Set class_ids from editingItem.class_ids:`, processedData.class_ids);
+            } else if (editingItem.classes && Array.isArray(editingItem.classes)) {
+              console.log(`🎯 Processing classes array:`, editingItem.classes);
+              
+              const classIds = editingItem.classes
+                                  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                .filter((cls: any) => cls && (cls.id || cls.value))
+                                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                .map((cls: any) => cls.id || cls.value);
+              
+              processedData.class_ids = classIds;
+              console.log(`🎯 Extracted class IDs:`, processedData.class_ids);
+            }
+          }
+          
+          // 🔥 معالجة الـ courses (المواد الدراسية)
+          if (field.name === 'course_ids') {
+            console.log(`🎯 Found course_ids field`);
+            console.log(`🎯 Editing item has courses:`, editingItem.courses);
+            
+            if (editingItem.course_ids) {
+              // إذا كانت course_ids موجودة مباشرة في البيانات
+              processedData.course_ids = Array.isArray(editingItem.course_ids) 
+                ? editingItem.course_ids 
+                : [editingItem.course_ids];
+              console.log(`🎯 Set course_ids from editingItem.course_ids:`, processedData.course_ids);
+            } else if (editingItem.courses && Array.isArray(editingItem.courses)) {
+              // إذا كانت courses موجودة كمصفوفة من الكائنات
+              console.log(`🎯 Processing courses array:`, editingItem.courses);
+              
+              // استخراج الـ IDs من مصفوفة courses
+              const courseIds = editingItem.courses
+                                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                .filter((course: any) => course && (course.id || course.value))
+                                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                .map((course: any) => course.id || course.value);
+              
+              processedData.course_ids = courseIds;
+              console.log(`🎯 Extracted course IDs:`, processedData.course_ids);
+            } else if (editingItem.courses && typeof editingItem.courses === 'string') {
+              // إذا كانت courses كـ JSON string
+              try {
+                const parsedCourses = JSON.parse(editingItem.courses);
+                if (Array.isArray(parsedCourses)) {
+                  const courseIds = parsedCourses
+                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                    .filter((course: any) => course && (course.id || course.value))
+                                        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                    .map((course: any) => course.id || course.value);
+                  
+                  processedData.course_ids = courseIds;
+                  console.log(`🎯 Parsed course IDs from JSON string:`, processedData.course_ids);
+                }
+              } catch (error) {
+                console.warn(`⚠️ Could not parse courses JSON:`, editingItem.courses);
+              }
+            }
+            
+            // إذا كان الحقل يتوقع value بدلاً من id
+            if (field.optionsKey === "subject" && processedData.course_ids && Array.isArray(processedData.course_ids)) {
+              console.log(`🎯 Field uses optionsKey "subject", ensuring proper format`);
+              
+              // تأكد أن القيم هي أرقام إذا كانت IDs
+                                  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              processedData.course_ids = processedData.course_ids.map((id: any) => {
+                if (typeof id === 'object' && id.id) {
+                  return id.id;
+                }
+                return Number(id) || id;
+              });
+              
+              console.log(`🎯 Final course_ids after processing:`, processedData.course_ids);
+            }
           }
         }
         
@@ -182,7 +256,24 @@ const FormModal: React.FC<FormModalProps> = ({
       });
       
       console.log('🎯 FINAL PROCESSED FORM DATA:', processedData);
+      console.log('🎯 Courses in processed data:', processedData.course_ids);
+      console.log('🎯 Classes in processed data:', processedData.class_ids);
       console.log('🎯 TOTAL FIELDS IN FINAL DATA:', Object.keys(processedData).length);
+      
+      // 🔥 تسجيل تفاصيل الحقول التي تتوقع courses
+      const courseFields = safeFormFields.filter(f => f && f.name === 'course_ids');
+      if (courseFields.length > 0) {
+        console.log('🎯 Form fields that expect courses:', 
+          courseFields.map(f => ({
+            name: f.name,
+            type: f.type,
+            component: f.component,
+            optionsKey: f.optionsKey,
+            label: f.label
+          }))
+        );
+      }
+      
       setLocalFormData(processedData);
     } else {
       console.log('🎯 No editing item, setting empty form data');
@@ -194,6 +285,8 @@ const FormModal: React.FC<FormModalProps> = ({
   useEffect(() => {
     if (Object.keys(localFormData).length > 0) {
       console.log('📤 Sending form data to parent:', localFormData);
+      console.log('📤 Course IDs in sending data:', localFormData.course_ids);
+      console.log('📤 Class IDs in sending data:', localFormData.class_ids);
       onFormDataChange(localFormData);
     }
   }, [localFormData, onFormDataChange]);
@@ -254,8 +347,15 @@ const FormModal: React.FC<FormModalProps> = ({
     
     console.log(`🔄 Updating field "${fieldName}":`, value);
     
+    // 🔥 معالجة خاصة للـ courses والـ classes
+    if (fieldName === 'course_ids' || fieldName === 'class_ids') {
+      console.log(`📊 Processing ${fieldName}:`, value);
+      console.log(`📊 Field info:`, safeFormFields.find(f => f && f.name === fieldName));
+    }
+    
     setLocalFormData(prev => {
       const newData = { ...prev, [fieldName]: value };
+      console.log(`📤 Sending updated data to parent for ${fieldName}:`, newData);
       onFormDataChange(newData);
       return newData;
     });
@@ -297,6 +397,11 @@ const FormModal: React.FC<FormModalProps> = ({
       </div>
     );
   }
+
+  // تسجيل البيانات النهائية قبل الـ render
+  console.log('🎯 Final form data before render:', localFormData);
+  console.log('🎯 Course IDs in final data:', localFormData.course_ids);
+  console.log('🎯 Class IDs in final data:', localFormData.class_ids);
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm ">
@@ -370,7 +475,19 @@ const FormModal: React.FC<FormModalProps> = ({
                       return null;
                     }
                     
-                    console.log(`✅ Rendering allowed field: ${field.name}`);
+                    console.log(`✅ Rendering allowed field: ${field.name}`, field);
+                    console.log(`✅ Current value:`, localFormData[field.name]);
+                    
+                    // 🔥 تسجيل تفاصيل خاصة للـ courses
+                    if (field.name === 'course_ids') {
+                      console.log(`📚 Course field details:`, {
+                        optionsKey: field.optionsKey,
+                        component: field.component,
+                        type: field.type,
+                        label: field.label
+                      });
+                      console.log(`📚 Available options from additionalQueries:`, additionalQueries?.[field.optionsKey || 'subject']);
+                    }
                     
                     return (
                       <FormFieldComponent
