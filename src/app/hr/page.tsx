@@ -422,6 +422,7 @@ function ClassDetailsModal({
 }
 
 export default function ClassesView() {
+  // Initialize with empty array instead of leaving it as undefined
   const [classes, setClasses] = useState<ClassItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [pagination, setPagination] = useState<PaginationMeta | null>(null);
@@ -447,10 +448,14 @@ export default function ClassesView() {
         body: JSON.stringify(filters)
       });
       
-      setClasses(response.data);
-      setPagination(response.meta);
+      // Ensure data is always an array
+      setClasses(response.data || []);
+      setPagination(response.meta || null);
     } catch (error) {
       console.error('Error fetching classes:', error);
+      // Set empty array on error
+      setClasses([]);
+      setPagination(null);
     } finally {
       setLoading(false);
     }
@@ -460,54 +465,21 @@ export default function ClassesView() {
     fetchClasses();
   }, [filters]);
 
-  // Handle search
-  const handleSearch = (searchTerm: string) => {
-    setFilters(prev => ({
-      ...prev,
-      search: searchTerm || undefined,
-      page: 1
-    }));
-  };
+  // ... rest of your functions remain the same ...
 
-  // Handle sort
-  const handleSort = (field: string) => {
-    setFilters(prev => ({
-      ...prev,
-      orderBy: field,
-      orderByDirection: prev.orderBy === field && prev.orderByDirection === 'asc' ? 'desc' : 'asc',
-      page: 1
-    }));
-  };
+  // Calculate statistics WITH PROPER NULL CHECKS
+  const totalStudents = classes?.reduce((sum, classItem) => 
+    sum + (parseInt(classItem?.count || '0') || 0), 0) || 0;
+  
+  const activeClasses = classes?.filter(classItem => classItem?.active)?.length || 0;
 
-  // Handle page change
-  const handlePageChange = (page: number) => {
-    setFilters(prev => ({ ...prev, page }));
-  };
-
-  // Handle per page change
-  const handlePerPageChange = (perPage: number) => {
-    setFilters(prev => ({ 
-      ...prev, 
-      perPage,
-      page: 1
-    }));
-  };
-
-  // Open class details modal
-  const openClassDetails = (classItem: ClassItem) => {
-    setSelectedClass(classItem);
-    setClassModalOpen(true);
-  };
-
-  // Close class details modal
-  const closeClassDetails = () => {
-    setClassModalOpen(false);
-    setSelectedClass(null);
-  };
-
-  // Calculate statistics
-  const totalStudents = classes.reduce((sum, classItem) => sum + parseInt(classItem.count), 0) || 0;
-  const activeClasses = classes.filter(classItem => classItem.active).length;
+  // Calculate unique schools WITH PROPER NULL CHECKS
+  const uniqueSchoolsCount = classes?.reduce((schoolIds, classItem) => {
+    if (classItem?.school_id && !schoolIds.includes(classItem.school_id)) {
+      schoolIds.push(classItem.school_id);
+    }
+    return schoolIds;
+  }, [] as number[])?.length || 0;
 
   // Generate page numbers for pagination
   const getPageNumbers = () => {
@@ -531,6 +503,7 @@ export default function ClassesView() {
     
     return [...new Set(pages)].sort((a, b) => a - b);
   };
+
 
   return (
     <MainLayout>

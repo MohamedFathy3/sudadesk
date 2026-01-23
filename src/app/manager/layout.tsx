@@ -46,7 +46,6 @@ export default function RootLayout({
         />
       )}
 
-      <StrictMode>
         <LanguageProvider>
           <QueryClientProvider client={queryClient}>
             <AuthProvider>
@@ -69,7 +68,6 @@ export default function RootLayout({
             <ReactQueryDevtools initialIsOpen={false} />
           </QueryClientProvider>
         </LanguageProvider>
-      </StrictMode>
     </>
   );
 }
