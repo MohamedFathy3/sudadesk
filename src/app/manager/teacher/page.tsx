@@ -34,6 +34,7 @@ export default function TeachersPage() {
     enterAddress: language === 'ar' ? 'أدخل العنوان' : 'Enter address',
     password: language === 'ar' ? 'كلمة المرور' : 'Password',
     assignedClasses: language === 'ar' ? 'الفصول الموكلة' : 'Assigned Classes',
+    assignedsubgect: language === 'ar' ? ' المواد' : ' material ',
     activeStatus: language === 'ar' ? 'الحالة النشطة' : 'Active Status',
     role: language === 'ar' ? 'الدور' : 'Role',
     enterRole: language === 'ar' ? 'أدخل دور المدرس' : 'Enter teacher role',
@@ -85,7 +86,8 @@ export default function TeachersPage() {
         },
       ]}
       additionalData={[
-        { key: 'classe', endpoint: '/classe' }
+        { key: 'classe', endpoint: '/classe' },
+        { key: 'subject', endpoint: '/course' }
       ]}
       formFields={[
         {
@@ -147,6 +149,14 @@ export default function TeachersPage() {
           component: 'class-selector',
           required: false,
           optionsKey: "classe",
+        },
+        {
+          name: 'course_ids', 
+          label: t.assignedsubgect,
+          type: 'custom',
+          component: 'class-selector',
+          required: false,
+          optionsKey: "subject",
         },
         {
           name: 'active',

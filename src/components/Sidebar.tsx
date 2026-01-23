@@ -175,6 +175,7 @@ export default function Sidebar({
       items: [
         { name: t.dashboard, icon: Home, href: '/admin', roles: ['super_admin'] },
         { name: t.schoolManagement, icon: School, href: '/admin/createSchool', roles: ['super_admin'] },
+        { name: t.systemSettings, icon: School, href: '/admin/setting', roles: ['super_admin'] },
         { name: t.schoolManagement, icon: School, href: '/director', roles: ['director', 'class_supervisor'] },
         { name: t.dashboard, icon: Home, href: '/reception', roles: ['reception'] },
         { name: t.addStudents, icon: UserPlus, href: '/reception/students', roles: ['reception'] },
@@ -232,14 +233,13 @@ export default function Sidebar({
         { name: t.myStudents, icon: Users, href: '/teacher/students', roles: ['teacher'] },
         { name: t.createExam, icon: FileText, href: '/teacher/AddExam', roles: ['teacher'] },
         { name: t.exam, icon: FileText, href: '/teacher/Exam', roles: ['teacher'] },
-        { name: t.attendance, icon: ClipboardCheck, href: '/teacher/attendance', roles: ['teacher'] },
       ]
     },
 
     {
       id: 'settings',
       title: language === 'ar' ? 'الإعدادات' : 'Settings',
-      roles: ['accountant','manager'],
+      roles: ['manager'],
       items: [
         { name: t.profile, icon: Settings, href: '/manager/profile', roles: ['manager'] },
       ]

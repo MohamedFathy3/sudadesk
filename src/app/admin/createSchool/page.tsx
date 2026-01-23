@@ -187,14 +187,14 @@ export default function SchoolsPage() {
           rows: 4
         },
         { 
-          name: 'manager.name', 
+          name: 'manager_name', 
           label: t.managerName, 
           type: 'text', 
           required: true,
           placeholder: t.enterManagerName,
         },
         { 
-          name: 'manager.email', 
+          name: 'manager_email', 
           label: t.managerEmail, 
           type: 'email', 
           required: true,
