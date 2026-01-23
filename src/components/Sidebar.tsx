@@ -242,7 +242,6 @@ export default function Sidebar({
       roles: ['accountant','manager'],
       items: [
         { name: t.profile, icon: Settings, href: '/manager/profile', roles: ['manager'] },
-        { name: t.systemSettings, icon: Settings, href: '/admin/settings', roles: ['super_admin'] },
       ]
     },
   ]
