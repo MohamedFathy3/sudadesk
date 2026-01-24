@@ -215,7 +215,6 @@ const FormModal: React.FC<FormModalProps> = ({
                     .filter((course: any) => course && (course.id || course.value))
                                         // eslint-disable-next-line @typescript-eslint/no-explicit-any
                     .map((course: any) => course.id || course.value);
-                  
                   processedData.course_ids = courseIds;
                   console.log(`🎯 Parsed course IDs from JSON string:`, processedData.course_ids);
                 }
@@ -224,7 +223,6 @@ const FormModal: React.FC<FormModalProps> = ({
               }
             }
             
-            // إذا كان الحقل يتوقع value بدلاً من id
             if (field.optionsKey === "subject" && processedData.course_ids && Array.isArray(processedData.course_ids)) {
               console.log(`🎯 Field uses optionsKey "subject", ensuring proper format`);
               

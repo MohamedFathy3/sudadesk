@@ -86,10 +86,19 @@ export default function TeachersPage() {
         },
       ]}
       additionalData={[
+        { key: 'subjectsLists', endpoint: '/course' },
         { key: 'classe', endpoint: '/classe' },
-        { key: 'subject', endpoint: '/course' }
       ]}
       formFields={[
+
+        {
+          name: 'course_ids', 
+          label: t.assignedsubgect,
+          type: 'custom',
+          component: 'class-subject',
+          required: false,
+          optionsKey: "subjectsLists",
+        },
         {
           name: 'name',
           label: t.teacherName,
@@ -142,22 +151,16 @@ export default function TeachersPage() {
           required: false,
           placeholder: t.enterAddress
         },
+   
         {
           name: 'class_ids', 
           label: t.assignedClasses,
           type: 'custom',
           component: 'class-selector',
           required: false,
-          optionsKey: "classe",
+          optionsKey: "classesList",
         },
-        {
-          name: 'course_ids', 
-          label: t.assignedsubgect,
-          type: 'custom',
-          component: 'class-selector',
-          required: false,
-          optionsKey: "subject",
-        },
+      
         {
           name: 'active',
           label: t.activeStatus,

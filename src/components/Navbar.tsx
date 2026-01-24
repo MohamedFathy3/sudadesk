@@ -45,7 +45,7 @@ export default function Navbar({
 
   return (
     <>
-      <header className="sticky top-0 z-50 border-b bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700">
+      <header className="sticky top-0 z-50 border-b bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 overflow-hidden">
         <div className="flex items-center justify-between h-16 px-4">
           {/* زر القائمة */}
           <div className="flex items-center space-x-2">

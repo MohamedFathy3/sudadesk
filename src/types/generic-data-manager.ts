@@ -143,7 +143,7 @@ export interface FormField {
   accept?: string;
   placeholder?: string;
   rows?: number;
-  component?: 'checkbox-group' | 'time-selector' | 'class-selector'; 
+  component?: 'checkbox-group' | 'time-selector' | 'class-selector' | 'class-subject'; 
 }
 
 export interface MutationResult {
