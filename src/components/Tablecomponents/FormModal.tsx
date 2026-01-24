@@ -180,64 +180,64 @@ const FormModal: React.FC<FormModalProps> = ({
               console.log(`🎯 Extracted class IDs:`, processedData.class_ids);
             }
           }
+        }
+        
+        // 🔥 معالجة خاصة لـ course_ids - التحويل من courses إلى course_ids
+        if (field.name === 'course_ids') {
+          console.log(`🎯 معالجة حقل course_ids - التحويل من courses إلى course_ids`);
+          console.log(`📦 البيانات الأصلية (courses):`, editingItem.courses);
           
-          // 🔥 معالجة الـ courses (المواد الدراسية)
-          if (field.name === 'course_ids') {
-            console.log(`🎯 Found course_ids field`);
-            console.log(`🎯 Editing item has courses:`, editingItem.courses);
+          let courseIdsArray: (number | string)[] = [];
+          
+          // الحالة 1: إذا كان هناك courses كمصفوفة كائنات
+          if (editingItem.courses && Array.isArray(editingItem.courses)) {
+            console.log(`✅ وجدت courses كمصفوفة كائنات`);
             
-            if (editingItem.course_ids) {
-              // إذا كانت course_ids موجودة مباشرة في البيانات
-              processedData.course_ids = Array.isArray(editingItem.course_ids) 
-                ? editingItem.course_ids 
-                : [editingItem.course_ids];
-              console.log(`🎯 Set course_ids from editingItem.course_ids:`, processedData.course_ids);
-            } else if (editingItem.courses && Array.isArray(editingItem.courses)) {
-              // إذا كانت courses موجودة كمصفوفة من الكائنات
-              console.log(`🎯 Processing courses array:`, editingItem.courses);
+            courseIdsArray = editingItem.courses
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              .filter((course: any) => course && (course.id || course.course_id))
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              .map((course: any) => course.id || course.course_id);
               
-              // استخراج الـ IDs من مصفوفة courses
-              const courseIds = editingItem.courses
-                                // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                .filter((course: any) => course && (course.id || course.value))
-                                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                .map((course: any) => course.id || course.value);
-              
-              processedData.course_ids = courseIds;
-              console.log(`🎯 Extracted course IDs:`, processedData.course_ids);
-            } else if (editingItem.courses && typeof editingItem.courses === 'string') {
-              // إذا كانت courses كـ JSON string
+            console.log(`✅ الـ IDs المستخرجة:`, courseIdsArray);
+          }
+          // الحالة 2: إذا كان هناك course_ids مباشرة (نادر)
+          else if (editingItem.course_ids) {
+            console.log(`✅ وجدت course_ids مباشرة`);
+            
+            if (Array.isArray(editingItem.course_ids)) {
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              courseIdsArray = editingItem.course_ids.map((id: any) => Number(id) || id);
+            } else if (typeof editingItem.course_ids === 'string') {
+              // إذا كانت سلسلة نصية، حاول تحليلها
               try {
-                const parsedCourses = JSON.parse(editingItem.courses);
-                if (Array.isArray(parsedCourses)) {
-                  const courseIds = parsedCourses
-                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                    .filter((course: any) => course && (course.id || course.value))
-                                        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                    .map((course: any) => course.id || course.value);
-                  processedData.course_ids = courseIds;
-                  console.log(`🎯 Parsed course IDs from JSON string:`, processedData.course_ids);
+                const parsed = JSON.parse(editingItem.course_ids);
+                if (Array.isArray(parsed)) {
+                  courseIdsArray = parsed.map(id => Number(id) || id);
                 }
-              } catch (error) {
-                console.warn(`⚠️ Could not parse courses JSON:`, editingItem.courses);
+              } catch (e) {
+                console.warn('⚠️ لا يمكن تحليل course_ids كـ JSON:', editingItem.course_ids);
+                courseIdsArray = [editingItem.course_ids];
               }
-            }
-            
-            if (field.optionsKey === "subject" && processedData.course_ids && Array.isArray(processedData.course_ids)) {
-              console.log(`🎯 Field uses optionsKey "subject", ensuring proper format`);
-              
-              // تأكد أن القيم هي أرقام إذا كانت IDs
-                                  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-              processedData.course_ids = processedData.course_ids.map((id: any) => {
-                if (typeof id === 'object' && id.id) {
-                  return id.id;
-                }
-                return Number(id) || id;
-              });
-              
-              console.log(`🎯 Final course_ids after processing:`, processedData.course_ids);
+            } else {
+              // إذا كانت قيمة مفردة
+              courseIdsArray = [Number(editingItem.course_ids) || editingItem.course_ids];
             }
           }
+          
+          // 🔥 الخطوة 3: تأكد أن النتيجة مصفوفة
+          if (!Array.isArray(courseIdsArray)) {
+            console.warn(`⚠️ courseIdsArray ليست مصفوفة! القيمة:`, courseIdsArray);
+            courseIdsArray = [];
+          }
+          
+          // 🔥 الخطوة 4: تخزين النتيجة
+          processedData.course_ids = courseIdsArray;
+          
+          console.log(`✅ النتيجة النهائية لـ course_ids:`, processedData.course_ids);
+          console.log(`✅ نوع البيانات:`, typeof processedData.course_ids);
+          console.log(`✅ هل هي مصفوفة؟`, Array.isArray(processedData.course_ids));
+          console.log(`✅ طول المصفوفة:`, processedData.course_ids.length);
         }
         
         // 🔥 تحسين معالجة الصور

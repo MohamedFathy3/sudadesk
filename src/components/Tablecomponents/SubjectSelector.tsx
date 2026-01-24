@@ -1,3 +1,4 @@
+// SubjectSelector.tsx
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
@@ -24,7 +25,7 @@ interface SubjectSelectorProps {
   placeholder?: string;
   disabled?: boolean;
   compact?: boolean;
-  optionsKey?: string; // إضافة هذا الخيار
+  optionsKey?: string;
 }
 
 export default function SubjectSelector({
@@ -37,7 +38,7 @@ export default function SubjectSelector({
   placeholder = '',
   disabled = false,
   compact = false,
-  optionsKey = 'subjectsLists' // قيمة افتراضية
+  optionsKey = 'subjectsLists'
 }: SubjectSelectorProps) {
   const { language } = useLanguage();
   const { user } = useAuth();
@@ -64,49 +65,69 @@ export default function SubjectSelector({
     noResults: language === 'ar' ? 'لا توجد نتائج' : 'No results found'
   };
 
+  // 🔥 DEBUG: console.log للمعطيات الواردة
+  console.log('🔍 SubjectSelector Props:', {
+    label,
+    value,
+    valueType: typeof value,
+    valueIsArray: Array.isArray(value),
+    valueLength: Array.isArray(value) ? value.length : 'N/A',
+    optionsKey,
+    additionalQueriesKeys: Object.keys(additionalQueries)
+  });
+
   // جلب المواد - أولوية للبيانات من additionalQueries
   useEffect(() => {
     const loadSubjects = async () => {
       try {
         setLoading(true);
         
-        console.log('🔍 SubjectSelector - additionalQueries:', additionalQueries);
-        console.log('🔍 SubjectSelector - optionsKey:', optionsKey);
+        console.log('📥 Trying to load subjects from additionalQueries...');
+        console.log('🔍 Key to look for:', optionsKey);
+        console.log('📦 additionalQueries object:', additionalQueries);
 
         // المحاولة الأولى: استخدام البيانات من additionalQueries
         if (additionalQueries && additionalQueries[optionsKey]) {
-          console.log('📥 Found data in additionalQueries for key:', optionsKey);
+          console.log('✅ Found data in additionalQueries for key:', optionsKey);
           
           const queryData = additionalQueries[optionsKey];
-          console.log('📦 Query data structure:', queryData);
+          console.log('📊 Query data structure:', queryData);
+          console.log('🔍 Query data type:', typeof queryData);
+          
+          // 🔥 فحص عميق لهيكل البيانات
+          if (queryData) {
+            console.log('📋 Query data properties:', Object.keys(queryData));
+            if (queryData.data) {
+              console.log('📋 Query data.data properties:', 
+                typeof queryData.data === 'object' ? Object.keys(queryData.data) : 'Not an object'
+              );
+            }
+          }
           
           // معالجة بنية البيانات المختلفة
-                  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           let subjectsData: any[] = [];
           
-          if (queryData.data) {
-            // الحالة 1: queryData.data هو المصفوفة
-            if (Array.isArray(queryData.data)) {
-              subjectsData = queryData.data;
-            } 
-            // الحالة 2: queryData.data.data هو المصفوفة (بناءً على الرد API السابق)
-            else if (queryData.data.data && Array.isArray(queryData.data.data)) {
-              subjectsData = queryData.data.data;
-            }
-          } 
-          // الحالة 3: queryData نفسه هو الرد API الكامل
+          // الحالة الأكثر شيوعاً: queryData يحتوي على data.data
+          if (queryData.data && queryData.data.data && Array.isArray(queryData.data.data)) {
+            subjectsData = queryData.data.data;
+            console.log('🎯 Found data in queryData.data.data array, count:', subjectsData.length);
+          }
+          // الحالة: queryData.data هو المصفوفة مباشرة
+          else if (Array.isArray(queryData.data)) {
+            subjectsData = queryData.data;
+            console.log('🎯 Found data in queryData.data array, count:', subjectsData.length);
+          }
+          // الحالة: queryData نفسه هو المصفوفة
           else if (Array.isArray(queryData)) {
             subjectsData = queryData;
-          }
-          // الحالة 4: queryData.data هو المصفوفة مباشرة
-          else if (queryData && queryData.data && Array.isArray(queryData.data)) {
-            subjectsData = queryData.data;
+            console.log('🎯 Found data in queryData array, count:', subjectsData.length);
           }
           
           console.log('📚 Extracted subjects data:', subjectsData);
           
           if (subjectsData.length > 0) {
-                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             const formattedSubjects = subjectsData.map((subject: any) => ({
               id: subject.id,
               name: subject.name || subject.subject_name || `Subject ${subject.id}`,
@@ -114,13 +135,18 @@ export default function SubjectSelector({
               description: subject.description || '',
               level: subject.level || subject.grade_level || ''
             }));
-            console.log('🎯 Formatted subjects:', formattedSubjects);
+            console.log('✅ Formatted subjects:', formattedSubjects);
+            console.log('✅ First subject sample:', formattedSubjects[0]);
             setSubjects(formattedSubjects);
             return;
+          } else {
+            console.warn('⚠️ No subjects data found in extracted array');
           }
+        } else {
+          console.log('❌ No data found in additionalQueries for key:', optionsKey);
         }
 
-        // المحاولة الثانية: إذا لم توجد بيانات في additionalQueries، جلب من API مباشر
+        // المحاولة الثانية: إذا لم توجد بيانات، جلب من API مباشر
         console.log('🔄 No data in additionalQueries, fetching directly from API');
         await fetchSubjectsFromAPI();
         
@@ -145,6 +171,8 @@ export default function SubjectSelector({
       };
 
       const queryParams = new URLSearchParams(queryObj);
+      console.log('🌐 Fetching subjects from API:', `/api/course?${queryParams}`);
+      
       const response = await fetch(`/api/course?${queryParams}`);
       
       if (response.ok) {
@@ -158,15 +186,20 @@ export default function SubjectSelector({
         if (data.data) {
           if (Array.isArray(data.data)) {
             subjectsData = data.data;
+            console.log('✅ Using data.data array from API');
           } else if (data.data.data && Array.isArray(data.data.data)) {
             subjectsData = data.data.data;
+            console.log('✅ Using data.data.data array from API');
           }
         } else if (Array.isArray(data)) {
           subjectsData = data;
+          console.log('✅ Using direct array from API');
         }
         
+        console.log('📊 Extracted subjects from API:', subjectsData.length);
+        
         if (subjectsData.length > 0) {
-                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           const formattedSubjects = subjectsData.map((subject: any) => ({
             id: subject.id,
             name: subject.name || subject.subject_name || `Subject ${subject.id}`,
@@ -174,26 +207,72 @@ export default function SubjectSelector({
             description: subject.description || '',
             level: subject.level || subject.grade_level || ''
           }));
+          console.log('✅ Formatted subjects from API (first 3):', formattedSubjects.slice(0, 3));
           setSubjects(formattedSubjects);
+        } else {
+          console.warn('⚠️ No subjects data found in API response');
         }
+      } else {
+        console.error('❌ API response not OK:', response.status);
       }
     } catch (error) {
       console.error('❌ Error fetching from API:', error);
     }
   };
 
+  // 🔥 تحديث المواد المختارة عند تغيير القيمة أو المواد المتاحة
   useEffect(() => {
-    // تحديث المواد المختارة عند تغيير القيمة
-    if (Array.isArray(value) && subjects.length > 0) {
-      console.log('🔄 Updating selected subjects, value:', value, 'subjects:', subjects);
+    console.log('🔄 تحديث المواد المختارة - القيمة الواردة:', {
+      value,
+      valueType: typeof value,
+      isArray: Array.isArray(value),
+      stringValue: String(value)
+    });
+    
+    // 🔥 الحل: معالجة جميع أنواع القيم
+    let processedValue: (number | string)[] = [];
+    
+    if (Array.isArray(value)) {
+      // إذا كانت مصفوفة بالفعل
+      processedValue = value;
+    } else if (value !== undefined && value !== null && value !== '') {
+      // إذا كانت قيمة مفردة
+      if (
+        typeof value === 'string' &&
+        value &&
+        typeof (value as string).trim === 'function' &&
+        (value as string).trim().startsWith('[') &&
+        (value as string).trim().endsWith(']')
+      ) {
+        // إذا كانت JSON string
+        try {
+          processedValue = JSON.parse(value);
+        } catch (e) {
+          console.warn('⚠️ لا يمكن تحليل القيمة كـ JSON:', value);
+          processedValue = [value];
+        }
+      } else {
+        // إذا كانت قيمة عادية
+        processedValue = [value];
+      }
+    }
+    
+    console.log('✅ القيمة المعالجة:', processedValue);
+    console.log('✅ عدد المواد المتاحة:', subjects.length);
+    
+    if (processedValue.length > 0 && subjects.length > 0) {
+      // تحويل جميع IDs إلى strings للمقارنة
+      const valueIds = processedValue.map(v => String(v));
+      console.log('🔢 الـ IDs كـ strings:', valueIds);
+      
       const selected = subjects.filter(subject => 
-        value.some(val => 
-          String(val) === String(subject.id)
-        )
+        valueIds.includes(String(subject.id))
       );
-      console.log('✅ Selected subjects found:', selected);
+      
+      console.log('✅ المواد المختارة التي تم العثور عليها:', selected);
       setSelectedSubjects(selected);
     } else {
+      console.log('ℹ️ لا توجد مواد مختارة أو مواد متاحة');
       setSelectedSubjects([]);
     }
   }, [value, subjects]);
@@ -201,10 +280,14 @@ export default function SubjectSelector({
   const handleSelectSubject = (subject: Subject) => {
     if (disabled) return;
 
+    console.log('🎯 Selecting subject:', subject);
+    
     let newValue: (number | string)[];
     
     if (multiple) {
       const isSelected = selectedSubjects.some(s => s.id === subject.id);
+      console.log('📌 Is currently selected?', isSelected);
+      
       if (isSelected) {
         // إزالة المادة
         const newSelected = selectedSubjects.filter(s => s.id !== subject.id);
@@ -224,6 +307,8 @@ export default function SubjectSelector({
       setIsOpen(false);
     }
     
+    console.log('📤 New value to send:', newValue);
+    
     // Ensure newValue is strictly type string[] or number[]
     if (typeof newValue?.[0] === 'string') {
       onChange(newValue as string[]);
@@ -232,11 +317,10 @@ export default function SubjectSelector({
     } else {
       onChange([]);
     }
-    
-    console.log('🎯 New value after selection:', newValue);
   };
 
   const handleClearAll = () => {
+    console.log('🧹 Clearing all selected subjects');
     setSelectedSubjects([]);
     onChange([]);
   };
@@ -260,6 +344,15 @@ export default function SubjectSelector({
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
+
+  // 🔥 Debug render
+  console.log('🎨 SubjectSelector rendering:', {
+    subjectsCount: subjects.length,
+    selectedSubjectsCount: selectedSubjects.length,
+    selectedSubjects: selectedSubjects.map(s => ({ id: s.id, name: s.name })),
+    isOpen,
+    loading
+  });
 
   return (
     <div className={`space-y-2 ${compact ? 'col-span-1' : 'col-span-1'}`}>
@@ -374,12 +467,14 @@ export default function SubjectSelector({
               ) : filteredSubjects.length === 0 ? (
                 <div className="p-6 text-center text-gray-500 dark:text-gray-400">
                   <BookOpen className="mx-auto mb-2" size={32} />
-                  {t.noResults}
+                  {subjects.length === 0 ? t.noSubjects : t.noResults}
                 </div>
               ) : (
                 <div className="divide-y divide-gray-100 dark:divide-gray-700">
                   {filteredSubjects.map(subject => {
                     const isSelected = selectedSubjects.some(s => s.id === subject.id);
+                    console.log('📌 Subject in list:', { id: subject.id, name: subject.name, isSelected });
+                    
                     return (
                       <div
                         key={subject.id}
